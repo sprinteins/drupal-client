@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  GRAALVM_VERSION: 20.3.0
+  GRAALVM_VERSION: 21.0.0
 
 jobs:
   version:
