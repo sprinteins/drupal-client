@@ -1,4 +1,9 @@
 {
+    "type": [
+        {
+            "target_id": "get_started_element"
+        }
+    ],
     "field_p_getstarted_title": [
         {
             "value": "Legal Terms"
