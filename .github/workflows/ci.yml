@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: '50 6 * * 3'
 
+env:
+  GRAALVM_VERSION: 20.3.0
+
 jobs:
   macos:
     runs-on: macos-latest
@@ -25,9 +28,9 @@ jobs:
         env:
           REVISION: ${{ github.sha }}
         run: |
-          wget -q https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-darwin-amd64-20.3.0.tar.gz
-          tar xzf graalvm-ce-java11-darwin-amd64-20.3.0.tar.gz
-          export JAVA_HOME="$(pwd)/graalvm-ce-java11-20.3.0/Contents/Home/"
+          wget -q https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${{ env.GRAALVM_VERSION }}/graalvm-ce-java11-darwin-amd64-${{ env.GRAALVM_VERSION }}.tar.gz
+          tar xzf graalvm-ce-java11-darwin-amd64-${{ env.GRAALVM_VERSION }}.tar.gz
+          export JAVA_HOME="$(pwd)/graalvm-ce-java11-${{ env.GRAALVM_VERSION }}/Contents/Home/"
           ${JAVA_HOME}/bin/gu install native-image
           brew install upx
           ./mvnw \
@@ -63,9 +66,9 @@ jobs:
         run: |
           wget -q https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
           tar xf upx-3.96-amd64_linux.tar.xz
-          wget -q https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-linux-amd64-20.3.0.tar.gz
-          tar xzf graalvm-ce-java11-linux-amd64-20.3.0.tar.gz
-          export JAVA_HOME="$(pwd)/graalvm-ce-java11-20.3.0"
+          wget -q https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${{ env.GRAALVM_VERSION }}/graalvm-ce-java11-linux-amd64-${{ env.GRAALVM_VERSION }}.tar.gz
+          tar xzf graalvm-ce-java11-linux-amd64-${{ env.GRAALVM_VERSION }}.tar.gz
+          export JAVA_HOME="$(pwd)/graalvm-ce-java11-${{ env.GRAALVM_VERSION }}"
           ${JAVA_HOME}/bin/gu install native-image
           ./mvnw \
             --batch-mode \
@@ -90,7 +93,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - run: choco install graalvm --version=20.3.0 --no-progress
+      - run: choco install graalvm --version=${{ env.GRAALVM_VERSION }} --no-progress
       - run: choco install upx --version=3.96 --no-progress
       - name: Cache Maven packages
         uses: actions/cache@v2.1.3
@@ -101,7 +104,7 @@ jobs:
       - name: Build with Maven
         shell: cmd
         env:
-          JAVA_HOME: C:\Program Files\GraalVM\graalvm-ce-java11-20.3.0
+          JAVA_HOME: C:\Program Files\GraalVM\graalvm-ce-java11-${{ env.GRAALVM_VERSION }}
           REVISION: ${{ github.sha }}
         run: |
           call "%JAVA_HOME%\bin\gu" install native-image
