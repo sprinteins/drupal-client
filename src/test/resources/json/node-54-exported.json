@@ -1,0 +1,254 @@
+{
+    "nid": [
+        {
+            "value": 54
+        }
+    ],
+    "uuid": [
+        {
+            "value": "3ea36e0c-2faf-4e7d-ba65-49a273520333"
+        }
+    ],
+    "vid": [
+        {
+            "value": 3464
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "api_reference",
+            "target_type": "node_type",
+            "target_uuid": "dc740c5b-e2fa-4a57-9ae5-8ab5c6d9e580"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2020-11-20T12:48:51+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_id": 5,
+            "target_type": "user",
+            "target_uuid": "1379afae-c5bb-4953-8e00-5f69bdbfe8f9",
+            "url": "/user/5"
+        }
+    ],
+    "revision_log": [
+        {
+            "value": "Version: 1.2.0"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_id": 5,
+            "target_type": "user",
+            "target_uuid": "1379afae-c5bb-4953-8e00-5f69bdbfe8f9",
+            "url": "/user/5"
+        }
+    ],
+    "title": [
+        {
+            "value": "DHL Location Finder API"
+        }
+    ],
+    "created": [
+        {
+            "value": "2018-12-04T09:39:43+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2020-11-20T12:48:51+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "moderation_state": [
+        {
+            "value": "published"
+        }
+    ],
+    "metatag": {
+        "value": {
+            "canonical_url": "http://dhl.docker.amazee.io/api-reference/location-finder",
+            "title": "DHL Location Finder API | DHL API Developer Portal"
+        }
+    },
+    "path": [
+        {
+            "alias": "/api-reference/location-finder",
+            "pid": 38,
+            "langcode": "en"
+        }
+    ],
+    "field_api_internal_reference": [
+        {
+            "value": "gapi-location-finder"
+        }
+    ],
+    "field_api_status": [
+        {
+            "value": "available"
+        }
+    ],
+    "field_author": [],
+    "field_description": [
+        {
+            "value": "The DHL Location Finder API provides Service Point locations of Deutsche Post DHL Group. This service is also known as pick up and drop off (PUDO).\n   \nDetailed documentation and release notes are available at https://developer.dhl/api-reference/location-finder.",
+            "format": "github_flavored_markdown",
+            "processed": "<p>The DHL Location Finder API provides Service Point locations of Deutsche Post DHL Group. This service is also known as pick up and drop off (PUDO).</p>\n<p>Detailed documentation and release notes are available at <a href=\"https://developer.dhl/api-reference/location-finder\">https://developer.dhl/api-reference/location-finder</a>.</p>",
+            "summary": "The DHL Location Finder API provides Service Point locations of Deutsche Post DHL Group. This service is also known as pick up and drop off (PUDO).\n   \nDetailed documentation and release notes are available at https://developer.dhl/api-reference/location-finder."
+        }
+    ],
+    "field_dhl_division": [
+        {
+            "target_id": 1,
+            "target_type": "taxonomy_term",
+            "target_uuid": "10b68db6-b5b7-46a7-b0b2-7fdbcb17f339",
+            "url": "/taxonomy/term/1"
+        }
+    ],
+    "field_display_title": [
+        {
+            "value": "Location Finder - Unified"
+        }
+    ],
+    "field_featured_api": [
+        {
+            "value": true
+        }
+    ],
+    "field_get_access_api": [
+        {
+            "value": "Location Finder - Unified"
+        }
+    ],
+    "field_get_access_behavior": [],
+    "field_get_access_in_page_nav": [
+        {
+            "value": "User Guide|Get Access"
+        }
+    ],
+    "field_get_access_url": [],
+    "field_get_started_docs_elements": [
+        {
+            "target_id": 193,
+            "target_revision_id": 17334,
+            "target_type": "paragraph",
+            "target_uuid": "9dafad1e-d865-4e28-86ae-efe6f0e40109"
+        },
+        {
+            "target_id": 194,
+            "target_revision_id": 17335,
+            "target_type": "paragraph",
+            "target_uuid": "01d2e7a6-00c4-4109-993b-7ba1534aec27"
+        },
+        {
+            "target_id": 195,
+            "target_revision_id": 17336,
+            "target_type": "paragraph",
+            "target_uuid": "72ed260a-9db1-4e67-ac1c-78f8d5834137"
+        }
+    ],
+    "field_list_description": [
+        {
+            "value": "<p><strong>Best for:</strong></p>\r\n\r\n<ul>\r\n\t<li>Finding all DHL <strong>pick-up</strong> and <strong>drop-off points</strong> to send and receive packages</li>\r\n\t<li>Integrating <strong>multiple</strong> types of <strong>Deutsche Post DHL locations</strong></li>\r\n\t<li>Locations in <strong>Germany</strong> and many countries in <strong>Europe</strong></li>\r\n</ul>\r\n",
+            "format": "basic_html",
+            "processed": "<p><strong>Best for:</strong></p>\n\n<ul>\n\t<li>Finding all DHL <strong>pick-up</strong> and <strong>drop-off points</strong> to send and receive packages</li>\n\t<li>Integrating <strong>multiple</strong> types of <strong>Deutsche Post DHL locations</strong></li>\n\t<li>Locations in <strong>Germany</strong> and many countries in <strong>Europe</strong></li>\n</ul>\n"
+        }
+    ],
+    "field_project_id": [],
+    "field_project_uuid": [],
+    "field_project_version_uuid": [],
+    "field_public_consumer_key": [
+        {
+            "value": "demo-key"
+        }
+    ],
+    "field_public_consumer_secret": [],
+    "field_rbac": [],
+    "field_region": [
+        {
+            "target_id": 2,
+            "target_type": "taxonomy_term",
+            "target_uuid": "0239b0a5-fb5c-4e4d-8346-7efdc5fb6d04",
+            "url": "/taxonomy/term/2"
+        }
+    ],
+    "field_release_note_elements": [
+        {
+            "target_id": 65,
+            "target_revision_id": 17337,
+            "target_type": "paragraph",
+            "target_uuid": "ffba6322-efce-4971-bba8-50e6a0728986"
+        },
+        {
+            "target_id": 482,
+            "target_revision_id": 17338,
+            "target_type": "paragraph",
+            "target_uuid": "a0867f56-bfab-4dc3-bc73-487605efc694"
+        },
+        {
+            "target_id": 426,
+            "target_revision_id": 17339,
+            "target_type": "paragraph",
+            "target_uuid": "273ae685-8b4d-48d6-8cd1-8fbbbe5901dc"
+        }
+    ],
+    "field_service": [
+        {
+            "target_id": 29,
+            "target_type": "taxonomy_term",
+            "target_uuid": "2ae1f9bc-722c-44ec-97de-ed49bbaa8d33",
+            "url": "/taxonomy/term/29"
+        }
+    ],
+    "field_source_file": [
+        {
+            "target_id": 820,
+            "display": true,
+            "description": "",
+            "target_type": "file",
+            "target_uuid": "73212398-b392-4a02-a7de-67394eb729b9",
+            "url": "http://dhl.docker.amazee.io/sites/default/files/2020-05/dpdhl-location-finder-1.2.0-swagger_1.yaml"
+        }
+    ],
+    "field_ubac": [],
+    "field_version": [
+        {
+            "value": "1.2.0"
+        }
+    ]
+}

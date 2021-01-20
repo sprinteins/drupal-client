@@ -1,0 +1,82 @@
+{
+    "id": [
+        {
+            "value": 195
+        }
+    ],
+    "uuid": [
+        {
+            "value": "72ed260a-9db1-4e67-ac1c-78f8d5834137"
+        }
+    ],
+    "revision_id": [
+        {
+            "value": 17336
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "get_started_element",
+            "target_type": "paragraphs_type",
+            "target_uuid": "6322ee84-67c5-417e-8e53-51ee376c4d2f"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2019-04-12T11:15:57+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "parent_id": [
+        {
+            "value": "54"
+        }
+    ],
+    "parent_type": [
+        {
+            "value": "node"
+        }
+    ],
+    "parent_field_name": [
+        {
+            "value": "field_get_started_docs_elements"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_p_getstarted_description": [
+        {
+            "value": "<h5>specifics for the use of Location DATA</h5>\r\n\r\n<ul>\r\n\t<li><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">Data requested and received via the DHL LOCATION FINDER&nbsp;API, such as addresses of DHL Service Point&nbsp;locations, location types, services at location, is hereinafter referred to as “Location Data”.</span></span></span></span></span></span></li>\r\n\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">Such Location Data is provided to You and/or the entity you are authorized to represent (hereinafter “You”/”Your”) via the DHL LOCATION FINDER&nbsp;API&nbsp;under the following prerequisites and/or restrictions:</span></span></span></span></span></span>\r\n\t<ul style=\"list-style-type:circle\">\r\n\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">You shall <b><u>only</u></b> publish, display and/or otherwise use the Location Data in connection with location data of other logistics/transportation services providers (e.g. show DPDHL´s locations together with locations of other transportation and/or logistics services providers on a website – a comparison portal for example – or any other (electronic) channel and/or medium), provided that You </span></span></span></span></span></span>\r\n\t\t<ul style=\"list-style-type:square\">\r\n\t\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">always show and/or display all DPDHL locations, that are available at the according address and that have been provided to You via the DHL LOCATION FINDER&nbsp;API (i.e. without dismissing single locations), and </span></span></span></span></span></span></li>\r\n\t\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">do not specifically select and/or recommend single locations &nbsp;thus contradicting DPDHL´s business interests.</span></span></span></span></span></span></li>\r\n\t\t</ul>\r\n\t\t</li>\r\n\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">You shall <b><u>not</u></b> store and/or modify Location Data in any form; it is especially prohibited to analyze and/or derive data/information for competitive purposes from the Location Data without our prior written consent.</span></span></span></span></span></span></li>\r\n\t</ul>\r\n\t</li>\r\n</ul>\r\n",
+            "format": "basic_html",
+            "processed": "<h5>specifics for the use of Location DATA</h5>\n\n<ul>\n\t<li><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">Data requested and received via the DHL LOCATION FINDER API, such as addresses of DHL Service Point locations, location types, services at location, is hereinafter referred to as “Location Data”.</span></span></span></span></span></span></li>\n\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">Such Location Data is provided to You and/or the entity you are authorized to represent (hereinafter “You”/”Your”) via the DHL LOCATION FINDER API under the following prerequisites and/or restrictions:</span></span></span></span></span></span>\n\t<ul style=\"list-style-type:circle\">\n\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">You shall <b><u>only</u></b> publish, display and/or otherwise use the Location Data in connection with location data of other logistics/transportation services providers (e.g. show DPDHL´s locations together with locations of other transportation and/or logistics services providers on a website – a comparison portal for example – or any other (electronic) channel and/or medium), provided that You </span></span></span></span></span></span>\n\t\t<ul style=\"list-style-type:square\">\n\t\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">always show and/or display all DPDHL locations, that are available at the according address and that have been provided to You via the DHL LOCATION FINDER API (i.e. without dismissing single locations), and </span></span></span></span></span></span></li>\n\t\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">do not specifically select and/or recommend single locations  thus contradicting DPDHL´s business interests.</span></span></span></span></span></span></li>\n\t\t</ul>\n\t\t</li>\n\t\t<li style=\"text-align:justify; margin:0cm 0cm 10pt\"><span style=\"font-size:11pt\"><span style=\"line-height:115%\"><span style=\"font-family:Calibri,sans-serif\"><span lang=\"EN-US\" style=\"font-size:12.0pt\" xml:lang=\"EN-US\"><span style=\"line-height:115%\"><span style=\"font-family:&quot;Frutiger&quot;,&quot;sans-serif&quot;\">You shall <b><u>not</u></b> store and/or modify Location Data in any form; it is especially prohibited to analyze and/or derive data/information for competitive purposes from the Location Data without our prior written consent.</span></span></span></span></span></span></li>\n\t</ul>\n\t</li>\n</ul>\n"
+        }
+    ],
+    "field_p_getstarted_title": [
+        {
+            "value": "Legal Terms"
+        }
+    ]
+}
