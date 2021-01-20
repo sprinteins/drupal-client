@@ -1,5 +1,7 @@
 package com.sprinteins.drupalcli;
 
+import java.util.Locale;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TargetId {
@@ -8,7 +10,7 @@ public enum TargetId {
 
 	@JsonValue
 	public String toLowerCase() {
-		return this.toString().toLowerCase();
+		return this.toString().toLowerCase(Locale.ROOT);
 	}
 
 }
