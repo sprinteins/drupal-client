@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_NULL)
 public class GetStartedParagraphModel {
 
+	private List<TypeModel> type = Collections
+			.singletonList(new TypeModel(TargetId.GET_STARTED_ELEMENT));
 	private List<FieldDescriptionModel> description;
 	private List<FieldTitleModel> title;
 
@@ -34,6 +37,14 @@ public class GetStartedParagraphModel {
 			title.add(new FieldTitleModel());
 		}
 		return title.get(0);
+	}
+
+	public List<TypeModel> getType() {
+		return type;
+	}
+
+	public void setType(List<TypeModel> type) {
+		this.type = type;
 	}
 
 	@JsonProperty("field_p_getstarted_description")
