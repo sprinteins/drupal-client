@@ -14,6 +14,12 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.TitleModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.GetStartedParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
