@@ -1,6 +1,6 @@
 package com.sprinteins.drupalcli;
 
-public class FieldDescriptionModel {
+public class DescriptionModel {
 
 	private String value;
 	private ValueFormat format;

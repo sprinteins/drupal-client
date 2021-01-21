@@ -8,7 +8,7 @@ public class DrupalClientApplication {
 		System.out.println("Hi there!");
 
 		GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
-		FieldDescriptionModel fieldDescription = getStartedParagraph
+		DescriptionModel fieldDescription = getStartedParagraph
 				.getOrCreateFirstDescription();
 		fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
 		fieldDescription.setValue("# Title");
