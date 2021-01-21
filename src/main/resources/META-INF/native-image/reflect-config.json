@@ -8,7 +8,7 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"com.sprinteins.drupalcli.FieldDescriptionModel",
+  "name":"com.sprinteins.drupalcli.DescriptionModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
