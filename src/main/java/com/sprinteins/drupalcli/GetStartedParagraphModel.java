@@ -14,27 +14,27 @@ public class GetStartedParagraphModel {
 
 	private List<TypeModel> type = Collections
 			.singletonList(new TypeModel(TargetId.GET_STARTED_ELEMENT));
-	private List<FieldDescriptionModel> description;
-	private List<FieldTitleModel> title;
+	private List<DescriptionModel> description;
+	private List<TitleModel> title;
 
 	@JsonIgnore
-	public FieldDescriptionModel getOrCreateFirstDescription() {
+	public DescriptionModel getOrCreateFirstDescription() {
 		if (description == null) {
 			description = new ArrayList<>();
 		}
 		if (description.isEmpty()) {
-			description.add(new FieldDescriptionModel());
+			description.add(new DescriptionModel());
 		}
 		return description.get(0);
 	}
 
 	@JsonIgnore
-	public FieldTitleModel getOrCreateFirstTitle() {
+	public TitleModel getOrCreateFirstTitle() {
 		if (title == null) {
 			title = new ArrayList<>();
 		}
 		if (title.isEmpty()) {
-			title.add(new FieldTitleModel());
+			title.add(new TitleModel());
 		}
 		return title.get(0);
 	}
@@ -48,20 +48,20 @@ public class GetStartedParagraphModel {
 	}
 
 	@JsonProperty("field_p_getstarted_description")
-	public List<FieldDescriptionModel> getDescription() {
+	public List<DescriptionModel> getDescription() {
 		return description;
 	}
 
-	public void setDescription(List<FieldDescriptionModel> description) {
+	public void setDescription(List<DescriptionModel> description) {
 		this.description = description;
 	}
 
 	@JsonProperty("field_p_getstarted_title")
-	public List<FieldTitleModel> getTitle() {
+	public List<TitleModel> getTitle() {
 		return title;
 	}
 
-	public void setTitle(List<FieldTitleModel> title) {
+	public void setTitle(List<TitleModel> title) {
 		this.title = title;
 	}
 

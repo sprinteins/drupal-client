@@ -1,6 +1,6 @@
 package com.sprinteins.drupalcli;
 
-public class FieldTitleModel {
+public class TitleModel {
 
 	private String value;
 
