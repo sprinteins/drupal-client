@@ -35,6 +35,7 @@ public class GetStartedParagraphClient {
                 .timeout(Duration.ofMillis(TIMEOUT_MS))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
                 //.header("auth", token)
+                .headers("Content-Type", "application/json")
                 .build();
 
         HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
