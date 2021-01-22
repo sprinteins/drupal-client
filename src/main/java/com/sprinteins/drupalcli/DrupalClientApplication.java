@@ -6,9 +6,10 @@ import java.nio.file.Paths;
 public class DrupalClientApplication {
 	public static void main(String[] args) throws Exception {
 
-		long id = 195;
-		String docPath = "README.md";
+		long id = Long.parseLong(args[0]);
+		String docPath = args[1];
 		String baseUri = "http://dhl.docker.amazee.io/entity/paragraph/";
+		if(args.length>2) {baseUri = args[2];}
 
 		System.out.println("ID: " + id);
 		System.out.println("DOC PATH: " + docPath);
