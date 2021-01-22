@@ -28,4 +28,13 @@ public class GetStartedParagraphClientTest {
             Assertions.fail();
         }
     }
+
+    @Test
+    public void testNotFound() throws Exception {
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            new GetStartedParagraphClient("http://localhost:"+port+"/not-found/")
+                    .patch(195, new GetStartedParagraphModel());
+        });
+    }
 }
