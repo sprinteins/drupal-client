@@ -1,21 +1,30 @@
 package com.sprinteins.drupalcli;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class DrupalClientApplication {
-
 	public static void main(String[] args) throws Exception {
-		System.out.println("Hi there!");
+
+		long id = 195;
+		String docPath = "README.md";
+		String baseUri = "http://dhl.docker.amazee.io/entity/paragraph/";
+
+		System.out.println("ID: " + id);
+		System.out.println("DOC PATH: " + docPath);
+		System.out.println("URI: " + baseUri);
+
+		// read from file
+		String markdown = Files.readString(Paths.get(docPath));
 
 		GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
 		DescriptionModel fieldDescription = getStartedParagraph
 				.getOrCreateFirstDescription();
 		fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
-		fieldDescription.setValue("# Title");
+		fieldDescription.setValue(markdown);
 
-		String output = new ObjectMapper()
-				.writeValueAsString(getStartedParagraph);
-		System.out.println(output);
+		// send request
+		new GetStartedParagraphClient(baseUri).patch(id, getStartedParagraph);
 	}
 
 }
