@@ -2,17 +2,20 @@ package com.sprinteins.drupalcli;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@RunWith(Parameterized.class)
 public class GetStartedParagraphClientTest {
 
     @LocalServerPort
     private int port;
 
     @Test
-    public void test() {
+    public void testPatchSuccess() {
         GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
 
         DescriptionModel fieldDescription = getStartedParagraph
@@ -21,7 +24,7 @@ public class GetStartedParagraphClientTest {
         fieldDescription.setValue("Test Value");
         try {
             new GetStartedParagraphClient("http://localhost:"+port+"/entity/paragraph/")
-                    .patch(195, getStartedParagraph);
+                    .patch(195, getStartedParagraph, "");
         } catch(Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -30,11 +33,11 @@ public class GetStartedParagraphClientTest {
     }
 
     @Test
-    public void testNotFound() throws Exception {
+    public void testPatchNotFound() throws Exception {
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
             new GetStartedParagraphClient("http://localhost:"+port+"/not-found/")
-                    .patch(195, new GetStartedParagraphModel());
+                    .patch(195, new GetStartedParagraphModel(), "");
         });
     }
 }
