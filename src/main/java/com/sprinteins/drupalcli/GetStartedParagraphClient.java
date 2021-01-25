@@ -12,7 +12,6 @@ import java.time.Duration;
 public class GetStartedParagraphClient {
     private static final int TIMEOUT_MS = 30 * 1000;
     private final String baseUri;
-    // private String token = "";
 
     public GetStartedParagraphClient(
             String baseUri
@@ -22,20 +21,19 @@ public class GetStartedParagraphClient {
 
     public void patch(
         long id,
-        GetStartedParagraphModel getStartedParagraph
+        GetStartedParagraphModel getStartedParagraph,
+        String token
     ) throws IOException, InterruptedException {
 
         String patchRequestBody = new ObjectMapper()
                 .writeValueAsString(getStartedParagraph);
-
 
         HttpRequest request = HttpRequest.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(baseUri + id))
                 .timeout(Duration.ofMillis(TIMEOUT_MS))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
-                //.header("auth", token)
-                .headers("Content-Type", "application/json")
+                .headers("Content-Type", "application/json", "Authorization", "Basic "+token)
                 .build();
 
         HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
