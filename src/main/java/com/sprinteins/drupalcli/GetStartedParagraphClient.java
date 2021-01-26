@@ -10,7 +10,9 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 public class GetStartedParagraphClient {
+
     private static final int TIMEOUT_MS = 30 * 1000;
+
     private final String baseUri;
 
     public GetStartedParagraphClient(

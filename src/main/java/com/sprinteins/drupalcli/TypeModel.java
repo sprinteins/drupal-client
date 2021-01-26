@@ -4,22 +4,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TypeModel {
 
-	private TargetId targetId;
+    private TargetId targetId;
 
-	public TypeModel() {
-	}
+    public TypeModel() {
+    }
 
-	public TypeModel(TargetId targetId) {
-		this.targetId = targetId;
-	}
+    public TypeModel(TargetId targetId) {
+        this.targetId = targetId;
+    }
 
-	@JsonProperty("target_id")
-	public TargetId getTargetId() {
-		return targetId;
-	}
+    @JsonProperty("target_id")
+    public TargetId getTargetId() {
+        return targetId;
+    }
 
-	public void setTargetId(TargetId targetId) {
-		this.targetId = targetId;
-	}
+    public void setTargetId(TargetId targetId) {
+        this.targetId = targetId;
+    }
 
 }

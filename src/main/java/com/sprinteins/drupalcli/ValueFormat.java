@@ -1,16 +1,16 @@
 package com.sprinteins.drupalcli;
 
-import java.util.Locale;
-
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.Locale;
 
 public enum ValueFormat {
 
-	GITHUB_FLAVORED_MARKDOWN, BASIC_HTML;
+    GITHUB_FLAVORED_MARKDOWN, BASIC_HTML;
 
-	@JsonValue
-	public String toLowerCase() {
-		return this.toString().toLowerCase(Locale.ROOT);
-	}
+    @JsonValue
+    public String toLowerCase() {
+        return this.toString().toLowerCase(Locale.ROOT);
+    }
 
 }
