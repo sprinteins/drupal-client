@@ -11,5 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/entity/paragraph")
 public class DrupalMockApplication {
     @PatchMapping("/{id}")
-    public void patch(@PathVariable() long id) {}
+    public void patch(@PathVariable() long id) {
+    }
 }
