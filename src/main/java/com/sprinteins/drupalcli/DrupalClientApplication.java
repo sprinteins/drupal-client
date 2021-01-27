@@ -37,8 +37,6 @@ public class DrupalClientApplication {
             Config config = configMapper.readValue(Files.readString(configPath), Config.class);
 
             long nodeId = config.getNode();
-            long id = config.getParagraphs().get(0).getId();
-            Path docPath = workingDir.resolve(config.getParagraphs().get(0).getContent());
             Path swaggerPath = workingDir.resolve(config.getSwagger());
             Path credentialsPath = workingDir.resolve("credentials.txt");
 
@@ -48,8 +46,6 @@ public class DrupalClientApplication {
             }
 
             System.out.println("NODE ID: " + nodeId);
-            System.out.println("PARAGRAPH ID: " + id);
-            System.out.println("DOCUMENT PATH: " + docPath);
             System.out.println("SWAGGER PATH: " + swaggerPath);
             System.out.println("CREDENTIALS FILE PATH: " + credentialsPath);
             System.out.println("BASE URI: " + baseUri);
@@ -62,16 +58,25 @@ public class DrupalClientApplication {
 
             ObjectMapper objectMapper = new ObjectMapper();
 
-            String markdown = Files.readString(docPath);
+            GetStartedParagraphClient getStartedParagraphClient = new GetStartedParagraphClient(objectMapper, baseUri, authenticationHeader);
 
-            GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
-            DescriptionModel fieldDescription = getStartedParagraph
-                    .getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
-            fieldDescription.setValue(markdown);
+            for(Config.ParagraphConfig paragraph : config.getParagraphs()) {
+                long id = paragraph.getId();
+                Path docPath = workingDir.resolve(paragraph.getContent());
 
-            new GetStartedParagraphClient(objectMapper, baseUri, authenticationHeader)
-                    .patch(id, getStartedParagraph);
+                System.out.println("PARAGRAPH ID: " + id);
+                System.out.println("DOCUMENT PATH: " + docPath);
+
+                String markdown = Files.readString(docPath);
+
+                GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
+                DescriptionModel fieldDescription = getStartedParagraph
+                        .getOrCreateFirstDescription();
+                fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
+                fieldDescription.setValue(markdown);
+
+                getStartedParagraphClient.patch(id, getStartedParagraph);
+            }
 
             ApiReferenceFileModel model =
                     new ApiReferenceFileClient(
