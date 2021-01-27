@@ -27,10 +27,10 @@ public class DrupalClientApplication {
                 baseUri = args[3];
             }
 
-            System.out.println("ID: " + id);
-            System.out.println("DOC PATH: " + docPath);
-            System.out.println("CRED FILE PATH: " + credentialsPath);
-            System.out.println("URI: " + baseUri);
+            System.out.println("PARAGRAPH ID: " + id);
+            System.out.println("DOCUMENT PATH: " + docPath);
+            System.out.println("CREDENTIALS FILE PATH: " + credentialsPath);
+            System.out.println("BASE URI: " + baseUri);
 
             String authenticationHeader = "Basic " + Base64.getEncoder().encodeToString(
                     Files.readAllLines(Paths.get(credentialsPath))
