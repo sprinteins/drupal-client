@@ -23,7 +23,7 @@ public class GetStartedParagraphClientTest {
         fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
         fieldDescription.setValue("Test Value");
         try {
-            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/entity/paragraph/", "")
+            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port, "")
                     .patch(195, getStartedParagraph);
         } catch (Exception e) {
             System.err.println(e.getMessage());
