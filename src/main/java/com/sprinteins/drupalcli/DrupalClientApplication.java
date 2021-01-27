@@ -32,6 +32,9 @@ public class DrupalClientApplication {
 
             Path configPath = Paths.get(args[0]);
             Path workingDir = configPath.toAbsolutePath().getParent();
+            if (workingDir == null) {
+                throw new IllegalStateException("Could not resolve working directory");
+            }
 
             ObjectMapper configMapper = new ObjectMapper(new YAMLFactory());
             Config config = configMapper.readValue(Files.readString(configPath), Config.class);
