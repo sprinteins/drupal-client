@@ -1,4 +1,4 @@
-package com.sprinteins.drupalcli;
+package com.sprinteins.drupalcli.getstartedparagraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

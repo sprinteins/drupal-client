@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ApiReferenceFileModel;
+import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
+import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 
