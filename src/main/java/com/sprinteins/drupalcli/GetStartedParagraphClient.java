@@ -42,9 +42,5 @@ public class GetStartedParagraphClient {
         if (httpResponse.statusCode() >= 300) {
             throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode());
         }
-
-        if (httpResponse.statusCode() == 200) {
-            System.out.println("Patch successful!");
-        }
     }
 }
