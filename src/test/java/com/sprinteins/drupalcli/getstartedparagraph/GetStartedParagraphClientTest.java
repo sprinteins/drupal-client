@@ -1,10 +1,8 @@
 package com.sprinteins.drupalcli.getstartedparagraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.DescriptionModel;
-import com.sprinteins.drupalcli.ValueFormat;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.models.DescriptionModel;
+import com.sprinteins.drupalcli.models.ValueFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

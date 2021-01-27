@@ -2,8 +2,8 @@ package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.TargetId;
-import com.sprinteins.drupalcli.TypeModel;
+import com.sprinteins.drupalcli.models.TargetId;
+import com.sprinteins.drupalcli.models.TypeModel;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.DescriptionModel;
-import com.sprinteins.drupalcli.TargetId;
-import com.sprinteins.drupalcli.TitleModel;
-import com.sprinteins.drupalcli.TypeModel;
+import com.sprinteins.drupalcli.models.DescriptionModel;
+import com.sprinteins.drupalcli.models.TargetId;
+import com.sprinteins.drupalcli.models.TitleModel;
+import com.sprinteins.drupalcli.models.TypeModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
