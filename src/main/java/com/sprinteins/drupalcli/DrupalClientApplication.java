@@ -12,25 +12,28 @@ public class DrupalClientApplication {
 
     public static int run(String[] args) {
         try {
-            if (args.length < 3) {
+            if (args.length < 5) {
                 System.out.println("You are missing some arguments!");
                 System.out.println("Please add the following arguments when calling this program:");
-                System.out.println("paragraph-id document-path credentials-doc-path [baseUri/entity/paragraph (default is amazee)]");
+                System.out.println("node-id paragraph-id document-path swagger-path credentials-doc-path [baseUri/entity/paragraph (default is amazee)]");
                 return 0;
             }
 
-            long id = Long.parseLong(args[0]);
-
-            String docPath = args[1];
-            String credentialsPath = args[2];
+            long nodeId = Long.parseLong(args[0]);
+            long id = Long.parseLong(args[1]);
+            String docPath = args[2];
+            String swaggerPath = args[3];
+            String credentialsPath = args[4];
 
             String baseUri = DEFAULT_BASE_URI;
-            if (args.length > 3) {
-                baseUri = args[3];
+            if (args.length > 5) {
+                baseUri = args[6];
             }
 
+            System.out.println("NODE ID: " + nodeId);
             System.out.println("PARAGRAPH ID: " + id);
             System.out.println("DOCUMENT PATH: " + docPath);
+            System.out.println("SWAGGER PATH: " + swaggerPath);
             System.out.println("CREDENTIALS FILE PATH: " + credentialsPath);
             System.out.println("BASE URI: " + baseUri);
 
