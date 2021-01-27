@@ -2,6 +2,7 @@ package com.sprinteins.drupalcli;
 
 import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ApiReferenceFileModel;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
@@ -12,6 +13,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 
@@ -21,22 +23,28 @@ public class DrupalClientApplication {
 
     public static int run(String[] args) {
         try {
-            if (args.length < 5) {
+            if (args.length < 1) {
                 System.out.println("You are missing some arguments!");
                 System.out.println("Please add the following arguments when calling this program:");
-                System.out.println("node-id paragraph-id document-path swagger-path credentials-doc-path [baseUri/entity/paragraph (default is amazee)]");
+                System.out.println("pathToConfigYaml [baseUri]");
                 return 0;
             }
 
-            long nodeId = Long.parseLong(args[0]);
-            long id = Long.parseLong(args[1]);
-            String docPath = args[2];
-            String swaggerPath = args[3];
-            String credentialsPath = args[4];
+            Path configPath = Paths.get(args[0]);
+            Path workingDir = configPath.toAbsolutePath().getParent();
+
+            ObjectMapper configMapper = new ObjectMapper(new YAMLFactory());
+            Config config = configMapper.readValue(Files.readString(configPath), Config.class);
+
+            long nodeId = config.getNode();
+            long id = config.getParagraphs().get(0).getId();
+            Path docPath = workingDir.resolve(config.getParagraphs().get(0).getContent());
+            Path swaggerPath = workingDir.resolve(config.getSwagger());
+            Path credentialsPath = workingDir.resolve("credentials.txt");
 
             String baseUri = DEFAULT_BASE_URI;
-            if (args.length > 5) {
-                baseUri = args[6];
+            if (args.length > 1) {
+                baseUri = args[2];
             }
 
             System.out.println("NODE ID: " + nodeId);
@@ -47,14 +55,14 @@ public class DrupalClientApplication {
             System.out.println("BASE URI: " + baseUri);
 
             String authenticationHeader = "Basic " + Base64.getEncoder().encodeToString(
-                    Files.readAllLines(Paths.get(credentialsPath))
+                    Files.readAllLines(credentialsPath)
                             .get(0)
                             .getBytes(StandardCharsets.UTF_8)
             );
 
             ObjectMapper objectMapper = new ObjectMapper();
 
-            String markdown = Files.readString(Paths.get(docPath));
+            String markdown = Files.readString(docPath);
 
             GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
             DescriptionModel fieldDescription = getStartedParagraph
@@ -70,7 +78,7 @@ public class DrupalClientApplication {
                             objectMapper,
                             baseUri,
                             authenticationHeader)
-                            .upload(Paths.get(swaggerPath));
+                            .upload(swaggerPath);
 
             NodeModel nodeModel = new NodeModel();
             nodeModel.getOrCreateFirstSourceFile().setTargetId(model.getFid().get(0).getValue());
