@@ -13,29 +13,27 @@ public class GetStartedParagraphClient {
 
     private static final int TIMEOUT_MS = 30 * 1000;
 
+    private final ObjectMapper objectMapper;
     private final String baseUri;
+    private final String authenticationHeader;
 
-    public GetStartedParagraphClient(
-            String baseUri
-    ) {
-        this.baseUri = baseUri;
+    public GetStartedParagraphClient(ObjectMapper objectMapper, String baseUri, String authenticationHeader) {
+        this.objectMapper = objectMapper;
+        this.baseUri = baseUri + "/entity/paragraph/";
+        this.authenticationHeader = authenticationHeader;
     }
 
-    public void patch(
-        long id,
-        GetStartedParagraphModel getStartedParagraph,
-        String token
-    ) throws IOException, InterruptedException {
+    public void patch(long id, GetStartedParagraphModel getStartedParagraph) throws IOException, InterruptedException {
 
-        String patchRequestBody = new ObjectMapper()
-                .writeValueAsString(getStartedParagraph);
+        String patchRequestBody = objectMapper.writeValueAsString(getStartedParagraph);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(baseUri + id))
                 .timeout(Duration.ofMillis(TIMEOUT_MS))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
-                .headers("Content-Type", "application/json", "Authorization", "Basic "+token)
+                .header("Content-Type", "application/json")
+                .header("Authorization", authenticationHeader)
                 .build();
 
         HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
