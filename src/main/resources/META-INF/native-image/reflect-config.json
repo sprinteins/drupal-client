@@ -8,37 +8,91 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"com.sprinteins.drupalcli.DescriptionModel",
+  "name":"com.sprinteins.drupalcli.Config",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.TitleModel",
+  "name":"com.sprinteins.drupalcli.Config$ParagraphConfig",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.GetStartedParagraphModel",
+  "name":"com.sprinteins.drupalcli.file.ApiReferenceFileModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.TargetId",
+  "name":"com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.DateValueModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.DescriptionModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.LongValueModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.StringValueModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.TargetId",
   "allDeclaredFields":true,
   "allDeclaredMethods":true
 },
 {
-  "name":"com.sprinteins.drupalcli.TypeModel",
+  "name":"com.sprinteins.drupalcli.models.TitleModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.ValueFormat",
+  "name":"com.sprinteins.drupalcli.models.TypeModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.UriValueModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.ValueFormat",
   "allDeclaredFields":true,
   "allDeclaredMethods":true
+},
+{
+  "name":"com.sprinteins.drupalcli.node.NodeModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.node.SourceFileModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
 }
 ]
