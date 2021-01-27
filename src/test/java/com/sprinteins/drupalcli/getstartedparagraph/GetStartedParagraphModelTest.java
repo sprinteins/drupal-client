@@ -1,10 +1,9 @@
 package com.sprinteins.drupalcli.getstartedparagraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.DescriptionModel;
+import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.TestFiles;
-import com.sprinteins.drupalcli.ValueFormat;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.models.ValueFormat;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 

@@ -6,6 +6,8 @@ import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ApiReferenceFileModel;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.models.DescriptionModel;
+import com.sprinteins.drupalcli.models.ValueFormat;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 

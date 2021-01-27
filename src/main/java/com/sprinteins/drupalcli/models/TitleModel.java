@@ -1,4 +1,4 @@
-package com.sprinteins.drupalcli;
+package com.sprinteins.drupalcli.models;
 
 public class TitleModel {
 
