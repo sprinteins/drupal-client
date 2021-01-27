@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,9 +21,9 @@ public class GetStartedParagraphClientTest {
         fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
         fieldDescription.setValue("Test Value");
         try {
-            new GetStartedParagraphClient("http://localhost:"+port+"/entity/paragraph/")
-                    .patch(195, getStartedParagraph, "");
-        } catch(Exception e) {
+            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/entity/paragraph/", "")
+                    .patch(195, getStartedParagraph);
+        } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
             Assertions.fail();
@@ -32,8 +33,8 @@ public class GetStartedParagraphClientTest {
     @Test
     public void testPatchNotFound() throws Exception {
         Assertions.assertThrows(IllegalStateException.class, () -> {
-            new GetStartedParagraphClient("http://localhost:"+port+"/not-found/")
-                    .patch(195, new GetStartedParagraphModel(), "");
+            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/not-found/", "")
+                    .patch(195, new GetStartedParagraphModel());
         });
     }
 }

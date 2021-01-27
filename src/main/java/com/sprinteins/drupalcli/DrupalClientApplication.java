@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli;
 
 import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -31,11 +32,13 @@ public class DrupalClientApplication {
             System.out.println("CRED FILE PATH: " + credentialsPath);
             System.out.println("URI: " + baseUri);
 
-            String token = Base64.getEncoder().encodeToString(
+            String authenticationHeader = "Basic " + Base64.getEncoder().encodeToString(
                     Files.readAllLines(Paths.get(credentialsPath))
                             .get(0)
                             .getBytes(StandardCharsets.UTF_8)
             );
+
+            ObjectMapper objectMapper = new ObjectMapper();
 
             String markdown = Files.readString(Paths.get(docPath));
 
@@ -45,7 +48,8 @@ public class DrupalClientApplication {
             fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
             fieldDescription.setValue(markdown);
 
-            new GetStartedParagraphClient(baseUri).patch(id, getStartedParagraph, token);
+            new GetStartedParagraphClient(objectMapper, baseUri, authenticationHeader)
+                    .patch(id, getStartedParagraph);
             return 0;
         } catch (RuntimeException e) {
             System.err.println("Couldn't process: " + e);
