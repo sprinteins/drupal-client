@@ -8,6 +8,8 @@ import java.util.Base64;
 
 public class DrupalClientApplication {
 
+    public static String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
+
     public static int run(String[] args) {
         try {
             if (args.length < 3) {
@@ -22,7 +24,7 @@ public class DrupalClientApplication {
             String docPath = args[1];
             String credentialsPath = args[2];
 
-            String baseUri = "http://dhl.docker.amazee.io/entity/paragraph/";
+            String baseUri = DEFAULT_BASE_URI;
             if (args.length > 3) {
                 baseUri = args[3];
             }
