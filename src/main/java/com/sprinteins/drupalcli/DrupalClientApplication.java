@@ -70,6 +70,7 @@ public class DrupalClientApplication {
                 String markdown = Files.readString(docPath);
 
                 GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
+                getStartedParagraph.getOrCreateFirstTitle().setValue(paragraph.getTitle());
                 DescriptionModel fieldDescription = getStartedParagraph
                         .getOrCreateFirstDescription();
                 fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
