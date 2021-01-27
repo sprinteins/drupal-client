@@ -2,6 +2,11 @@ package com.sprinteins.drupalcli;
 
 import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.ApiReferenceFileModel;
+import com.sprinteins.drupalcli.node.NodeClient;
+import com.sprinteins.drupalcli.node.NodeModel;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -55,6 +60,22 @@ public class DrupalClientApplication {
 
             new GetStartedParagraphClient(objectMapper, baseUri, authenticationHeader)
                     .patch(id, getStartedParagraph);
+
+            ApiReferenceFileModel model =
+                    new ApiReferenceFileClient(
+                            objectMapper,
+                            baseUri,
+                            authenticationHeader)
+                            .upload(Paths.get(swaggerPath));
+
+            NodeModel nodeModel = new NodeModel();
+            nodeModel.getOrCreateFirstSourceFile().setTargetId(model.getFid().get(0).getValue());
+            new NodeClient(
+                    objectMapper,
+                    baseUri,
+                    authenticationHeader)
+                    .patch(nodeId, nodeModel);
+
             return 0;
         } catch (RuntimeException e) {
             System.err.println("Couldn't process: " + e);
