@@ -33,10 +33,8 @@ public class GetStartedParagraphClientTest {
     }
 
     @Test
-    public void testPatchNotFound() throws Exception {
-        Assertions.assertThrows(IllegalStateException.class, () -> {
-            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/not-found/", "")
-                    .patch(195, new GetStartedParagraphModel());
-        });
+    public void testPatchNotFound()  {
+        Assertions.assertThrows(IllegalStateException.class, () -> new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/not-found/", "")
+                .patch(195, new GetStartedParagraphModel()));
     }
 }
