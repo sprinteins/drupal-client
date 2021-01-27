@@ -19,7 +19,7 @@ import java.util.Base64;
 
 public class DrupalClientApplication {
 
-    public static String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
+    public static final String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
 
     public static int run(String[] args) {
         try {
