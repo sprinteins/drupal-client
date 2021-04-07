@@ -43,7 +43,7 @@ jobs:
           "./target/drupal-cli-macos-${REVISION}"
           mkdir target/artifacts
           cp target/drupal-cli-* target/artifacts
-      - uses: actions/upload-artifact@v2.2.2
+      - uses: actions/upload-artifact@v2.2.3
         with:
           name: drupal-cli-${{ github.job }}-${{ github.sha }}
           path: target/artifacts
@@ -80,7 +80,7 @@ jobs:
           "./target/drupal-cli-linux-${REVISION}"
           mkdir target/artifacts
           cp target/drupal-cli-* target/artifacts
-      - uses: actions/upload-artifact@v2.2.2
+      - uses: actions/upload-artifact@v2.2.3
         with:
           name: drupal-cli-${{ github.job }}-${{ github.sha }}
           path: target/artifacts
@@ -115,7 +115,7 @@ jobs:
           .\target\drupal-cli-windows-%REVISION%.exe
           mkdir target\artifacts
           copy target\drupal-cli-* target\artifacts
-      - uses: actions/upload-artifact@v2.2.2
+      - uses: actions/upload-artifact@v2.2.3
         with:
           name: drupal-cli-${{ github.job }}-${{ github.sha }}
           path: target/artifacts
