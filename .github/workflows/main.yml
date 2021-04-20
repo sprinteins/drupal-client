@@ -48,7 +48,7 @@ jobs:
     - name: Bump version and push tag
       id: tag
       if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      uses: mathieudutour/github-tag-action@v5.4
+      uses: mathieudutour/github-tag-action@v5.5
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         release_branches: master,main
