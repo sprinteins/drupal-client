@@ -72,7 +72,7 @@ jobs:
         graalvm: ${{ env.GRAALVM_VERSION }}
         java: 'java11'
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -113,7 +113,7 @@ jobs:
         graalvm: ${{ env.GRAALVM_VERSION }}
         java: 'java11'
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -158,7 +158,7 @@ jobs:
         java: 'java11'
     - run: choco install upx --version=3.96 --no-progress
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: .m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -249,7 +249,7 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
