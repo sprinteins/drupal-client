@@ -94,7 +94,7 @@ jobs:
         "./target/${{ env.ARTIFACT }}-macos-${REVISION}"
         mkdir target/artifacts
         cp target/${{ env.ARTIFACT }}-* target/artifacts
-    - uses: actions/upload-artifact@v2.2.3
+    - uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
@@ -136,7 +136,7 @@ jobs:
         "./target/${{ env.ARTIFACT }}-linux-${REVISION}"
         mkdir target/artifacts
         cp target/${{ env.ARTIFACT }}-* target/artifacts
-    - uses: actions/upload-artifact@v2.2.3
+    - uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
@@ -176,7 +176,7 @@ jobs:
         .\target\${{ env.ARTIFACT }}-windows-%REVISION%.exe
         mkdir target\artifacts
         copy target\${{ env.ARTIFACT }}-* target\artifacts
-    - uses: actions/upload-artifact@v2.2.3
+    - uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
