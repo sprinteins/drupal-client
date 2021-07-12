@@ -8,6 +8,7 @@ import com.sprinteins.drupalcli.models.TypeModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class NodeModel {
 
@@ -27,20 +28,20 @@ public class NodeModel {
     }
 
     public List<TypeModel> getType() {
-        return type;
+        return Optional.ofNullable(type).map(List::copyOf).orElse(null);
     }
 
     public void setType(List<TypeModel> type) {
-        this.type = type;
+        this.type = Optional.ofNullable(type).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("field_source_file")
     public List<SourceFileModel> getSourceFile() {
-        return sourceFile;
+        return Optional.ofNullable(sourceFile).map(List::copyOf).orElse(null);
     }
 
     public void setSourceFile(List<SourceFileModel> sourceFile) {
-        this.sourceFile = sourceFile;
+        this.sourceFile = Optional.ofNullable(sourceFile).map(List::copyOf).orElse(null);
     }
 
 }

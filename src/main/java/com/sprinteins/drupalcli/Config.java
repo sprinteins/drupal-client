@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Config {
 
@@ -25,11 +26,11 @@ public class Config {
     }
 
     public List<ParagraphConfig> getParagraphs() {
-        return paragraphs;
+        return Optional.ofNullable(paragraphs).map(List::copyOf).orElse(null);
     }
 
     public void setParagraphs(List<ParagraphConfig> paragraphs) {
-        this.paragraphs = paragraphs;
+        this.paragraphs = Optional.ofNullable(paragraphs).map(List::copyOf).orElse(null);
     }
 
     public static class ParagraphConfig {

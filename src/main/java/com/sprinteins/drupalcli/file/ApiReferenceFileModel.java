@@ -6,6 +6,7 @@ import com.sprinteins.drupalcli.models.StringValueModel;
 import com.sprinteins.drupalcli.models.UriValueModel;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ApiReferenceFileModel {
 
@@ -22,91 +23,91 @@ public class ApiReferenceFileModel {
     private List<DateValueModel> changed;
 
     public List<LongValueModel> getFid() {
-        return fid;
+        return Optional.ofNullable(fid).map(List::copyOf).orElse(null);
     }
 
     public void setFid(List<LongValueModel> fid) {
-        this.fid = fid;
+        this.fid = Optional.ofNullable(fid).map(List::copyOf).orElse(null);
     }
 
     public List<StringValueModel> getUuid() {
-        return uuid;
+        return Optional.ofNullable(uuid).map(List::copyOf).orElse(null);
     }
 
     public void setUuid(List<StringValueModel> uuid) {
-        this.uuid = uuid;
+        this.uuid = Optional.ofNullable(uuid).map(List::copyOf).orElse(null);
     }
 
     public List<StringValueModel> getLangcode() {
-        return langcode;
+        return Optional.ofNullable(langcode).map(List::copyOf).orElse(null);
     }
 
     public void setLangcode(List<StringValueModel> langcode) {
-        this.langcode = langcode;
+        this.langcode = Optional.ofNullable(langcode).map(List::copyOf).orElse(null);
     }
 
     public List<Object> getUid() {
-        return uid;
+        return Optional.ofNullable(uid).map(List::copyOf).orElse(null);
     }
 
     public void setUid(List<Object> uid) {
-        this.uid = uid;
+        this.uid = Optional.ofNullable(uid).map(List::copyOf).orElse(null);
     }
 
     public List<StringValueModel> getFilename() {
-        return filename;
+        return Optional.ofNullable(filename).map(List::copyOf).orElse(null);
     }
 
     public void setFilename(List<StringValueModel> filename) {
-        this.filename = filename;
+        this.filename = Optional.ofNullable(filename).map(List::copyOf).orElse(null);
     }
 
     public List<UriValueModel> getUri() {
-        return uri;
+        return Optional.ofNullable(uri).map(List::copyOf).orElse(null);
     }
 
     public void setUri(List<UriValueModel> uri) {
-        this.uri = uri;
+        this.uri = Optional.ofNullable(uri).map(List::copyOf).orElse(null);
     }
 
     public List<StringValueModel> getFilemime() {
-        return filemime;
+        return Optional.ofNullable(filemime).map(List::copyOf).orElse(null);
     }
 
     public void setFilemime(List<StringValueModel> filemime) {
-        this.filemime = filemime;
+        this.filemime = Optional.ofNullable(filemime).map(List::copyOf).orElse(null);
     }
 
     public List<LongValueModel> getFilesize() {
-        return filesize;
+        return Optional.ofNullable(filesize).map(List::copyOf).orElse(null);
     }
 
     public void setFilesize(List<LongValueModel> filesize) {
-        this.filesize = filesize;
+        this.filesize = Optional.ofNullable(filesize).map(List::copyOf).orElse(null);
     }
 
     public List<StringValueModel> getStatus() {
-        return status;
+        return Optional.ofNullable(status).map(List::copyOf).orElse(null);
     }
 
     public void setStatus(List<StringValueModel> status) {
-        this.status = status;
+        this.status = Optional.ofNullable(status).map(List::copyOf).orElse(null);
     }
 
     public List<DateValueModel> getCreated() {
-        return created;
+        return Optional.ofNullable(created).map(List::copyOf).orElse(null);
     }
 
     public void setCreated(List<DateValueModel> created) {
-        this.created = created;
+        this.created = Optional.ofNullable(created).map(List::copyOf).orElse(null);
     }
 
     public List<DateValueModel> getChanged() {
-        return changed;
+        return Optional.ofNullable(changed).map(List::copyOf).orElse(null);
     }
 
     public void setChanged(List<DateValueModel> changed) {
-        this.changed = changed;
+        this.changed = Optional.ofNullable(changed).map(List::copyOf).orElse(null);
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.sprinteins.drupalcli.models.TypeModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @JsonInclude(Include.NON_NULL)
 public class GetStartedParagraphModel {
@@ -44,29 +45,29 @@ public class GetStartedParagraphModel {
     }
 
     public List<TypeModel> getType() {
-        return type;
+        return Optional.ofNullable(type).map(List::copyOf).orElse(null);
     }
 
     public void setType(List<TypeModel> type) {
-        this.type = type;
+        this.type = Optional.ofNullable(type).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("field_p_getstarted_description")
     public List<DescriptionModel> getDescription() {
-        return description;
+        return Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
     public void setDescription(List<DescriptionModel> description) {
-        this.description = description;
+        this.description = Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("field_p_getstarted_title")
     public List<TitleModel> getTitle() {
-        return title;
+        return Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 
     public void setTitle(List<TitleModel> title) {
-        this.title = title;
+        this.title = Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 
 }
