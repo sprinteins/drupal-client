@@ -9,6 +9,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class NodeClient {
 
     private static final int TIMEOUT_MS = 30 * 1000;
@@ -17,6 +19,7 @@ public class NodeClient {
     private final String baseUri;
     private final String authenticationHeader;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public NodeClient(ObjectMapper objectMapper, String baseUri, String authenticationHeader) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/node/";
