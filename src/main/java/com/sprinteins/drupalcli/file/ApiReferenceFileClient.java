@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,8 +10,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class ApiReferenceFileClient {
 

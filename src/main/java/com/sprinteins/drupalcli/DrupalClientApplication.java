@@ -1,6 +1,5 @@
 package com.sprinteins.drupalcli;
 
-import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -12,6 +11,7 @@ import com.sprinteins.drupalcli.models.ValueFormat;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
