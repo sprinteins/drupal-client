@@ -89,6 +89,15 @@
                         </executions>
                         <configuration>
                             <imageName>${project.artifactId}-${platform}-${project.version}</imageName>
+                            <mainClass>com.sprinteins.drupalcli.DrupalClientApplication</mainClass>
+                            <buildArgs>
+                                --no-fallback
+                                --report-unsupported-elements-at-runtime
+                                --allow-incomplete-classpath
+                                --initialize-at-build-time=sun.instrument.InstrumentationImpl
+                                -H:+ReportExceptionStackTraces
+                                -H:EnableURLProtocols=https
+                            </buildArgs>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -139,11 +148,6 @@
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
-            <version>4.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli-codegen</artifactId>
             <version>4.6.1</version>
         </dependency>
     </dependencies>
@@ -265,6 +269,21 @@
                             <mainClass>${mainClass}</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <!-- annotationProcessorPaths requires maven-compiler-plugin version 3.5 or higher -->
+                <version>3.8.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>info.picocli</groupId>
+                            <artifactId>picocli-codegen</artifactId>
+                            <version>4.6.1</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
