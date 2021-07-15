@@ -20,7 +20,7 @@ public class DrupalClientApplicationTest {
 
     @Test
     public void testMissingEnv() throws Exception {
-        String[] args = {"update"};
+        String[] args = {"update", "--api-page=3", "--api-page-directory=api-page"};
         int status = new CommandLine(new DrupalClientApplication()).execute(args);
         Assertions.assertEquals(1, status);
     }

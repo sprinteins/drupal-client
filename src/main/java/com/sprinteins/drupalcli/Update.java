@@ -29,10 +29,10 @@ class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
 
 
-    @Option(names = { "--api-page" , "-a"}, description = "API page ID")
+    @Option(names = { "--api-page" , "-a"}, description = "API page ID", required = true)
     Long nodeId;
 
-    @Option(names = { "--api-page-directory" , "-d"}, description = "Local path to the API page documentation")
+    @Option(names = { "--api-page-directory" , "-d"}, description = "Local path to the API page documentation", required = true)
     String directory;
 
     @Option(names = { "--portal-environment" , "-p"}, description = "Portal environment to update")
