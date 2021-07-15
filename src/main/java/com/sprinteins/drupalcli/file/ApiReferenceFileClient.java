@@ -30,12 +30,12 @@ public class ApiReferenceFileClient {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .version(HttpClient.Version.HTTP_1_1)
-                    .uri(URI.create(baseUri))
+                    .uri(URI.create(baseUri + "?_format=json"))
                     .timeout(Duration.ofMillis(TIMEOUT_MS))
                     .POST(HttpRequest.BodyPublishers.ofFile(path))
                     .header("Content-Type", "application/octet-stream")
                     .header("Content-Disposition", "file; filename=\"" + path.getFileName() + "\"")
-                    .header("Authorization", authenticationHeader)
+                    .header("api-key", authenticationHeader)
                     .build();
 
             HttpResponse<String> httpResponse = HttpClient.newBuilder().build()

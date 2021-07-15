@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.getstartedparagraph;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.TestFiles;
 import com.sprinteins.drupalcli.models.DescriptionModel;
@@ -33,7 +34,10 @@ public class GetStartedParagraphModelTest {
         String expected = TestFiles
                 .readAllBytesToString("json/" + path + ".json");
 
-        String actual = new ObjectMapper().writerWithDefaultPrettyPrinter()
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        String actual = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(value);
 
         JSONAssert.assertEquals(expected, actual, true);

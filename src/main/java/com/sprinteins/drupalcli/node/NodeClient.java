@@ -32,11 +32,11 @@ public class NodeClient {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .version(HttpClient.Version.HTTP_1_1)
-                    .uri(URI.create(baseUri + id))
+                    .uri(URI.create(baseUri + id + "?_format=json"))
                     .timeout(Duration.ofMillis(TIMEOUT_MS))
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", authenticationHeader)
+                    .header("api-key", authenticationHeader)
                     .build();
 
             HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
@@ -47,6 +47,32 @@ public class NodeClient {
             }
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Patch failed", e);
+        }
+    }
+
+    public NodeModel get(long id) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1)
+                    .GET()
+                    .uri(URI.create(baseUri + id + "?_format=json"))
+                    .timeout(Duration.ofMillis(TIMEOUT_MS))
+                    .header("Content-Type", "application/json")
+                    .header("api-key", authenticationHeader)
+                    .build();
+
+            HttpResponse<String> httpResponse = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.ALWAYS)
+                    .build()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (httpResponse.statusCode() >= 300) {
+                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
+            }
+
+            return objectMapper.readValue(httpResponse.body(), NodeModel.class);
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException("Get Node failed", e);
         }
     }
 

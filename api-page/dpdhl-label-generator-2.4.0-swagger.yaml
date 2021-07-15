@@ -1,0 +1,1029 @@
+openapi: 3.0.0
+
+info:
+  version: 2.4.0
+  title: 'DHL Label Generator API'
+  description: >-
+    The DHL Label Generator API produces labels for a given DHL shipping product
+    in PDF or ZPL format.
+
+servers:
+  - url: https://api-sandbox.dhl.com/label-generator/v2
+
+security:
+  - OAuth2: []
+
+paths:
+
+  /labels/parcel-international:
+    post:
+      summary: Parcel International Label
+      operationId: generateParcelInternationalLabel
+      x-jvm-package: label
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelInternationalRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /labels/parcel-connect:
+    post:
+      summary: Parcel Connect Label
+      operationId: generateParcelConnectLabel
+      x-jvm-package: label
+      requestBody:
+        description: 'Request body for a Parcel Connect label'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelConnectRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /labels/parcel-connect-plus:
+    post:
+      summary: Parcel Connect Plus Label
+      operationId: generateParcelConnectPlusLabel
+      x-jvm-package: label
+      requestBody:
+        description: 'Request body for a Parcel Connect Plus label'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelConnectRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /labels/parcel-connect-undeliverable:
+    post:
+      summary: Parcel Connect Undeliverable Label
+      operationId: generateParcelConnectUndeliverableLabel
+      x-jvm-package: label
+      requestBody:
+        description: 'Request body for a Parcel Connect Undeliverable label'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelConnectUndeliverableRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /labels/parcel-return-connect:
+    post:
+      summary: Parcel Return Connect Label
+      operationId: generateParcelReturnConnectLabel
+      x-jvm-package: label
+      requestBody:
+        description: 'Request body for a Parcel Return Connect label'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelConnectRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /labels/housebill:
+    post:
+      summary: Housebill Label
+      operationId: generateHousebill
+      x-jvm-package: label
+      requestBody:
+        description: A JSON object containing data to request a housebill label
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HousebillRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /customs-forms/cn23:
+    post:
+      summary: CN23 Customs Form
+      operationId: generateCustomsForm
+      x-jvm-package: customsform
+      requestBody:
+        description: 'A JSON object containing data to request CN23 customs form'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CN23Request'
+      responses:
+        "200":
+          $ref: '#/components/responses/LabelSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+  /qr-code:
+    post:
+      summary: QR Code
+      operationId: generateQRCode
+      x-jvm-package: qr-code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QrCodeRequest'
+        required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/QRCodeSuccess200'
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthorized401'
+        '429':
+          $ref: '#/components/responses/TooManyRequests429'
+        '500':
+          $ref: '#/components/responses/InternalServerError500'
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: This API uses OAuth 2 with the client-credentials grant flow
+      flows:
+        clientCredentials:
+          tokenUrl: https://api-sandbox.dhl.com/auth/v1/token?response_type=access_token&grant_type=client_credentials
+          scopes: {}
+
+  schemas:
+
+    #######################
+    # Parcel International
+    #######################
+    ParcelInternationalRequest:
+      type: object
+      properties:
+        shipment:
+          type: object
+          properties:
+            id:
+              type: string
+            origin:
+              $ref: '#/components/schemas/PostalAddress'
+            sourceOrigin:
+              $ref: '#/components/schemas/PostalAddress'
+            destination:
+              $ref: '#/components/schemas/PostalAddress'
+            shipmentDetails:
+              type: object
+              properties:
+                sender:
+                  $ref: '#/components/schemas/Person'
+                sourceSender:
+                  $ref: '#/components/schemas/Person'
+                receiver:
+                  $ref: '#/components/schemas/Person'
+                billingNumber:
+                  type: string
+                routingCode:
+                  type: string
+                totalNumberOfPieces:
+                  type: integer
+                weight:
+                  $ref: '#/components/schemas/QuantitativeValue'
+                bulkyGoods:
+                  type: boolean
+                references:
+                  type: object
+                  properties:
+                    customerReference:
+                      type: string
+            serviceFeatures:
+              type: object
+              properties:
+                signatureRequired:
+                  type: boolean
+                scanRequired:
+                  type: boolean
+                undeliverableInstructions:
+                  type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: "#/components/schemas/LabelMimeType"
+            labelSize:
+              $ref: "#/components/schemas/LabelSize"
+            resolution:
+              $ref: "#/components/schemas/Resolution"
+            pageSize:
+              type: string
+              enum: ['10x15', '10x20','a4-landscape', 'a4-portrait', 'same-as-label']
+            testWatermark:
+              type: boolean
+      example:
+        shipment:
+          id: 'JJD0001234567'
+          origin:
+            addressCountry: 'DE'
+            streetAddress: 'Heinrich-Bruening. Str. 5'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          sourceOrigin:
+            addressCountry: 'DE'
+            streetAddress: 'Thomas Mueller Str. 25'
+            postalCode: '82362'
+            addressLocality: 'Weilheim'
+          destination:
+            addressCountry: 'DE'
+            streetAddress: 'Charles-de-Gaulle-Str. 20'
+            additionalAddressLine: 'N/A'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          shipmentDetails:
+            sender:
+              additionalIdentifiers:
+                - 'Michaela'
+                - 'Mueller'
+            sourceSender:
+              additionalIdentifiers:
+                - 'Herbert'
+                - 'Mueller'
+                - 'Senior'
+            receiver:
+              additionalIdentifiers:
+                - 'Klaus'
+                - 'Dieter'
+                - 'Meyer'
+            billingNumber: '123456F'
+            routingCode: '21348075016401'
+            totalNumberOfPieces: 1
+            weight:
+              value: 5
+              unitText: 'Kg'
+            bulkyGoods: true
+            references:
+              customerReference: '123456789'
+          serviceFeatures:
+            undeliverableInstructions: 'Return to sender after 10 days, with the most economical shipping / Zurück an den Absender, nach 10 Tagen auf dem preiswertesten Weg.'
+            signatureRequired: true
+            scanRequired: true
+        metaData:
+          mimeType: 'pdf'
+          labelSize: '10x21'
+          pageSize: 'same-as-label'
+
+
+    #######################
+    # Parcel Connect
+    #######################
+    ParcelConnectRequest:
+      type: object
+      properties:
+        shipment:
+          $ref: '#/components/schemas/ParcelConnectShipment'
+        manualSortingInstructions:
+          $ref: '#/components/schemas/ManualSortingInstructions'
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: "#/components/schemas/LabelMimeType"
+            labelSize:
+              $ref: "#/components/schemas/LabelSize"
+            resolution:
+              $ref: "#/components/schemas/Resolution"
+            pageSize:
+              $ref: "#/components/schemas/PageSize"
+            testWatermark:
+              type: boolean
+      example:
+        shipment:
+          id: 'JJD0001234567'
+          origin:
+            addressCountry: 'DE'
+            streetAddress: 'Heinrich-Bruening. Str. 5'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          destination:
+            addressCountry: 'DE'
+            streetAddress: 'Charles-de-Gaulle-Str. 20'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          shipmentDetails:
+            sender:
+              additionalIdentifiers:
+                - 'Michaela'
+                - 'Mueller'
+            receiver:
+              additionalIdentifiers:
+                - 'Klaus'
+                - 'Dieter'
+                - 'Meyer'
+              telephone: '+49 561 2345678'
+            billingNumber: '123456F'
+            shipmentNumber: '456987456'
+            masterReferenceNumber: '123565487'
+            routingCode: '21348075016401'
+            totalNumberOfPieces: 1
+            pieceNumber: 1
+            weight:
+              value: 5
+              unitText: 'Kg'
+            bulkyGoods: true
+            references:
+              customerReference: '158749AFOWI'
+          serviceFeatures:
+            cashOnDelivery:
+              monetaryAmount:
+                value: 1000
+                currency: 'EUR'
+        manualSortingInstructions:
+          manualSortingInstructionsSegment1: 'LG'
+          manualSortingInstructionsSegment2: '411GA'
+          manualSortingInstructionsSegment1Highlighted: false
+        metaData:
+          mimeType: 'pdf'
+          labelSize: '10x15'
+          pageSize: 'a4-landscape'
+
+    ParcelConnectUndeliverableRequest:
+      type: object
+      properties:
+        shipment:
+          $ref: '#/components/schemas/ParcelConnectShipment'
+        manualSortingInstructions:
+          $ref: '#/components/schemas/ManualSortingInstructions'
+        undeliverableOf:
+          type: string
+        undeliverableReason:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: "#/components/schemas/LabelMimeType"
+            labelSize:
+              $ref: "#/components/schemas/LabelSize"
+            resolution:
+              $ref: "#/components/schemas/Resolution"
+            pageSize:
+              $ref: "#/components/schemas/PageSize"
+            testWatermark:
+              type: boolean
+      example:
+        shipment:
+          id: 'JJD0001234567'
+          origin:
+            addressCountry: 'DE'
+            streetAddress: 'Heinrich-Bruening. Str. 5'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          destination:
+            addressCountry: 'DE'
+            streetAddress: 'Charles-de-Gaulle-Str. 20'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+          shipmentDetails:
+            sender:
+              additionalIdentifiers:
+                - 'Michaela'
+                - 'Mueller'
+            receiver:
+              additionalIdentifiers:
+                - 'Klaus'
+                - 'Dieter'
+                - 'Meyer'
+              telephone: '+49 561 2345678'
+            billingNumber: '123456F'
+            shipmentNumber: '456987456'
+            masterReferenceNumber: '123565487'
+            routingCode: '21348075016401'
+            totalNumberOfPieces: 1
+            pieceNumber: 1
+            weight:
+              value: 5
+              unitText: 'Kg'
+            references:
+              customerReference: '158749AFOWI'
+          serviceFeatures:
+            cashOnDelivery:
+              value: 1000
+              currency: 'EUR'
+        undeliverableOf: 'A person'
+        undeliverableReason: 'Not found'
+        metaData:
+          mimeType: 'pdf'
+          labelSize: '10x15'
+          pageSize: 'a4-landscape'
+
+    #######################
+    # CN23
+    #######################
+    CN23Request:
+      type: object
+      properties:
+        shipment:
+          type: object
+          properties:
+            id:
+              type: string
+            origin:
+              $ref: '#/components/schemas/PostalAddress'
+            destination:
+              $ref: '#/components/schemas/PostalAddress'
+            shipmentDetails:
+              type: object
+              properties:
+                sender:
+                  $ref: '#/components/schemas/Person'
+                senderCustomsInformation:
+                  $ref: '#/components/schemas/CustomsInformation'
+                receiver:
+                  $ref: '#/components/schemas/Person'
+                receiverCustomsInformation:
+                  $ref: '#/components/schemas/CustomsInformation'
+                weight:
+                  $ref: '#/components/schemas/QuantitativeValue'
+                itemsMonetaryValue:
+                  $ref: '#/components/schemas/MonetaryAmount'
+                shippingFee:
+                  $ref: '#/components/schemas/MonetaryAmount'
+                shipmentInjectionPoint:
+                  $ref: '#/components/schemas/PostalAddress'
+                shipmentInjectionDate:
+                  type: string
+            shipmentCustomsDetails:
+              type: object
+              properties:
+                itemsCategory:
+                  type: string
+                  description: >-
+                    Refers to the type of shipment, for example, gifts, documents,
+                    commercial goods, etc.
+                license:
+                  type: string
+                certificate:
+                  type: string
+                invoice:
+                  type: string
+            shipmentContents:
+              type: array
+              items:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  quantity:
+                    $ref: '#/components/schemas/QuantitativeValue'
+                  weight:
+                    $ref: '#/components/schemas/QuantitativeValue'
+                  monetaryValue:
+                    $ref: '#/components/schemas/MonetaryAmount'
+                  hsTariffNumber:
+                    type: string
+                    description: >-
+                      The HS (Harmonised System or in German Harmonisierte System) is a
+                      description and coding system aimed at providing a worldwide
+                      uniform classification of goods. (www.zoll.de)
+                  origin:
+                    $ref: '#/components/schemas/PostalAddress'
+            serviceFeatures:
+              type: object
+              properties:
+                cashOnDelivery:
+                  type: object
+                  properties:
+                    monetaryAmount:
+                      $ref: '#/components/schemas/MonetaryAmount'
+                    bankInformation:
+                      type: object
+                      properties:
+                        bankAccountHolder:
+                          type: string
+                        bankName:
+                          type: string
+                        iban:
+                          type: string
+                        bic:
+                          type: string
+                serviceClass:
+                  type: string
+                undeliverableInstructions:
+                  type: string
+        comments:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: "#/components/schemas/LabelMimeType"
+            testWatermark:
+              type: boolean
+      example:
+        shipment:
+          id: '123456789012'
+          origin:
+            addressCountry: 'Deutschland'
+            streetAddress: 'Marie-Calm-Str. 1-5'
+            postalCode: '34131'
+            addressLocality: 'Kassel'
+            addressRegion: 'Hassen'
+          destination:
+            addressCountry: 'Deutschland'
+            streetAddress: 'Sträßchensweg 10'
+            additionalAddressLine: 'N/A'
+            postalCode: '53113'
+            addressLocality: 'Bonn'
+            addressRegion: 'Nordrhein-Westfalen'
+          shipmentDetails:
+            sender:
+              additionalIdentifiers:
+                - 'Micromata GmbH'
+                - 'Tester'
+              telephone: '+49 561 1234567'
+              email: 'testsend@deutschepost.de'
+            senderCustomsInformation:
+              eoriNumber: 'FR73282932000083'
+              referenceNumber: 'AB12345678X3'
+            receiver:
+              additionalIdentifiers:
+                - 'DHL Paket GmbH'
+              telephone: '+49 561 2345678'
+              email: 'testrecv@deutschepost.de'
+            receiverCustomsInformation:
+              eoriNumber: 'FR73282932000091'
+              referenceNumber: 'DE23456789Y2'
+            weight:
+              value: 35
+              unitText: 'Kg'
+            itemsMonetaryValue:
+              value: 32
+              currency: 'EUR'
+            shippingFee:
+              value: 7
+              currency: 'EUR'
+            shipmentInjectionPoint:
+              addressLocality: 'Kassel'
+              addressCountry: 'Deutschland'
+            shipmentInjectionDate: '10.05.2020'
+          shipmentCustomsDetails:
+            itemsCategory: 'Sales'
+            license: '123abc'
+            certificate: 'abc123'
+            invoice: '456898713215'
+          shipmentContents:
+            - description: 'Schweizer Schokolade'
+              quantity:
+                value: 5
+                unitText: 'units'
+              weight:
+                value: 1
+                unitText: 'Kg'
+              monetaryValue:
+                value: 7
+                currency: 'EUR'
+              hsTariffNumber: '123456'
+              origin:
+                addressCountry: 'Deutschland'
+            - description: 'Orangenmarmelade'
+              quantity:
+                value: 7
+                unitText: 'units'
+              weight:
+                value: 3
+                unitText: 'Kg'
+              monetaryValue:
+                value: 10
+                currency: 'EUR'
+              hsTariffNumber: '987456'
+              origin:
+                addressCountry: 'DE'
+          serviceFeatures:
+            cashOnDelivery:
+              monetaryAmount:
+                value: 100
+                currency: 'EUR'
+                valueInLetters: 'One thousand'
+              bankInformation:
+                bankAccountHolder: 'John Doe'
+                bankName: 'Commerzbank Bonn'
+                iban: 'DE12500105170648489890'
+                bic: 'COLSDE33XXX'
+            serviceClass: 'PREMIUM'
+            undeliverableInstructions: 'Return to sender'
+        comments: 'These are nice articles'
+        metaData:
+          mimeType: 'pdf'
+
+
+    #######################
+    # Housebill
+    #######################
+
+    HousebillRequest:
+      type: object
+      properties:
+        serviceCode:
+          type: string
+          example: 'AA0'
+        shipment:
+          type: object
+          properties:
+            housebillNumber:
+              type: string
+              x-nullable: false
+            origin:
+              type: string
+              minLength: 3
+              maxLength: 5
+            destination:
+              type: string
+              minLength: 3
+              maxLength: 5
+            shipmentDetails:
+              type: object
+              properties:
+                totalNumberOfPieces:
+                  type: integer
+                weight:
+                  $ref: '#/components/schemas/HousebillWeight'
+                shipmentCreationDate:
+                  type: string
+                  pattern: '^\d{2}[a-zA-Z]{3}\d{2}$'
+        additionalInformation:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: "#/components/schemas/LabelMimeType"
+            pageSize:
+              $ref: "#/components/schemas/PageSize"
+            resolution:
+              $ref: "#/components/schemas/Resolution"
+            testWatermark:
+              type: boolean
+      example:
+        serviceCode: "AA0"
+        shipment:
+          housebillNumber: "8FE7018"
+          origin: "LEJ"
+          destination: "HKG"
+          shipmentDetails:
+            totalNumberOfPieces: 1
+            weight:
+              value: 50.0
+              unitCode: "KGM"
+            shipmentCreationDate: "01JAN21"
+        additionalInformation: "This is a test label"
+        metaData:
+          mimeType: "pdf"
+          pageSize: "same-as-label"
+
+    ####################
+    # QR Code
+    ####################
+
+    QrCodeRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: '#/components/schemas/QrCodeMimeType'
+            sizePixels:
+              type: integer
+      example:
+        content: 'Tracking number: 123ABC456DEF'
+        metaData:
+          mimeType: 'png'
+          sizePixels: 250
+
+    QrCodeResponse:
+      type: object
+      properties:
+        document:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: '#/components/schemas/QrCodeMimeType'
+            sizePixels:
+              type: integer
+      example:
+        document: 'base64-encoded string'
+        metaData:
+          mimeType: 'png'
+          sizePixels: 250
+
+    ####################
+    # Document Response
+    ####################
+
+    DocumentResponse:
+      type: object
+      properties:
+        shipment:
+          type: object
+          properties:
+            id:
+              type: string
+              x-nullable: false
+            housebillNumber:
+              type: string
+              x-nullable: false
+        document:
+          type: string
+        metaData:
+          type: object
+          properties:
+            mimeType:
+              $ref: '#/components/schemas/LabelMimeType'
+            resolution:
+              $ref: "#/components/schemas/Resolution"
+            testWatermark:
+              type: boolean
+
+    ####################
+    # Other Components
+    ####################
+
+    ParcelConnectShipment:
+      type: object
+      properties:
+        id:
+          type: string
+        origin:
+          $ref: '#/components/schemas/PostalAddress'
+        destination:
+          $ref: '#/components/schemas/PostalAddress'
+        shipmentDetails:
+          type: object
+          properties:
+            sender:
+              $ref: '#/components/schemas/Person'
+            receiver:
+              $ref: '#/components/schemas/Person'
+            billingNumber:
+              type: string
+            shipmentNumber:
+              type: string
+            masterReferenceNumber:
+              type: string
+            routingCode:
+              type: string
+            totalNumberOfPieces:
+              type: integer
+            pieceNumber:
+              type: integer
+            weight:
+              $ref: '#/components/schemas/QuantitativeValue'
+            bulkyGoods:
+              type: boolean
+            references:
+              type: object
+              properties:
+                customerReference:
+                  type: string
+        serviceFeatures:
+          type: object
+          properties:
+            cashOnDelivery:
+              type: object
+              properties:
+                monetaryAmount:
+                  $ref: '#/components/schemas/MonetaryAmount'
+
+    CustomsInformation:
+      type: object
+      properties:
+        eoriNumber:
+          type: string
+          description: >-
+            The EORI number (Economic Operators' Registration and Identification
+            number) is an operator identification number that is valid
+            throughout the European Union and replaces the German customs
+            number. (www.zoll.de/)
+        referenceNumber:
+          type: string
+
+    MonetaryAmount:
+      type: object
+      properties:
+        value:
+          type: number
+        currency:
+          type: string
+        valueInLetters:
+          type: string
+
+    ManualSortingInstructions:
+      type: object
+      properties:
+        manualSortingInstructionsSegment1:
+          type: string
+        manualSortingInstructionsSegment2:
+          type: string
+        manualSortingInstructionsSegment1Highlighted:
+          type: boolean
+
+    PostalAddress:
+      type: object
+      properties:
+        addressCountry:
+          type: string
+        streetAddress:
+          type: string
+        additionalAddressLine:
+          type: string
+        postalCode:
+          type: string
+        addressLocality:
+          type: string
+        addressRegion:
+          type: string
+
+    Person:
+      type: object
+      properties:
+        additionalIdentifiers:
+          type: array
+          items:
+            type: string
+        telephone:
+          type: string
+        email:
+          type: string
+
+    QuantitativeValue:
+      type: object
+      properties:
+        value:
+          type: number
+        unitText:
+          type: string
+
+    HousebillWeight:
+      type: object
+      properties:
+        value:
+          type: number
+        unitCode:
+          type: string
+          enum: [KGM, LBS]
+
+    LabelMimeType:
+      type: string
+      enum: [pdf, zpl]
+
+    LabelSize:
+      type: string
+      enum: ['10x15', '10x21']
+
+    PageSize:
+      type: string
+      enum: [ 'a4-landscape', 'a4-portrait', 'same-as-label' ]
+
+    Resolution:
+      type: object
+      required:
+        - value
+        - unitText
+      properties:
+        value:
+          type: number
+          minimum: 150
+          maximum: 300
+          default: 203
+        unitText:
+          type: string
+          enum: [DPI]
+          default: 'DPI'
+      description: >-
+        Resolution of the document. Only used for ZPL.
+        Currently only dpi is accepted as unit code.
+        If left blank, the default of 203 dpi is used (8DPMM)
+
+    QrCodeMimeType:
+      type: string
+      enum: [png]
+
+    ProblemDetailModel:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+        detail:
+          type: string
+
+  responses:
+
+    LabelSuccess200:
+      description: 'Created: Label has been generated'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DocumentResponse'
+
+    QRCodeSuccess200:
+      description: 'Created: QR code has been generated'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QrCodeResponse'
+
+    BadRequest400:
+      description: 'Bad Request 400'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailModel'
+
+    Unauthorized401:
+      description: Unauthorized. Provided key or token is invalid for requested resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailModel'
+
+    TooManyRequests429:
+      description: Too many requests in a short time.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailModel'
+
+    InternalServerError500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailModel'

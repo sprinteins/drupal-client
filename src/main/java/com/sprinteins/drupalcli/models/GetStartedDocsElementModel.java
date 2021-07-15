@@ -2,25 +2,27 @@ package com.sprinteins.drupalcli.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TypeModel {
+public class GetStartedDocsElementModel {
 
-    private TargetId targetId;
+    private Long targetId;
+    private Long targetRevisionId;
     private TargetType targetType;
     private String targetUuid;
 
-    public TypeModel() {
-    }
-
-    public TypeModel(TargetId targetId) {
-        this.targetId = targetId;
-    }
-
     @JsonProperty("target_id")
-    public TargetId getTargetId() {
+    public Long getTargetId() {
         return targetId;
     }
-    public void setTargetId(TargetId targetId) {
+    public void setTargetId(Long targetId) {
         this.targetId = targetId;
+    }
+
+    @JsonProperty("target_revision_id")
+    public Long getTargetRevisionId() {
+        return targetRevisionId;
+    }
+    public void setTargetRevisionId(Long targetRevisionId) {
+        this.targetRevisionId = targetRevisionId;
     }
 
     @JsonProperty("target_type")
