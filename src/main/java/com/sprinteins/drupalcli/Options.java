@@ -2,6 +2,8 @@ package com.sprinteins.drupalcli;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class Options {
 
@@ -11,9 +13,9 @@ public class Options {
     public static final String DISABLE_CHECKS_OPTIONS_KEY = "explicitly-disable-checks";
 
     private Long nodeID;
-    String apiDirectory;
-    String portalEnv;
-    ArrayList<String> disabledChecks;
+    private String apiDirectory;
+    private String portalEnv;
+    private List<String> disabledChecks;
 
     public Long getNodeID() { return nodeID; }
     public void setNodeID(Long nodeID) { this.nodeID = nodeID; }
@@ -24,8 +26,8 @@ public class Options {
     public String getPortalEnv() { return portalEnv; }
     public void setPortalEnv(String portalEnv) { this.portalEnv = portalEnv; }
 
-    public ArrayList<String> getDisabledChecks() { return disabledChecks; }
-    public void setDisabledChecks(ArrayList<String> disabledChecks) { this.disabledChecks = disabledChecks; }
+    public List<String> getDisabledChecks() { return Optional.ofNullable(disabledChecks).map(List::copyOf).orElse(null); }
+    public void setDisabledChecks(List<String> disabledChecks) { this.disabledChecks = Optional.ofNullable(disabledChecks).map(List::copyOf).orElse(null); }
 
     public Options(String[] args){
         for(String argument:args){
@@ -43,9 +45,15 @@ public class Options {
                 case DISABLE_CHECKS_OPTIONS_KEY:
                     String[] checks = parts[1].split(",");
                     if(checks.length != 0){
-                        setDisabledChecks(new ArrayList<String>());
+                        List<String> disabledChecks = new ArrayList<String>();
+                        if (this.disabledChecks != null) {
+                            disabledChecks.addAll(this.disabledChecks);
+                        }
                         Collections.addAll(disabledChecks, checks);
+                        setDisabledChecks(disabledChecks);
                     }
+                    break;
+                default:
                     break;
             }
         }
