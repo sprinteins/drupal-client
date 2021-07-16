@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 
 public class OpenAPI {
 
-    private String OpenAPISpecFileName;
+    private String openAPISpecFileName;
     private String directory;
 
-    public String getOpenAPISpecFileName() { return OpenAPISpecFileName; }
-    public void setOpenAPISpecFileName(String openAPISpecFile) { OpenAPISpecFileName = openAPISpecFile; }
+    public String getOpenAPISpecFileName() { return openAPISpecFileName; }
+    public void setOpenAPISpecFileName(String openAPISpecFile) { openAPISpecFileName = openAPISpecFile; }
 
     public String getDirectory() { return directory; }
     public void setDirectory(String directory) { this.directory = directory; }

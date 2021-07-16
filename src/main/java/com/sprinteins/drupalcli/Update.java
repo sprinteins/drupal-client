@@ -64,9 +64,9 @@ class Update implements Callable<Integer> {
         OpenAPI apiSpec = new OpenAPI(directory);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
 
-        String content = Files.readString(mainFilePath);
-        FrontMatterReader frontMatter = new FrontMatterReader();
-        Map<String, List<String>> data = frontMatter.readFromFile(content);
+        //String content = Files.readString(mainFilePath);
+        //FrontMatterReader frontMatter = new FrontMatterReader();
+        //Map<String, List<String>> data = frontMatter.readFromFile(content);
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
@@ -90,7 +90,7 @@ class Update implements Callable<Integer> {
                     apiKey)
                     .get(getStartedDocsElement.getTargetId());
 
-            Path docPath = workingDir.resolve(getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase().replace(" ", "-") + ".markdown");
+            Path docPath = workingDir.resolve(getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ENGLISH).replace(" ", "-") + ".markdown");
             String markdown = Files.readString(docPath);
 
             DescriptionModel fieldDescription = getStartedParagraph
