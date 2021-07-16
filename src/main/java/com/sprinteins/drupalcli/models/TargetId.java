@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public enum TargetId {
 
-    GET_STARTED_ELEMENT, API_REFERENCE;
+    GET_STARTED_ELEMENT, API_REFERENCE, IMAGE;
 
     @JsonValue
     public String toLowerCase() {

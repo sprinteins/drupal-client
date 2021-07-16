@@ -7,6 +7,7 @@ public class TypeModel {
     private TargetId targetId;
     private TargetType targetType;
     private String targetUuid;
+    private String href;
 
     public TypeModel() {
     }
@@ -14,6 +15,10 @@ public class TypeModel {
     public TypeModel(TargetId targetId) {
         this.targetId = targetId;
     }
+
+    @JsonProperty("href")
+    public String getHrefhref() { return href; }
+    public void setHref(String href) { this.href = href; }
 
     @JsonProperty("target_id")
     public TargetId getTargetId() {

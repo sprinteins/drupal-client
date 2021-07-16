@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "type": {
+      "href": "http://dhl.docker.amazee.io/rest/type/file/image"
+    }
+  },
+  "uri": [
+    {
+      "value": "public://api-docs/test-file.png"
+    }
+  ],
+  "filename": {
+    "value": "test-file.png"
+  },
+  "filemime": {
+    "value": "image/png"
+  },
+  "type": {
+    "target_id": "image"
+  },
+  "data": [
+    {
+      "value": "DATA_HERE"
+    }
+  ]
+}
