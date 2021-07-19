@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli;
 
+import com.sprinteins.drupalcli.commands.Update;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
