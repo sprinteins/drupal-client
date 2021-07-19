@@ -221,6 +221,7 @@
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Low</threshold>
+                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
