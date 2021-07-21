@@ -25,10 +25,9 @@
   "allDeclaredMethods":true
 },
 {
-  "name":"com.sprinteins.drupalcli.Update",
+  "name":"com.sprinteins.drupalcli.commands.Update",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "allDeclaredMethods":true
 },
 {
   "name":"com.sprinteins.drupalcli.file.ApiReferenceFileModel",
