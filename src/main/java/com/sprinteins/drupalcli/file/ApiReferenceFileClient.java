@@ -1,7 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +18,6 @@ public class ApiReferenceFileClient {
     private final String baseUri;
     private final String authenticationHeader;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ApiReferenceFileClient(ObjectMapper objectMapper, String baseUri, String authenticationHeader) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/file/upload/node/api_reference/field_source_file";

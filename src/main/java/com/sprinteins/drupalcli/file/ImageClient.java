@@ -1,7 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,7 +17,6 @@ public class ImageClient {
     private final String baseUri;
     private final String apiKey;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/entity/file";

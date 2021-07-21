@@ -1,7 +1,6 @@
 package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,7 +17,6 @@ public class NodeClient {
     private final String baseUri;
     private final String authenticationHeader;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public NodeClient(ObjectMapper objectMapper, String baseUri, String authenticationHeader) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/node/";
