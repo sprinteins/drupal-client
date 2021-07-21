@@ -10,9 +10,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-import com.sprinteins.drupalcli.node.NodeModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 public class GetStartedParagraphClient {
 
     private static final int TIMEOUT_MS = 30 * 1000;
