@@ -150,7 +150,7 @@ public class Update implements Callable<Integer> {
                 listOfUri.add(uri);
                 linkType.setHref(baseUri + "/rest/type/file/image");
                 links.setType(linkType);
-                filename.setValue(image.getFileName().toString());
+                Optional.ofNullable(image.getFileName()).map(Path::toString).ifPresent(filename::setValue);
                 filemime.setValue("image/png");
 
 
