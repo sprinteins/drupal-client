@@ -14,11 +14,9 @@ import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
-import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +25,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Command(name = "update", description = "Update description")
 public class Update implements Callable<Integer> {
@@ -118,12 +115,12 @@ public class Update implements Callable<Integer> {
 
             // get all the images
             Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
-            Set setOfImages = listFilesUsingFilesList(imageFolder.toString());
+            Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
 
             // loop over set and search in markdown -> replace with new imagesource
-            for (Object image :setOfImages){
+            for (Path image :setOfImages){
                 System.out.println("Uploading images...:");
-                System.out.println("Working on: " + image);
+                System.out.println("Working on: " + image.getFileName());
 
                 // create new image model
                 ImageModel imageModel = new ImageModel();
@@ -141,8 +138,7 @@ public class Update implements Callable<Integer> {
 
 
                 // get base64 string from file
-                File imageFile = new File(String.valueOf(imageFolder.resolve(image.toString())));
-                String base64Image = encodeImage(imageFile);
+                String base64Image = encodeImage(image);
 
                 // create data list
                 imageData.setValue(base64Image);
@@ -154,7 +150,7 @@ public class Update implements Callable<Integer> {
                 listOfUri.add(uri);
                 linkType.setHref(baseUri + "/rest/type/file/image");
                 links.setType(linkType);
-                filename.setValue(image.toString());
+                filename.setValue(image.getFileName().toString());
                 filemime.setValue("image/png");
 
 
@@ -173,7 +169,7 @@ public class Update implements Callable<Integer> {
                         .post(imageModel);
 
 
-                cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + image,   "/sites/default/files/" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + image);
+                cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + image.getFileName(),   "/sites/default/files/" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + image);
                 System.out.println("Finished");
             }
 
@@ -209,26 +205,19 @@ public class Update implements Callable<Integer> {
         return cleanedMarkdown[cleanedMarkdown.length-1];
     }
 
-    public Set<String> listFilesUsingFilesList(String dir) throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
-            return stream
+    public Set<Path> listFilesUsingFilesList(Path dir) throws IOException {
+            return Files.list(dir)
                     .filter(file -> !Files.isDirectory(file))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
                     .collect(Collectors.toSet());
-        }
     }
 
-    public static String encodeImage(File file) {
-        String base64Image = "";
-        try (FileInputStream imageInFile = new FileInputStream(file)) {
-            byte[] imageData = new byte[(int) file.length()];
-            // imageInFile.read(imageData);
-            base64Image = Base64.getEncoder().encodeToString(imageData);
+    public static String encodeImage(Path file) {
+        try {
+            return Base64.getEncoder().encodeToString(Files.readAllBytes(file));
         } catch (IOException ioe) {
             System.out.println("Exception while reading the Image " + ioe);
         }
-        return base64Image;
+        return "";
     }
 }
 
