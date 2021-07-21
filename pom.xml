@@ -89,7 +89,7 @@
                         </executions>
                         <configuration>
                             <imageName>${project.artifactId}-${platform}-${project.version}</imageName>
-                            <mainClass>com.sprinteins.drupalcli.DrupalClientApplication</mainClass>
+                            <mainClass>${mainClass}</mainClass>
                             <buildArgs>
                                 --no-fallback
                                 --report-unsupported-elements-at-runtime
