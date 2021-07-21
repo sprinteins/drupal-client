@@ -1,21 +1,15 @@
 package com.sprinteins.drupalcli.node;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprinteins.drupalcli.models.TargetModel;
 
-public class SourceFileModel {
+public class SourceFileModel extends TargetModel {
 
-    private Long targetId;
     private Boolean display = Boolean.TRUE;
     private String description = "";
-    private String targetType = "file";
 
-    @JsonProperty("target_id")
-    public Long getTargetId() {
-        return targetId;
-    }
-
-    public void setTargetId(Long targetId) {
-        this.targetId = targetId;
+    public SourceFileModel() {
+        super();
+        this.setTargetType("file");
     }
 
     public Boolean getDisplay() {
@@ -34,13 +28,10 @@ public class SourceFileModel {
         this.description = description;
     }
 
-    @JsonProperty("target_type")
-    public String getTargetType() {
-        return targetType;
-    }
-
-    public void setTargetType(String targetType) {
-        this.targetType = targetType;
+    @Override
+    public String toString() {
+        return "SourceFileModel {display=" + display + ", description=" + description + ", targetId=" + getTargetId()
+                + ", targetType=" + getTargetType() + ", targetUuid=" + getTargetUuid() + "}";
     }
 
 }
