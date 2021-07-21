@@ -95,6 +95,19 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>graal-agent-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-agentlib:native-image-agent=access-filter-file=./src/main/resources/META-INF/native-image/access-filter-file.json,caller-filter-file=./src/main/resources/META-INF/native-image/caller-filter-file.json,config-merge-dir=./src/main/resources/META-INF/native-image</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>

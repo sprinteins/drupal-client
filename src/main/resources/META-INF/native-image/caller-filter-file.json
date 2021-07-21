@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {"excludeClasses": "ch.**"},
+    {"excludeClasses": "com.**"},
+    {"excludeClasses": "java.**"},
+    {"excludeClasses": "javax.**"},
+    {"excludeClasses": "jdk.**"},
+    {"excludeClasses": "net.**"},
+    {"excludeClasses": "org.**"},
+    {"excludeClasses": "picocli.**"},
+    {"excludeClasses": "sun.**"},
+    {"includeClasses": "com.fasterxml.**"},
+    {"includeClasses": "com.sprinteins.drupalcli.**"},
+    {"excludeClasses": "com.sprinteins.drupalcli.mock.*"}
+  ]
+}
