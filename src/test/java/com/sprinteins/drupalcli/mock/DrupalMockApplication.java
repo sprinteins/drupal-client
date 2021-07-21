@@ -1,4 +1,4 @@
-package com.sprinteins.drupalcli;
+package com.sprinteins.drupalcli.mock;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.PatchMapping;

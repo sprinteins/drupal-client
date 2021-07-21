@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.getstartedparagraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.mock.DrupalMockApplication;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.ValueFormat;
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = DrupalMockApplication.class)
 public class GetStartedParagraphClientTest {
 
     @LocalServerPort
