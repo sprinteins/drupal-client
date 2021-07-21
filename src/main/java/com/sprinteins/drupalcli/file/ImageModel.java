@@ -1,27 +1,29 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.models.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ImageModel {
 
-    private LinksModel _links;
+    private LinksModel links;
     private List<UriValueModel> uri;
     private StringValueModel filename;
     private StringValueModel filemime;
     private TypeModel type = new TypeModel(TargetId.IMAGE);
     private List<StringValueModel> data;
 
+    @JsonProperty("_links")
+    public LinksModel getLinks() { return links; }
+    public void setLinks(LinksModel links) { this.links = links; }
+    
+    public List<StringValueModel> getData() { return Optional.ofNullable(data).map(List::copyOf).orElse(null); }
+    public void setData(List<StringValueModel> data) { this.data = Optional.ofNullable(data).map(List::copyOf).orElse(null); }
 
-    public LinksModel get_links() { return _links; }
-    public void setLinks(LinksModel links) { this._links = links; }
-
-    public List<StringValueModel> getData() { return data; }
-    public void setData(List<StringValueModel> data) { this.data = data; }
-
-    public List<UriValueModel> getUri() { return uri; }
-    public void setUri(List<UriValueModel> uri) { this.uri = uri; }
+    public List<UriValueModel> getUri() { return Optional.ofNullable(uri).map(List::copyOf).orElse(null); }
+    public void setUri(List<UriValueModel> uri) { this.uri = Optional.ofNullable(uri).map(List::copyOf).orElse(null); }
 
     public StringValueModel getFilename() { return filename; }
     public void setFilename(StringValueModel filename) { this.filename = filename; }
