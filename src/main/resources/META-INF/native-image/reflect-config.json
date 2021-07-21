@@ -1,5 +1,28 @@
 [
 {
+  "name":"boolean",
+  "allDeclaredMethods":true
+},
+{
+  "name":"boolean[]"
+},
+{
+  "name":"com.sprinteins.drupalcli.DrupalClientApplication",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true
+},
+{
+  "name":"com.sprinteins.drupalcli.commands.Export",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true
+},
+{
+  "name":"com.sprinteins.drupalcli.commands.Update",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"com.sprinteins.drupalcli.file.FileUploadModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
@@ -102,6 +125,22 @@
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
+},
+{
+  "name":"com.vladsch.flexmark.util.sequence.BasedOptionsHolder$Options",
+  "allPublicFields":true
+},
+{
+  "name":"com.vladsch.flexmark.util.sequence.LineAppendable$Options",
+  "allPublicFields":true
+},
+{
+  "name":"com.vladsch.flexmark.util.sequence.LineInfo$Flags",
+  "allPublicFields":true
+},
+{
+  "name":"com.vladsch.flexmark.util.sequence.builder.ISegmentBuilder$Options",
+  "allPublicFields":true
 },
 {
   "name":"void",
