@@ -14,9 +14,7 @@ public class LongValueModel {
 
     @Override
     public String toString() {
-        return "LongValueModel{" +
-                "value=" + value +
-                '}';
+        return "LongValueModel {value=" + value + "}";
     }
 
 }

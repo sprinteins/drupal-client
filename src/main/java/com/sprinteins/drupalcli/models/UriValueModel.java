@@ -23,10 +23,7 @@ public class UriValueModel {
 
     @Override
     public String toString() {
-        return "UriValueModel{" +
-                "value='" + value + '\'' +
-                ", url='" + url + '\'' +
-                '}';
+        return "UriValueModel {value=" + value + ", url=" + url + "}";
     }
 
 }

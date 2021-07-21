@@ -21,4 +21,9 @@ public class DescriptionModel {
         this.format = format;
     }
 
+    @Override
+    public String toString() {
+        return "DescriptionModel {value=" + value + ", format=" + format + "}";
+    }
+
 }

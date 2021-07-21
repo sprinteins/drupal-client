@@ -14,9 +14,7 @@ public class StringValueModel {
 
     @Override
     public String toString() {
-        return "StringValueModel{" +
-                "value='" + value + '\'' +
-                '}';
+        return "StringValueModel {value=" + value + "}";
     }
 
 }

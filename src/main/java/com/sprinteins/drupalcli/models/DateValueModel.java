@@ -23,10 +23,7 @@ public class DateValueModel {
 
     @Override
     public String toString() {
-        return "DateValueModel{" +
-                "value='" + value + '\'' +
-                ", format='" + format + '\'' +
-                '}';
+        return "DateValueModel{value='" + value + "', format='" + format + "'}";
     }
 
 }

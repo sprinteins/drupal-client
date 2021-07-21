@@ -39,4 +39,10 @@ public class TypeModel {
     @JsonProperty("target_uuid")
     public String getTargetUuid() { return targetUuid; }
     public void setTargetUuid(String targetUuid) { this.targetUuid = targetUuid; }
+
+    @Override
+    public String toString() {
+        return "TypeModel {targetId=" + targetId + "}";
+    }
+
 }

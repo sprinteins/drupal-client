@@ -106,5 +106,9 @@ public class NodeModel {
         this.getStartedDocsElement = Optional.ofNullable(getStartedDocsElement).map(List::copyOf).orElse(null);
     }
 
+    @Override
+    public String toString() {
+        return "NodeModel{type='" + type + "', sourceFile='" + sourceFile + "}";
+    }
 
 }
