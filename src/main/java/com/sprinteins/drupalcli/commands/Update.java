@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.commands;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.markusbernhardt.proxy.ProxySearch;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -19,6 +20,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
+import java.net.ProxySelector;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,6 +55,12 @@ public class Update implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception{
+        ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
+        ProxySelector proxySelector = proxySearch.getProxySelector();
+        if (proxySelector != null) {
+            ProxySelector.setDefault(proxySelector);
+        }
+
         Path workingDir = Paths.get(directory);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
 
