@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -53,8 +52,6 @@ public class Update implements Callable<Integer> {
     public Integer call() throws Exception{
         Path workingDir = Paths.get(directory);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String timestampString = String.valueOf(timestamp.getTime());
 
         String apiKey = readApiKey();
 
@@ -75,8 +72,7 @@ public class Update implements Callable<Integer> {
         FrontMatterReader frontMatter = new FrontMatterReader();
         Map<String, List<String>> data = frontMatter.readFromFile(content);
         List<String> titleList = data.get("title");
-        String title = titleList.get(0).replace(" ", "").toLowerCase(Locale.ROOT);
-
+        String title = titleList.get(0);
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
@@ -90,7 +86,7 @@ public class Update implements Callable<Integer> {
                 apiKey);
 
 
-        System.out.println("Updating node: " + nodeId + " ...");
+        System.out.println("Updating node: " + title + " - " + nodeId + " ...");
         NodeModel nodeModel = new NodeClient(
                 objectMapper,
                 baseUri,
@@ -129,7 +125,9 @@ public class Update implements Callable<Integer> {
                                     apiKey)
                                     .upload(imagePath);
 
-                    cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                    if(imageModel != null){
+                        cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                    }
                 }
             }
 
