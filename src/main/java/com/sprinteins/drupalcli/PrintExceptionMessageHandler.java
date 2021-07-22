@@ -11,7 +11,9 @@ class PrintExceptionMessageHandler implements IExecutionExceptionHandler {
                                         CommandLine cmd,
                                         ParseResult parseResult){
 
-        cmd.getErr().println(cmd.getColorScheme().errorText(ex.getMessage()));
+	    if (ex.getMessage() != null) {
+	        cmd.getErr().println(cmd.getColorScheme().errorText(ex.getMessage()));
+	    }
         
         if (parseResult.expandedArgs().contains("--debug")) { 
             ex.printStackTrace(cmd.getErr());
