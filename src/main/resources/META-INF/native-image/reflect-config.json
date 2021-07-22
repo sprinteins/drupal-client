@@ -1,6 +1,6 @@
 [
 {
-  "name":"com.sprinteins.drupalcli.file.ImageModel",
+  "name":"com.sprinteins.drupalcli.file.FileUploadModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
