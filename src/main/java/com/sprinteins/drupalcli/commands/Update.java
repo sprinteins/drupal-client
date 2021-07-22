@@ -67,6 +67,9 @@ public class Update implements Callable<Integer> {
         if (portalEnv.length() > 1) {
             baseUri = portalEnv;
         }
+        if (baseUri.endsWith("/")) {
+            baseUri = baseUri.substring(0, baseUri.length() - 1);
+        }
 
         OpenAPI apiSpec = new OpenAPI(directory);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
