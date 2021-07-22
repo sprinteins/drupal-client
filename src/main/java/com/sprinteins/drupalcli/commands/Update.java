@@ -216,14 +216,5 @@ public class Update implements Callable<Integer> {
                     .filter(file -> !Files.isDirectory(file))
                     .collect(Collectors.toSet());
     }
-
-    public static String encodeImage(Path file) {
-        try {
-            return Base64.getEncoder().encodeToString(Files.readAllBytes(file));
-        } catch (IOException ioe) {
-            System.out.println("Exception while reading the Image " + ioe);
-        }
-        return "";
-    }
 }
 
