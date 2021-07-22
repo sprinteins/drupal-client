@@ -1,11 +1,11 @@
 package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
@@ -32,7 +32,7 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
+            HttpResponse<Void> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.discarding());
 
             if (httpResponse.statusCode() >= 300) {
@@ -51,8 +51,7 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClient.newBuilder()
-                    .followRedirects(HttpClient.Redirect.ALWAYS)
+            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
 

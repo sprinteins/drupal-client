@@ -1,11 +1,11 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
@@ -31,7 +31,7 @@ public class ApiReferenceFileClient {
                     .header("Content-Disposition", "file; filename=\"" + path.getFileName() + "\"")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClient.newBuilder().build()
+            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
