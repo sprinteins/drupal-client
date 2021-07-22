@@ -71,7 +71,7 @@ public class Update implements Callable<Integer> {
             baseUri = baseUri.substring(0, baseUri.length() - 1);
         }
 
-        OpenAPI apiSpec = new OpenAPI(directory);
+        OpenAPI apiSpec = new OpenAPI(workingDir);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
 
         String content = Files.readString(mainFilePath);
