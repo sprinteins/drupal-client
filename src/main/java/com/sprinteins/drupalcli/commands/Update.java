@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
-import com.sprinteins.drupalcli.file.ApiReferenceFileModel;
+import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.file.ImageModel;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.models.*;
@@ -118,58 +117,18 @@ public class Update implements Callable<Integer> {
             Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
 
             // loop over set and search in markdown -> replace with new imagesource
-            for (Path image :setOfImages){
+            for (Path imagePath :setOfImages){
                 System.out.println("Uploading images...:");
-                System.out.println("Working on: " + image.getFileName());
+                System.out.println("Working on: " + imagePath.getFileName());
 
-                // create new image model
-                ImageModel imageModel = new ImageModel();
+                FileUploadModel imageModel =
+                        new ImageClient(
+                                objectMapper,
+                                baseUri,
+                                apiKey)
+                                .upload(imagePath);
 
-                // init ImageModel
-                LinksModel links = new LinksModel();
-                TypeModel linkType = new TypeModel();
-                List<UriValueModel> listOfUri = new ArrayList<>();
-                UriValueModel uri = new UriValueModel();
-                StringValueModel filename = new StringValueModel();
-                StringValueModel filemime = new StringValueModel();
-                List<StringValueModel> listOfData = new ArrayList<>();
-                StringValueModel imageData = new StringValueModel();
-
-
-
-                // get base64 string from file
-                String base64Image = encodeImage(image);
-
-                // create data list
-                imageData.setValue(base64Image);
-                listOfData.add(imageData);
-
-
-                // modify model with data
-                uri.setValue("public://" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + image);
-                listOfUri.add(uri);
-                linkType.setHref(baseUri + "/rest/type/file/image");
-                links.setType(linkType);
-                Optional.ofNullable(image.getFileName()).map(Path::toString).ifPresent(filename::setValue);
-                filemime.setValue("image/png");
-
-
-                imageModel.setLinks(links);
-                imageModel.setUri(listOfUri);
-                imageModel.setFilename(filename);
-                imageModel.setFilemime(filemime);
-                imageModel.setData(listOfData);
-
-
-
-                new ImageClient(
-                        objectMapper,
-                        baseUri,
-                        apiKey)
-                        .post(imageModel);
-
-
-                cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + image.getFileName(),   "/sites/default/files/" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + image);
+                cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(),   "/sites/default/files/" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + imagePath);
                 System.out.println("Finished");
             }
 
@@ -182,7 +141,7 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished paragraphs");
         }
 
-        ApiReferenceFileModel model =
+        FileUploadModel apiReferenceModel =
                 new ApiReferenceFileClient(
                         objectMapper,
                         baseUri,
@@ -190,7 +149,7 @@ public class Update implements Callable<Integer> {
                         .upload(swaggerPath);
 
         NodeModel patchNodeModel = new NodeModel();
-        patchNodeModel.getOrCreateFirstSourceFile().setTargetId(model.getFid().get(0).getValue());
+        patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
         new NodeClient(
                 objectMapper,
                 baseUri,

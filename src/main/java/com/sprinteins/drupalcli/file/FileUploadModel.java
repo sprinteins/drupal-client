@@ -8,7 +8,7 @@ import com.sprinteins.drupalcli.models.UriValueModel;
 import java.util.List;
 import java.util.Optional;
 
-public class ApiReferenceFileModel {
+public class FileUploadModel {
 
     private List<LongValueModel> fid;
     private List<StringValueModel> uuid;
@@ -112,7 +112,7 @@ public class ApiReferenceFileModel {
 
     @Override
     public String toString() {
-        return "ApiReferenceFileModel{" +
+        return "FileUploadModel{" +
                 "fid=" + fid +
                 ", uuid=" + uuid +
                 ", langcode=" + langcode +

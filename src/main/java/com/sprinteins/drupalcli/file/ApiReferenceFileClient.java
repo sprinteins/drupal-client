@@ -22,7 +22,7 @@ public class ApiReferenceFileClient {
         this.apiKey = apiKey;
     }
 
-    public ApiReferenceFileModel upload(Path path) {
+    public FileUploadModel upload(Path path) {
         try {
             HttpRequest request = HttpRequestBuilderFactory
                     .create(URI.create(baseUri + "?_format=json"), apiKey)
@@ -34,7 +34,7 @@ public class ApiReferenceFileClient {
             HttpResponse<String> httpResponse = HttpClient.newBuilder().build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            return objectMapper.readValue(httpResponse.body(), ApiReferenceFileModel.class);
+            return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Upload failed", e);
         }

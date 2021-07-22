@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 
 public class ImageClient {
 
@@ -17,25 +18,25 @@ public class ImageClient {
 
     public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
-        this.baseUri = baseUri + "/entity/file";
+        this.baseUri = baseUri + "/file/upload/media/file/field_media_file";
         this.apiKey = apiKey;
     }
 
-    public void post(ImageModel imageModel) throws IOException, InterruptedException {
+    public FileUploadModel upload(Path path) {
+        try {
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(baseUri + "?_format=json"), apiKey)
+                    .POST(HttpRequest.BodyPublishers.ofFile(path))
+                    .header("Content-Type", "application/octet-stream")
+                    .header("Content-Disposition", "file; filename=\"" + path.getFileName() + "\"")
+                    .build();
 
-        String patchRequestBody = objectMapper.writeValueAsString(imageModel);
+            HttpResponse<String> httpResponse = HttpClient.newBuilder().build()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
 
-        HttpRequest request = HttpRequestBuilderFactory
-                .create(URI.create(baseUri + "?_format=hal_json"), apiKey)
-                .method("POST", HttpRequest.BodyPublishers.ofString(patchRequestBody))
-                .header("Content-Type", "application/hal+json")
-                .build();
-
-        HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
-                .send(request, HttpResponse.BodyHandlers.discarding());
-
-        if (httpResponse.statusCode() >= 300) {
-            throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
+            return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException("Upload failed", e);
         }
     }
 }
