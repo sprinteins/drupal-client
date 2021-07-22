@@ -56,10 +56,7 @@ public class Update implements Callable<Integer> {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String timestampString = String.valueOf(timestamp.getTime());
 
-        String apiKey = System.getenv(API_KEY_ENV_KEY);
-        if (apiKey == null || apiKey.isEmpty() ) {
-            throw new Exception("API key is missing!");
-        }
+        String apiKey = readApiKey();
 
         boolean markdownFileExists = Files.exists(mainFilePath);
         if(!markdownFileExists) {
@@ -162,6 +159,30 @@ public class Update implements Callable<Integer> {
 
         System.out.println("Finished processing node: " + nodeId);
         return 0;
+    }
+
+    private String readApiKey() {
+        String apiKeyFile = System.getenv(API_KEY_ENV_KEY);
+        if (apiKeyFile == null || apiKeyFile.isEmpty() ) {
+            throw new IllegalArgumentException("API key file not found : DHL_API_DEVELOPER_PORTAL_TOKEN_FILE environment variable not set");
+        }
+        Path path = Paths.get(apiKeyFile);
+        if (Files.notExists(path)) {
+            throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
+        }
+        try {
+            List<String> apiKeyLines = Files.readAllLines(path);
+            if (apiKeyLines.isEmpty()) {
+                throw new IllegalArgumentException("API key invalid: " + path + " is empty");
+            }
+            String apiKey = apiKeyLines.get(0);
+            if (apiKey.isEmpty() ) {
+                throw new IllegalArgumentException("API key invalid : first line of " + path + " is empty");
+            }
+            return apiKey;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
+        }
     }
 
     private String correctMarkdownStructure(String markdown) {
