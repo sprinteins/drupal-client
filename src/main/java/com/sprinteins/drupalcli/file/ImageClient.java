@@ -19,11 +19,13 @@ public class ImageClient {
     private final ObjectMapper objectMapper;
     private final String baseUri;
     private final String apiKey;
+    private final String apiDocsDirectory;
 
     public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/file/upload/media/file/field_media_file";
         this.apiKey = apiKey;
+        this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
     }
 
     public FileUploadModel upload(Path path) throws NoSuchAlgorithmException {
@@ -41,6 +43,22 @@ public class ImageClient {
             return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Upload failed", e);
+        }
+    }
+
+    public int head(Path path) throws NoSuchAlgorithmException {
+        try {
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(apiDocsDirectory + generateMd5Hash(path) + path.getFileName()), apiKey)
+                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> httpResponse = HttpClient.newBuilder().build()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            return httpResponse.statusCode();
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException("Head failed", e);
         }
     }
 

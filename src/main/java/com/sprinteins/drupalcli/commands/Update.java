@@ -115,18 +115,27 @@ public class Update implements Callable<Integer> {
 
             // loop over set and search in markdown -> replace with new imagesource
             for (Path imagePath :setOfImages){
-                if(cleanedMarkdown.contains(imagePath.getFileName().toString())){
-                    System.out.println("Uploading " + imagePath.getFileName() + "...");
-
-                    FileUploadModel imageModel =
-                            new ImageClient(
+                String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
+                if(cleanedMarkdown.contains(filename)){
+                    int status = new ImageClient(
                                     objectMapper,
                                     baseUri,
                                     apiKey)
-                                    .upload(imagePath);
+                                    .head(imagePath);
+                    if (status != 200) {
+                        System.out.println("Uploading " + imagePath.getFileName() + "...");
+                        FileUploadModel imageModel =
+                                new ImageClient(
+                                        objectMapper,
+                                        baseUri,
+                                        apiKey)
+                                        .upload(imagePath);
 
-                    if(imageModel != null){
-                        cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                        if(imageModel != null){
+                            cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                        }
+                    } else {
+                        System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
                     }
                 }
             }
