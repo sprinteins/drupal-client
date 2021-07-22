@@ -1,17 +1,15 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 
 public class ImageClient {
-
-    private static final int TIMEOUT_MS = 30 * 1000;
 
     private final ObjectMapper objectMapper;
     private final String baseUri;
@@ -27,13 +25,10 @@ public class ImageClient {
 
         String patchRequestBody = objectMapper.writeValueAsString(imageModel);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .uri(URI.create(baseUri + "?_format=hal_json"))
-                .timeout(Duration.ofMillis(TIMEOUT_MS))
+        HttpRequest request = HttpRequestBuilderFactory
+                .create(URI.create(baseUri + "?_format=hal_json"), apiKey)
                 .method("POST", HttpRequest.BodyPublishers.ofString(patchRequestBody))
                 .header("Content-Type", "application/hal+json")
-                .header("api-key", apiKey)
                 .build();
 
         HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()

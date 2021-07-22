@@ -1,26 +1,24 @@
 package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 
 public class NodeClient {
 
-    private static final int TIMEOUT_MS = 30 * 1000;
-
     private final ObjectMapper objectMapper;
     private final String baseUri;
-    private final String authenticationHeader;
+    private final String apiKey;
 
-    public NodeClient(ObjectMapper objectMapper, String baseUri, String authenticationHeader) {
+    public NodeClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/node/";
-        this.authenticationHeader = authenticationHeader;
+        this.apiKey = apiKey;
     }
 
     public void patch(long id, NodeModel nodeModel) {
@@ -28,13 +26,10 @@ public class NodeClient {
             String patchRequestBody = objectMapper
                     .writeValueAsString(nodeModel);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .uri(URI.create(baseUri + id + "?_format=json"))
-                    .timeout(Duration.ofMillis(TIMEOUT_MS))
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(baseUri + id + "?_format=json"), apiKey)
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
                     .header("Content-Type", "application/json")
-                    .header("api-key", authenticationHeader)
                     .build();
 
             HttpResponse<Void> httpResponse = HttpClient.newBuilder().build()
@@ -50,13 +45,10 @@ public class NodeClient {
 
     public NodeModel get(long id) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .version(HttpClient.Version.HTTP_1_1)
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(baseUri + id + "?_format=json"), apiKey)
                     .GET()
-                    .uri(URI.create(baseUri + id + "?_format=json"))
-                    .timeout(Duration.ofMillis(TIMEOUT_MS))
                     .header("Content-Type", "application/json")
-                    .header("api-key", authenticationHeader)
                     .build();
 
             HttpResponse<String> httpResponse = HttpClient.newBuilder()
