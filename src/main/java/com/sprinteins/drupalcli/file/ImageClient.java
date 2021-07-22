@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 public class ImageClient {
 
@@ -54,6 +55,6 @@ public class ImageClient {
             hash.append(hexCode[(b >> 4) & 0xF]);
             hash.append(hexCode[(b & 0xF)]);
         }
-        return hash.toString().toUpperCase();
+        return hash.toString().toUpperCase(Locale.ROOT);
     }
 }
