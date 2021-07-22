@@ -36,8 +36,6 @@ public class Update implements Callable<Integer> {
     public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
-    public static final String APIDOCS_FOLDER_NAME = "api-docs";
-
 
     @Option(names = { "--api-page" , "-a"}, description = "API page ID", required = true)
     Long nodeId;
@@ -95,6 +93,7 @@ public class Update implements Callable<Integer> {
                 apiKey);
 
 
+        System.out.println("Updating node: " + nodeId + " ...");
         NodeModel nodeModel = new NodeClient(
                 objectMapper,
                 baseUri,
@@ -102,9 +101,9 @@ public class Update implements Callable<Integer> {
                 .get(nodeId);
 
         for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()){
-            System.out.println("Updating paragraphs...");
+            System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
 
-            GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphClient(
+                        GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphClient(
                     objectMapper,
                     baseUri,
                     apiKey)
@@ -123,18 +122,18 @@ public class Update implements Callable<Integer> {
 
             // loop over set and search in markdown -> replace with new imagesource
             for (Path imagePath :setOfImages){
-                System.out.println("Uploading images...:");
-                System.out.println("Working on: " + imagePath.getFileName());
+                if(cleanedMarkdown.contains(imagePath.getFileName().toString())){
+                    System.out.println("Uploading " + imagePath.getFileName() + "...");
 
-                FileUploadModel imageModel =
-                        new ImageClient(
-                                objectMapper,
-                                baseUri,
-                                apiKey)
-                                .upload(imagePath);
+                    FileUploadModel imageModel =
+                            new ImageClient(
+                                    objectMapper,
+                                    baseUri,
+                                    apiKey)
+                                    .upload(imagePath);
 
-                cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(),   "/sites/default/files/" + APIDOCS_FOLDER_NAME + "/" + title + "/" + timestampString + "/" + imagePath);
-                System.out.println("Finished");
+                    cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                }
             }
 
             DescriptionModel fieldDescription = getStartedParagraph
@@ -143,7 +142,7 @@ public class Update implements Callable<Integer> {
             fieldDescription.setValue(cleanedMarkdown);
 
             getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
-            System.out.println("Finished paragraphs");
+            System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
         }
 
         FileUploadModel apiReferenceModel =
@@ -161,7 +160,8 @@ public class Update implements Callable<Integer> {
                 apiKey)
                 .patch(nodeId, patchNodeModel);
 
-       return 0;
+        System.out.println("Finished processing node: " + nodeId);
+        return 0;
     }
 
     private String correctMarkdownStructure(String markdown) {
