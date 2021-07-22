@@ -48,6 +48,9 @@ public class Update implements Callable<Integer> {
     @Option(names = { "--explicitly-disable-checks" , "-e"}, description = "Explicitly disabled checks")
     ArrayList<String> disabledChecks;
 
+    @Option(names = { "--debug" }, description = "Enable debug mode")
+    boolean debug;
+
     @Override
     public Integer call() throws Exception{
         Path workingDir = Paths.get(directory);
