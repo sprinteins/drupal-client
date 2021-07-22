@@ -40,6 +40,10 @@ public class ImageClient {
             HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (httpResponse.statusCode() >= 300) {
+                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
+            }
 
             return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
         } catch (IOException | InterruptedException e) {
