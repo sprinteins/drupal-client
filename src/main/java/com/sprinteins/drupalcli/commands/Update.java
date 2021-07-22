@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -55,7 +56,8 @@ public class Update implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception{
-        ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
+        ProxySearch proxySearch = new ProxySearch();
+        proxySearch.addStrategy(Strategy.ENV_VAR);
         ProxySelector proxySelector = proxySearch.getProxySelector();
         if (proxySelector != null) {
             ProxySelector.setDefault(proxySelector);
