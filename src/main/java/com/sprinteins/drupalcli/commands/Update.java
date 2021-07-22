@@ -10,7 +10,9 @@ import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
 import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
-import com.sprinteins.drupalcli.models.*;
+import com.sprinteins.drupalcli.models.DescriptionModel;
+import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
+import com.sprinteins.drupalcli.models.ValueFormat;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import picocli.CommandLine.Command;
@@ -24,6 +26,8 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @Command(name = "update", description = "Update description")
 public class Update implements Callable<Integer> {
@@ -111,6 +115,7 @@ public class Update implements Callable<Integer> {
 
             // remove frontmatter
             String cleanedMarkdown = removeFrontmatter(markdown);
+            cleanedMarkdown = correctMarkdownStructure(cleanedMarkdown);
 
             // get all the images
             Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
@@ -157,6 +162,20 @@ public class Update implements Callable<Integer> {
                 .patch(nodeId, patchNodeModel);
 
        return 0;
+    }
+
+    private String correctMarkdownStructure(String markdown) {
+        List<String> lines = Arrays.asList(markdown.split("\r?\n"));
+        return lines.stream().map(line -> {
+            // the markdown structure should support "normal" header levels starting with h1
+            // but currently the API page requires the uploaded structure to start with h3
+            // so we add two levels to the header level
+            // this only supports atx-style headers
+            if (line.startsWith("#")) {
+                return "##" + line;
+            }
+            return line;
+        }).collect(joining("\n"));
     }
 
     public String removeFrontmatter(String markdown){
