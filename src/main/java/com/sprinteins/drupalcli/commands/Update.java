@@ -25,6 +25,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
@@ -128,7 +130,7 @@ public class Update implements Callable<Integer> {
                         FileUploadModel imageModel = imageClient.upload(imagePath);
 
                         if(imageModel != null){
-                            cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
+                                cleanedMarkdown = replaceImageTag(cleanedMarkdown, imagePath, imageModel);
                         }
                     } else {
                         System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
@@ -205,6 +207,32 @@ public class Update implements Callable<Integer> {
             return Files.list(dir)
                     .filter(file -> !Files.isDirectory(file))
                     .collect(Collectors.toSet());
+    }
+
+    public String replaceImageTag(String markdown, Path imagePath, FileUploadModel imageModel ){
+
+
+        String imageRegexPattern = "!\\[[^]]*]\\("+ IMAGE_FOLDER_NAME + "/" + imagePath.getFileName() +"\\)";
+        String altTextRegexPattern = "\\[[^]]*]";
+        String markdownImage = "";
+
+        Pattern pattern = Pattern.compile(imageRegexPattern);
+        Matcher matcher = pattern.matcher(markdown);
+        boolean match = matcher.find();
+        if (match)
+        {
+            markdownImage = matcher.group(0);
+        }
+        String[] removeFromAltText = markdownImage.split(altTextRegexPattern);
+        String altText = markdownImage.replace(removeFromAltText[0] + "[", "");
+        altText = altText.replace("]" + removeFromAltText[1], "");
+        String uuid = imageModel.getUuid().get(0).getValue();
+        String src = imageModel.getUri().get(0).getUrl();
+        String imageTag = "<img alt=\\\"" + altText + "\\\" data-align=\\\"center\\\" data-entity-type=\\\"file\\\" data-entity-uuid=\\\"" + uuid + "\\\" src=\\\""+ src +"\\\" />";
+
+        markdown = markdown.replace(markdownImage, imageTag);
+
+        return markdown;
     }
 }
 
