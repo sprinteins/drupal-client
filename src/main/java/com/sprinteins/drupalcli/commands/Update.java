@@ -233,7 +233,7 @@ public class Update implements Callable<Integer> {
         altText = altText.replace("]" + removeFromAltText[1], "");
         String uuid = imageModel.getUuid().get(0).getValue();
         String src = imageModel.getUri().get(0).getUrl();
-        String imageTag = "<img alt=\\\"" + altText + "\\\" data-align=\\\"center\\\" data-entity-type=\\\"file\\\" data-entity-uuid=\\\"" + uuid + "\\\" src=\\\""+ src +"\\\" />";
+        String imageTag = "<img alt=\"" + altText + "\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"" + uuid + "\" src=\""+ src +"\" />";
 
         markdown = markdown.replace(markdownImage, imageTag);
 

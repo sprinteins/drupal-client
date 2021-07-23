@@ -31,7 +31,7 @@ public class UpdateTest {
         String expected = "* Document dimensions: specified by the user, it's always a square.\n" +
                 "* Format support: PNG\n" +
                 "\n" +
-                "<img alt=\\\"QR Code\\\" data-align=\\\"center\\\" data-entity-type=\\\"file\\\" data-entity-uuid=\\\"ba7f7051-6273-4d66-8ddb-f12b6d39a814\\\" src=\\\"/sites/default/files/api-docs/media/qr_code.png\\\" />\n" +
+                "<img alt=\"QR Code\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"ba7f7051-6273-4d66-8ddb-f12b6d39a814\" src=\"/sites/default/files/api-docs/media/qr_code.png\" />\n" +
                 "\n" +
                 "### Using the API\n";
 
