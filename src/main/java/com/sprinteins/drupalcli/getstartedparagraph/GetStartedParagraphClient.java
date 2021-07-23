@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.getstartedparagraph;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
+import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,9 +35,7 @@ public class GetStartedParagraphClient {
         HttpResponse<Void> httpResponse = HttpClientBuilderFactory.create().build()
                 .send(request, HttpResponse.BodyHandlers.discarding());
 
-        if (httpResponse.statusCode() >= 300) {
-            throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
-        }
+        HttpResponseStatusHandler.checkStatusCode(httpResponse);
     }
 
     public GetStartedParagraphModel get(long id) throws IOException, InterruptedException {
@@ -50,10 +49,8 @@ public class GetStartedParagraphClient {
             HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (httpResponse.statusCode() >= 300) {
-                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
-            }
+            
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return objectMapper.readValue(httpResponse.body(), GetStartedParagraphModel.class);
         } catch (IOException | InterruptedException e) {

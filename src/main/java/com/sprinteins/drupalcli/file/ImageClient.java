@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.file;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
+import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -41,9 +42,7 @@ public class ImageClient {
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
             
-            if (httpResponse.statusCode() >= 300) {
-                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
-            }
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
         } catch (IOException | InterruptedException e) {

@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.node;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
+import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,9 +36,7 @@ public class NodeClient {
             HttpResponse<Void> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.discarding());
 
-            if (httpResponse.statusCode() >= 300) {
-                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode());
-            }
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Patch failed", e);
         }
@@ -55,9 +54,7 @@ public class NodeClient {
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (httpResponse.statusCode() >= 300) {
-                throw new IllegalStateException("Bad Status Code: " + httpResponse.statusCode() + "\nBody: "+ httpResponse.body());
-            }
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return objectMapper.readValue(httpResponse.body(), NodeModel.class);
         } catch (IOException | InterruptedException e) {
