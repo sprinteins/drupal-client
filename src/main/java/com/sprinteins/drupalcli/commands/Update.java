@@ -108,43 +108,48 @@ public class Update implements Callable<Integer> {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
 
             Path docPath = workingDir.resolve(getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ROOT).replace(" ", "-") + ".markdown");
-            String markdown = Files.readString(docPath);
 
-            // remove frontmatter
-            String cleanedMarkdown = removeFrontmatter(markdown);
-            cleanedMarkdown = correctMarkdownStructure(cleanedMarkdown);
+            if(Files.exists(docPath)){
+                String markdown = Files.readString(docPath);
 
-            // get all the images
-            Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
-            Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
+                // remove frontmatter
+                String cleanedMarkdown = removeFrontmatter(markdown);
+                cleanedMarkdown = correctMarkdownStructure(cleanedMarkdown);
 
-            // loop over set and search in markdown -> replace with new imagesource
-            for (Path imagePath :setOfImages){
-                String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
-                if(cleanedMarkdown.contains(filename)){
+                // get all the images
+                Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
+                Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
 
-                    int status = imageClient
-                                    .head(imagePath);
-                    if (status != 200) {
-                        System.out.println("Uploading " + imagePath.getFileName() + "...");
-                        FileUploadModel imageModel = imageClient.upload(imagePath);
+                // loop over set and search in markdown -> replace with new imagesource
+                for (Path imagePath :setOfImages){
+                    String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
+                    if(cleanedMarkdown.contains(filename)){
 
-                        if(imageModel != null){
+                        int status = imageClient.head(imagePath);
+                        if (status != 200) {
+                            System.out.println("Uploading " + imagePath.getFileName() + "...");
+                            FileUploadModel imageModel = imageClient.upload(imagePath);
+
+                            if(imageModel != null){
                                 cleanedMarkdown = replaceImageTag(cleanedMarkdown, imagePath, imageModel);
+                            }
+                        } else {
+                            System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
                         }
-                    } else {
-                        System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
                     }
                 }
+
+                DescriptionModel fieldDescription = getStartedParagraph
+                        .getOrCreateFirstDescription();
+                fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
+                fieldDescription.setValue(cleanedMarkdown);
+
+                getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
+                System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
             }
-
-            DescriptionModel fieldDescription = getStartedParagraph
-                    .getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
-            fieldDescription.setValue(cleanedMarkdown);
-
-            getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
-            System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
+            else {
+                System.out.println("Skipping " + docPath + " (file is not present)");
+            }
         }
 
         FileUploadModel apiReferenceModel =
