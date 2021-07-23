@@ -1,10 +1,8 @@
 package com.sprinteins.drupalcli.commands;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
+import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -91,32 +89,21 @@ public class Update implements Callable<Integer> {
         String title = titleList.get(0);
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-
-        GetStartedParagraphClient getStartedParagraphClient = new GetStartedParagraphClient(
-                objectMapper,
-                baseUri,
-                apiKey);
-
+        
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
+        NodeClient nodeClient = applicationContext.nodeClient();
+        GetStartedParagraphClient getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        ImageClient imageClient = applicationContext.imageClient();
+        ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
-        NodeModel nodeModel = new NodeClient(
-                objectMapper,
-                baseUri,
-                apiKey)
-                .get(nodeId);
+        
+        NodeModel nodeModel = nodeClient.get(nodeId);
 
         for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()){
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
 
-                        GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphClient(
-                    objectMapper,
-                    baseUri,
-                    apiKey)
-                    .get(getStartedDocsElement.getTargetId());
+            GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
 
             Path docPath = workingDir.resolve(getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ROOT).replace(" ", "-") + ".markdown");
             String markdown = Files.readString(docPath);
@@ -133,19 +120,12 @@ public class Update implements Callable<Integer> {
             for (Path imagePath :setOfImages){
                 String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
                 if(cleanedMarkdown.contains(filename)){
-                    int status = new ImageClient(
-                                    objectMapper,
-                                    baseUri,
-                                    apiKey)
+
+                    int status = imageClient
                                     .head(imagePath);
                     if (status != 200) {
                         System.out.println("Uploading " + imagePath.getFileName() + "...");
-                        FileUploadModel imageModel =
-                                new ImageClient(
-                                        objectMapper,
-                                        baseUri,
-                                        apiKey)
-                                        .upload(imagePath);
+                        FileUploadModel imageModel = imageClient.upload(imagePath);
 
                         if(imageModel != null){
                             cleanedMarkdown = cleanedMarkdown.replace(IMAGE_FOLDER_NAME + "/" + imagePath.getFileName(), imageModel.getUri().get(0).getUrl());
@@ -166,18 +146,12 @@ public class Update implements Callable<Integer> {
         }
 
         FileUploadModel apiReferenceModel =
-                new ApiReferenceFileClient(
-                        objectMapper,
-                        baseUri,
-                        apiKey)
+                apiReferenceFileClient
                         .upload(swaggerPath);
 
         NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
-        new NodeClient(
-                objectMapper,
-                baseUri,
-                apiKey)
+        nodeClient
                 .patch(nodeId, patchNodeModel);
 
         System.out.println("Finished processing node: " + nodeId);
