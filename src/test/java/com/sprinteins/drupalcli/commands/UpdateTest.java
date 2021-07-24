@@ -24,14 +24,16 @@ public class UpdateTest {
         String markdown = "* Document dimensions: specified by the user, it's always a square.\n" +
                 "* Format support: PNG\n" +
                 "\n" +
-                "![QR Code](images/qr_code.png)\n" +
+                "![QR code below text](images/qr_code.png)\n" +
+                "![QR code inside table](images/qr_code.png)\n" +
                 "\n" +
                 "### Using the API\n";
 
         String expected = "* Document dimensions: specified by the user, it's always a square.\n" +
                 "* Format support: PNG\n" +
                 "\n" +
-                "<img alt=\"QR Code\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"ba7f7051-6273-4d66-8ddb-f12b6d39a814\" src=\"/sites/default/files/api-docs/media/qr_code.png\" />\n" +
+                "<img alt=\"QR code below text\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"ba7f7051-6273-4d66-8ddb-f12b6d39a814\" src=\"/sites/default/files/api-docs/media/qr_code.png\" />\n" +
+                "<img alt=\"QR code inside table\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"ba7f7051-6273-4d66-8ddb-f12b6d39a814\" src=\"/sites/default/files/api-docs/media/qr_code.png\" />\n" +
                 "\n" +
                 "### Using the API\n";
 
@@ -47,4 +49,45 @@ public class UpdateTest {
         Assertions.assertEquals(expected, actual);
 
     }
+
+    @Test
+    public void testFindString(){
+        Update update = new Update();
+        String markdown = "* Document dimensions: specified by the user, it's always a square.\n" +
+                "* Format support: PNG\n" +
+                "\n" +
+                "![QR code below text](images/qr_code.png)\n" +
+                "![QR code inside table](images/qr_code.png)\n" +
+                "\n" +
+                "### Using the API\n";
+        String imageRegexPattern = "!\\[[^]]*]\\(images/qr_code.png\\)";
+
+        List<String> actual = update.findString(markdown, imageRegexPattern);
+
+        String expected = "![QR code below text](images/qr_code.png)";
+        Assertions.assertEquals(expected, actual.get(0));
+
+        expected = "![QR code inside table](images/qr_code.png)";
+        Assertions.assertEquals(expected, actual.get(1));
+    }
+
+    @Test
+    public void testExtractAltTexts(){
+        Update update = new Update();
+        List<String> strings = new ArrayList<>();
+        strings.add("![QR code below text](images/qr_code.png)");
+        strings.add("![QR code inside table](images/qr_code.png)");
+
+        String altTextRegexPattern = "\\[[^]]*]";
+
+        List<String> actual = update.extractAltTexts(strings, altTextRegexPattern);
+
+        String expected = "QR code below text";
+        Assertions.assertEquals(expected, actual.get(0));
+
+        expected = "QR code inside table";
+        Assertions.assertEquals(expected, actual.get(1));
+    }
+
+
 }

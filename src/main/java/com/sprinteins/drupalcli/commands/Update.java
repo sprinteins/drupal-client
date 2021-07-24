@@ -214,28 +214,48 @@ public class Update implements Callable<Integer> {
                     .collect(Collectors.toSet());
     }
 
+    public List<String> findString(String input, String regex){
+
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        while(matcher.find()){
+            matches.add(input.substring(matcher.start(), matcher.end()));
+        }
+        return matches;
+    }
+
+    public List<String> extractAltTexts(List<String> inputList, String regex) {
+
+        List<String> altTexts = new ArrayList<>();
+
+        for(String input: inputList) {
+            List<String> result = findString(input, regex);
+            altTexts.add(result.get(0).substring(1, result.get(0).length() - 1));
+        }
+        return altTexts;
+    }
+
+
     public String replaceImageTag(String markdown, Path imagePath, FileUploadModel imageModel ){
 
-
+        // find image string
         String imageRegexPattern = "!\\[[^]]*]\\("+ IMAGE_FOLDER_NAME + "/" + imagePath.getFileName() +"\\)";
-        String altTextRegexPattern = "\\[[^]]*]";
-        String markdownImage = "";
+        List<String> markdownImages = findString(markdown, imageRegexPattern);
 
-        Pattern pattern = Pattern.compile(imageRegexPattern);
-        Matcher matcher = pattern.matcher(markdown);
-        boolean match = matcher.find();
-        if (match)
-        {
-            markdownImage = matcher.group(0);
-        }
-        String[] removeFromAltText = markdownImage.split(altTextRegexPattern);
-        String altText = markdownImage.replace(removeFromAltText[0] + "[", "");
-        altText = altText.replace("]" + removeFromAltText[1], "");
+        // get alt text
+        String altTextRegexPattern = "\\[[^]]*]";
+        List<String> altTexts = extractAltTexts(markdownImages, altTextRegexPattern);
+
+        // replace image tag
         String uuid = imageModel.getUuid().get(0).getValue();
         String src = imageModel.getUri().get(0).getUrl();
-        String imageTag = "<img alt=\"" + altText + "\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"" + uuid + "\" src=\""+ src +"\" />";
 
-        markdown = markdown.replace(markdownImage, imageTag);
+        for(int index = 0; index < markdownImages.size(); index++){
+            String imageTag = "<img alt=\"" + altTexts.get(index) + "\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"" + uuid + "\" src=\""+ src +"\" />";
+            markdown = markdown.replace(markdownImages.get(index), imageTag);
+        }
 
         return markdown;
     }
