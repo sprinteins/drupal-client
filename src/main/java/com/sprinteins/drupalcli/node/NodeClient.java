@@ -62,4 +62,28 @@ public class NodeClient {
         }
     }
 
+    public NodeModel getByUri(String link) {
+        try {
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(cleanLink(link) + "?_format=json"), apiKey)
+                    .GET()
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
+                    .build()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
+
+            return objectMapper.readValue(httpResponse.body(), NodeModel.class);
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException("Get Node failed", e);
+        }
+    }
+
+    public String cleanLink(String link){
+        URI uri = URI.create(link);
+        return uri.getScheme() + "://" + uri.getHost() + uri.getPath();
+    }
 }
