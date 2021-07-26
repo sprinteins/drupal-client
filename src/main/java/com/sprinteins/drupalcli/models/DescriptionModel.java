@@ -4,6 +4,7 @@ public class DescriptionModel {
 
     private String value;
     private ValueFormat format;
+    private String processed;
 
     public String getValue() {
         return value;
@@ -21,9 +22,17 @@ public class DescriptionModel {
         this.format = format;
     }
 
+    public String getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(String processed) {
+        this.processed = processed;
+    }
+
     @Override
     public String toString() {
-        return "DescriptionModel {value=" + value + ", format=" + format + "}";
+        return "DescriptionModel {value=" + value + ", format=" + format + ", processed= " + processed + "}";
     }
 
 }
