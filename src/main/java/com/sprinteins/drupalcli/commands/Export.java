@@ -59,7 +59,11 @@ public class Export implements Callable<Integer> {
             for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
                 GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
                 DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
-                htmlList.add(descriptionModel.getValue());
+                if(descriptionModel.getProcessed() != null){
+                    htmlList.add(descriptionModel.getProcessed());
+                } else {
+                    htmlList.add(descriptionModel.getValue());
+                }
             }
         } else {
             htmlList.add(Files.readString(Paths.get(htmlFile)));
