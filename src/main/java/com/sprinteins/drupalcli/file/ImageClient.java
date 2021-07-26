@@ -26,7 +26,7 @@ public class ImageClient {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/file/upload/media/file/field_media_file";
         this.apiKey = apiKey;
-        this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/media/";
+        this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
     }
 
     public FileUploadModel upload(Path path) throws NoSuchAlgorithmException {
