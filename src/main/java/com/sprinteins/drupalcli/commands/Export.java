@@ -1,18 +1,23 @@
 package com.sprinteins.drupalcli.commands;
 
 import com.sprinteins.drupalcli.ApplicationContext;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
+import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
+import com.sprinteins.drupalcli.paragraph.*;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
-import picocli.CommandLine;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -20,60 +25,134 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 
 @Command(name = "export", description = "Export page")
 public class Export implements Callable<Integer> {
 
-    public static final String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
     public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
+    public static final String API_DOCS_DIRECTORY = "api-docs";
+    public static final String API_DOCS_IMAGE_DIRECTORY = "images";
+    public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
 
-    @CommandLine.ArgGroup(multiplicity = "1")
-    Dependent group;
-
-    static class Dependent {
-        @Option(names = { "--link" }, description = "Link to the api page that needs to be exported")
-        String link;
-
-        @Option(names = { "--html" }, description = "Local path to the html file")
-        String htmlFile;
-    }
-
+     @Option(names = { "--link" }, description = "Link to the api page that needs to be exported", required = true)
+     String link;
 
     @Override
     public Integer call() throws Exception {
-        String link = group.link;
-        String htmlFile = group.htmlFile;
-        List<String> htmlList = new ArrayList<>();
+        URI uri = URI.create(link);
+        String baseUri = uri.getScheme() + "://" + uri.getHost();
+        String apiKey = readApiKey();
 
-        if (link.length() > 1) {
-            URI uri = URI.create(link);
-            String baseUri = uri.getScheme() + "://" + uri.getHost();
-            String apiKey = readApiKey();
-            ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
-            NodeClient nodeClient = applicationContext.nodeClient();
-            GetStartedParagraphClient getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
+        NodeClient nodeClient = applicationContext.nodeClient();
+        var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+        ImageClient imageClient = applicationContext.imageClient();
+        ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
-            NodeModel nodeModel = nodeClient.getByUri(link);
+        Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY));
+        Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY));
 
-            for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
-                GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
-                DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
-                if(descriptionModel.getProcessed() != null){
-                    htmlList.add(descriptionModel.getProcessed());
-                } else {
-                    htmlList.add(descriptionModel.getValue());
-                }
-            }
-        } else {
-            htmlList.add(Files.readString(Paths.get(htmlFile)));
+        NodeModel nodeModel = nodeClient.getByUri(link);
+
+        // create main.markdown
+        List<String> mainMarkdown = new ArrayList<>();
+        mainMarkdown.add("---");
+        mainMarkdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+        mainMarkdown.add("menu:");
+
+
+        // fetch get started elements
+        for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
+            GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
+            DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
+
+            mainMarkdown.add("  - " + getStartedParagraph.getOrCreateFirstTitle().getValue());
+
+            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+
+            // download all images
+            downloadImages(imageClient, doc);
+
+            //cleanup
+            String cleanedHtml = cleanUpHtml(doc.html());
+
+            //convert to md
+            String markdown = convertToHtml(cleanedHtml);
+
+            //save markdown
+            Files.writeString(Paths.get(API_DOCS_DIRECTORY, getStartedParagraph
+                    .getOrCreateFirstTitle()
+                    .getValue()
+                    .toLowerCase(Locale.ROOT)
+                    .replace(" ", "-") + ".markdown"), markdown);
+
         }
 
-        for(String html: htmlList){
-            String markdown = FlexmarkHtmlConverter.builder().build().convert(html);
-            System.out.println(markdown);
+        // fetch release notes
+        for(ReleaseNoteElementModel releaseNoteElementModel: nodeModel.getReleaseNotesElement()){
+            ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
+            DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
+
+            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+
+            //cleanup
+            String cleanedHtml = cleanUpHtml(doc.html());
+
+            //convert to md
+            String markdown = convertToHtml(cleanedHtml);
+
+            //save markdown
+            Files.writeString(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY, releaseNoteParagraphModel
+                    .getOrCreateFirstTitle()
+                    .getValue()
+                    .toLowerCase(Locale.ROOT)
+                    .replace(" ", "-") + ".markdown"), markdown);
         }
+
+
+        // fetch api reference docs file
+        String sourceFileLink = nodeModel.getOrCreateFirstSourceFile().getUrl();
+        String fileName = Paths.get(sourceFileLink).getFileName().toString();
+        byte[] apiReferenceBytes = apiReferenceFileClient.download(sourceFileLink);
+        Files.write(Paths.get(API_DOCS_DIRECTORY, fileName), apiReferenceBytes);
+
+
+        // finish up main markdown and add description list
+        mainMarkdown.add("---");
+        String description = nodeModel.getOrCreateFirstListDescription().getValue();
+        String markdown = convertToHtml(cleanUpHtml(description));
+        mainMarkdown.add(markdown);
+
+
+        Files.write(Paths.get(API_DOCS_DIRECTORY, "main.markdown"), mainMarkdown);
+
         return 0;
+    }
+
+    private void downloadImages(ImageClient imageClient, Document doc) throws IOException {
+        Elements images = doc.select("img");
+        for(Element image: images){
+            String imageName = Paths.get(URI.create(image.attr("src")).getPath()).getFileName().toString();
+            byte[] imageByte = imageClient.download(image.attr("src"));
+            Files.write(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY, imageName), imageByte);
+            // change source attribute
+            image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
+        }
+    }
+
+    private String cleanUpHtml(String html) {
+        html = html.replace(" </strong>", " </strong> ");
+        return html;
+    }
+
+    private String convertToHtml(String html) {
+        MutableDataSet options = new MutableDataSet();
+        // add options to the HtmlConverter
+
+        return FlexmarkHtmlConverter.builder(options).build().convert(html);
     }
 
     private String readApiKey() {
