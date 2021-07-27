@@ -17,7 +17,7 @@ public class FrontMatterReader {
     private static final Set<Extension> EXTENSIONS = Collections.singleton(YamlFrontMatterExtension.create());
     private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS).build();
 
-    public Map<String, List<String>> readFromFile(String content) throws Exception {
+    public Map<String, List<String>> readFromString(String content) throws Exception {
         AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
         Node document = PARSER.parse(content);
         visitor.visit(document);

@@ -86,7 +86,7 @@ public class Update implements Callable<Integer> {
 
         String content = Files.readString(mainFilePath);
         FrontMatterReader frontMatter = new FrontMatterReader();
-        Map<String, List<String>> data = frontMatter.readFromFile(content);
+        Map<String, List<String>> data = frontMatter.readFromString(content);
         List<String> titleList = data.get("title");
         String title = titleList.get(0);
 

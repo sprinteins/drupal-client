@@ -9,7 +9,7 @@ public class FrontMatterReaderTest {
     @Test
     void testName() throws Exception {
         String markdown = TestFiles.readAllBytesToString("markdown/markdown-with-frontmatter.markdown");
-        var frontmatter = new FrontMatterReader().readFromFile(markdown);
+        var frontmatter = new FrontMatterReader().readFromString(markdown);
         String string = frontmatter.get("title").get(0);
         assertEquals("Hey there", string);
     }
