@@ -2,9 +2,7 @@ package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.TargetId;
 import com.sprinteins.drupalcli.models.TitleModel;
 import com.sprinteins.drupalcli.models.TypeModel;
 
