@@ -37,3 +37,6 @@ build/
 !/.settings/org.eclipse.jdt.ui.prefs
 
 credentials.txt
+
+### export folder api docs ###
+/api-docs
