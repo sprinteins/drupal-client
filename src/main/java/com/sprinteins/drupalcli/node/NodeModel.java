@@ -14,6 +14,7 @@ public class NodeModel {
     private List<TypeModel> type = Collections
             .singletonList(new TypeModel(TargetId.API_REFERENCE));
     private List<GetStartedDocsElementModel> getStartedDocsElement;
+    private List<ReleaseNoteElementModel> releaseNotesElement;
     private List<SourceFileModel> sourceFile;
     private List<LongValueModel> nid;
     private List<StringValueModel> uuid;
@@ -21,6 +22,8 @@ public class NodeModel {
     private List<StringValueModel> langcode;
     private List<DateValueModel> revisionTimestamp;
     private List<UidValueModel> revisionUid;
+    private List<DescriptionModel> listDescription;
+    private List<TitleModel> displayTitle;
 
 
     @JsonIgnore
@@ -33,6 +36,29 @@ public class NodeModel {
         }
         return sourceFile.get(0);
     }
+
+    @JsonIgnore
+    public DescriptionModel getOrCreateFirstListDescription() {
+        if (listDescription == null) {
+            listDescription = new ArrayList<>();
+        }
+        if (listDescription.isEmpty()) {
+            listDescription.add(new DescriptionModel());
+        }
+        return listDescription.get(0);
+    }
+
+    @JsonIgnore
+    public TitleModel getOrCreateFirstDisplayTitle() {
+        if (displayTitle == null) {
+            displayTitle = new ArrayList<>();
+        }
+        if (displayTitle.isEmpty()) {
+            displayTitle.add(new TitleModel());
+        }
+        return displayTitle.get(0);
+    }
+
 
     public List<TypeModel> getType() {
         return Optional.ofNullable(type).map(List::copyOf).orElse(null);
@@ -104,6 +130,32 @@ public class NodeModel {
     }
     public void setGetStartedDocsElement(List<GetStartedDocsElementModel> getStartedDocsElement) {
         this.getStartedDocsElement = Optional.ofNullable(getStartedDocsElement).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_list_description")
+    public List<DescriptionModel> getListDescription() {
+        return Optional.ofNullable(listDescription).map(List::copyOf).orElse(null);
+    }
+
+    public void setListDescription(List<DescriptionModel> description) {
+        this.listDescription = Optional.ofNullable(description).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_display_title")
+    public List<TitleModel> getDisplayTitle() {
+        return Optional.ofNullable(displayTitle).map(List::copyOf).orElse(null);
+    }
+
+    public void setDisplayTitle(List<TitleModel> title) {
+        this.displayTitle = Optional.ofNullable(title).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_release_note_elements")
+    public List<ReleaseNoteElementModel> getReleaseNotesElement() {
+        return Optional.ofNullable(releaseNotesElement).map(List::copyOf).orElse(null);
+    }
+    public void setReleaseNotesElement(List<ReleaseNoteElementModel> releaseNotesElement) {
+        this.releaseNotesElement = Optional.ofNullable(releaseNotesElement).map(List::copyOf).orElse(null);
     }
 
     @Override
