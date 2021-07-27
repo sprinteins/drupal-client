@@ -1,8 +1,7 @@
-package com.sprinteins.drupalcli.getstartedparagraph;
+package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.TargetId;
@@ -14,13 +13,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@JsonInclude(Include.NON_NULL)
-public class GetStartedParagraphModel {
-
-    private List<TypeModel> type = Collections
-            .singletonList(new TypeModel(TargetId.GET_STARTED_ELEMENT));
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class ParagraphModel {
     private List<DescriptionModel> description;
     private List<TitleModel> title;
+    private List<TypeModel> type;
+
+    public ParagraphModel(TypeModel type){
+        this.type = Collections.singletonList(type);
+    }
 
     @JsonIgnore
     public DescriptionModel getOrCreateFirstDescription() {
@@ -44,15 +45,7 @@ public class GetStartedParagraphModel {
         return title.get(0);
     }
 
-    public List<TypeModel> getType() {
-        return Optional.ofNullable(type).map(List::copyOf).orElse(null);
-    }
 
-    public void setType(List<TypeModel> type) {
-        this.type = Optional.ofNullable(type).map(List::copyOf).orElse(null);
-    }
-
-    @JsonProperty("field_p_getstarted_description")
     public List<DescriptionModel> getDescription() {
         return Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
@@ -61,13 +54,20 @@ public class GetStartedParagraphModel {
         this.description = Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
-    @JsonProperty("field_p_getstarted_title")
     public List<TitleModel> getTitle() {
         return Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 
     public void setTitle(List<TitleModel> title) {
         this.title = Optional.ofNullable(title).map(List::copyOf).orElse(null);
+    }
+
+    public List<TypeModel> getType() {
+        return Optional.ofNullable(type).map(List::copyOf).orElse(null);
+    }
+
+    public void setType(List<TypeModel> type) {
+        this.type = Optional.ofNullable(type).map(List::copyOf).orElse(null);
     }
 
 }

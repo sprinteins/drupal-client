@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.mock.DrupalMockApplication;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.ValueFormat;
+import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +26,7 @@ public class GetStartedParagraphClientTest {
         fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
         fieldDescription.setValue("Test Value");
         try {
-            new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port, "")
+            new ParagraphClient<>(new ObjectMapper(), "http://localhost:" + port, "", GetStartedParagraphModel.class)
                     .patch(195, getStartedParagraph);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -35,7 +37,7 @@ public class GetStartedParagraphClientTest {
 
     @Test
     public void testPatchNotFound()  {
-        Assertions.assertThrows(IllegalStateException.class, () -> new GetStartedParagraphClient(new ObjectMapper(), "http://localhost:" + port + "/not-found/", "")
+        Assertions.assertThrows(IllegalStateException.class, () -> new ParagraphClient<>(new ObjectMapper(), "http://localhost:" + port + "/not-found/", "", GetStartedParagraphModel.class)
                 .patch(195, new GetStartedParagraphModel()));
     }
 }

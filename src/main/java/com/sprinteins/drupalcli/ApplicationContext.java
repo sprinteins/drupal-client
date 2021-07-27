@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
 import com.sprinteins.drupalcli.node.NodeClient;
+import com.sprinteins.drupalcli.paragraph.*;
 
 public class ApplicationContext {
 
     private final ObjectMapper objectMapper;
     private final NodeClient nodeClient;
-    private final GetStartedParagraphClient getStartedParagraphClient;
+    private final ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient;
+    private final ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient;
     private final ImageClient imageClient;
     private final ApiReferenceFileClient apiReferenceFileClient;
 
@@ -25,10 +26,11 @@ public class ApplicationContext {
                  objectMapper,
                  baseUri,
                  apiKey);
-         getStartedParagraphClient = new GetStartedParagraphClient(
+         getStartedParagraphClient = new ParagraphClient<>(
                  objectMapper,
                  baseUri,
-                 apiKey);
+                 apiKey,
+                 GetStartedParagraphModel.class);
          imageClient = new ImageClient(
                  objectMapper,
                  baseUri,
@@ -37,6 +39,11 @@ public class ApplicationContext {
                  objectMapper,
                  baseUri,
                  apiKey);
+        releaseNoteParagraphClient = new ParagraphClient<>(
+                objectMapper,
+                baseUri,
+                apiKey,
+                ReleaseNoteParagraphModel.class);
     }
     
     public ObjectMapper objectMapper() {
@@ -47,9 +54,11 @@ public class ApplicationContext {
         return nodeClient;
     }
 
-    public GetStartedParagraphClient getStartedParagraphClient() {
+    public ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient() {
         return getStartedParagraphClient;
     }
+
+    public ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient() { return releaseNoteParagraphClient;}
 
     public ImageClient imageClient() {
         return imageClient;
