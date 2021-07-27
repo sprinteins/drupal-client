@@ -130,16 +130,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.commonmark</groupId>
-            <artifactId>commonmark</artifactId>
-            <version>0.18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.commonmark</groupId>
-            <artifactId>commonmark-ext-yaml-front-matter</artifactId>
-            <version>0.18.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-html2md-converter</artifactId>
             <version>0.62.2</version>
