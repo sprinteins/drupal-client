@@ -6,6 +6,7 @@ public class SourceFileModel extends TargetModel {
 
     private Boolean display = Boolean.TRUE;
     private String description = "";
+    private String url;
 
     public SourceFileModel() {
         super();
@@ -28,10 +29,14 @@ public class SourceFileModel extends TargetModel {
         this.description = description;
     }
 
+    public String getUrl() { return url; }
+
+    public void setUrl(String url) { this.url = url; }
+
     @Override
     public String toString() {
         return "SourceFileModel {display=" + display + ", description=" + description + ", targetId=" + getTargetId()
-                + ", targetType=" + getTargetType() + ", targetUuid=" + getTargetUuid() + "}";
+                + ", targetType=" + getTargetType() + ", targetUuid=" + getTargetUuid() + ", url=" + getUrl() + "}";
     }
 
 }
