@@ -8,13 +8,12 @@ import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphClient;
-import com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
 import com.sprinteins.drupalcli.models.ValueFormat;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
+import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -94,7 +93,7 @@ public class Update implements Callable<Integer> {
         
         ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
         NodeClient nodeClient = applicationContext.nodeClient();
-        GetStartedParagraphClient getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
