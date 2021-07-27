@@ -1,10 +1,11 @@
 package com.sprinteins.drupalcli;
 
-import org.commonmark.Extension;
-import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
-import org.commonmark.ext.front.matter.YamlFrontMatterVisitor;
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
+
+import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.misc.Extension;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,10 +17,10 @@ public class FrontMatterReader {
     private static final Set<Extension> EXTENSIONS = Collections.singleton(YamlFrontMatterExtension.create());
     private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS).build();
 
-    public Map<String, List<String>> readFromFile(String fileString) throws Exception {
-        YamlFrontMatterVisitor visitor = new YamlFrontMatterVisitor();
-        Node document = PARSER.parse(fileString);
-        document.accept(visitor);
+    public Map<String, List<String>> readFromFile(String content) throws Exception {
+        AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
+        Node document = PARSER.parse(content);
+        visitor.visit(document);
         return visitor.getData();
     }
 }
