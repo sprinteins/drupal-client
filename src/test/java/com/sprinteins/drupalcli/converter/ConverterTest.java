@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 public class ConverterTest {
 
-    // remove underline
     @Test
     void testRemoveUnderlineTag() throws Exception {
         Converter converter = new Converter();
@@ -14,7 +13,7 @@ public class ConverterTest {
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
     }
-    // absolute links to the same portal should be relative
+
     @Test
     void testMakeAbsoluteLinksRelative() throws Exception {
         Converter converter = new Converter();
@@ -24,7 +23,7 @@ public class ConverterTest {
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
     }
-    // ids in headings
+
     @Test
     void testRemoveIdsFromHeadings() throws Exception {
         Converter converter = new Converter();
@@ -50,7 +49,6 @@ public class ConverterTest {
         Assertions.assertEquals(expected, markdown);
     }
 
-    // long microsoft -
     @Test
     void testFixLongDash() throws Exception {
         Converter converter = new Converter();
@@ -60,7 +58,6 @@ public class ConverterTest {
         Assertions.assertEquals(expected, markdown);
     }
 
-    // keep table tags
     @Test
     void testIgnoreDivTags() throws Exception {
         Converter converter = new Converter();
@@ -72,7 +69,6 @@ public class ConverterTest {
         Assertions.assertEquals(expected, markdown);
     }
 
-    // keep div tags
     @Test
     void testIgnoreTableTags() throws Exception {
         Converter converter = new Converter();
@@ -116,6 +112,27 @@ public class ConverterTest {
         Assertions.assertEquals(expected, markdown);
     }
 
+    @Test
+    void testIgnoreDivTagsWithAttributes() throws Exception {
+        Converter converter = new Converter();
+        String html = "<div class=\"table-responsive\">TEST ME</div>";
+        String expected = "<div class=\"table-responsive\">\n" +
+                "TEST ME\n" +
+                "</div>\n";
+        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
+        Assertions.assertEquals(expected, markdown);
+    }
+
+    @Test
+    void testIgnoreTableTagsWithAttributes() throws Exception {
+        Converter converter = new Converter();
+        String html = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">TEST ME</table>";
+        String expected = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">\n" +
+                "TEST ME\n" +
+                "</table>\n";
+        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
+        Assertions.assertEquals(expected, markdown);
+    }
 
     // convert markdown to html
 
