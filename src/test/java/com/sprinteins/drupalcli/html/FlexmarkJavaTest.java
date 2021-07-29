@@ -9,7 +9,6 @@ import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
-import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
@@ -17,7 +16,6 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
