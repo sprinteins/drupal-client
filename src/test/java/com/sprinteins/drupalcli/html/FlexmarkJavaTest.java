@@ -2,6 +2,7 @@ package com.sprinteins.drupalcli.html;
 
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.TestFiles;
+import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
 import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
@@ -79,7 +80,7 @@ public class FlexmarkJavaTest {
                         .replace(" ", "-") + ".html"), html);
 
                 //convert to markdown
-                String markdown = FlexmarkHtmlConverter.builder().build().convert(html);
+                String markdown = new Converter().convertHtmlToMarkdown(html, link);
 
                 //save markdown
                 Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
@@ -126,7 +127,7 @@ public class FlexmarkJavaTest {
                         .toLowerCase(Locale.ROOT)
                         .replace(" ", "-") + ".html"), html);
 
-                String markdown = FlexmarkHtmlConverter.builder().build().convert(html);
+                String markdown = new Converter().convertHtmlToMarkdown(html, link);
 
                 //save markdown
                 Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
