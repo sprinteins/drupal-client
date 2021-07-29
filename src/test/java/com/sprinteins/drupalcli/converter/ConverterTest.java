@@ -133,7 +133,32 @@ public class ConverterTest {
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
     }
-
+    
+    @Test
+    public void testTableWithStyle() throws Exception {
+        String html = "<table align=\"center\" border=\"1\" cellpadding=\"1\" cellspacing=\"1\" style=\"width: 569px;\">\n"
+                + "<tbody>\n"
+                + "<tr>\n"
+                + "<td> <p class=\"text-align-center\">Packet Tracked</p> </td>\n"
+                + "<td style=\"width: 103px;\"> <p class=\"text-align-center\">Packet Plus</p> </td>\n"
+                + "<td style=\"width: 205px;\"> <p class=\"text-align-center\">Packet (Standard / Priority)</p> </td>\n"
+                + "<td style=\"width: 149px;\"> <p class=\"text-align-center\">Packet Return</p> </td>\n"
+                + "</tr>\n"
+                + "</tbody>\n"
+                + "</table>\n";
+        ConverterTest.assertHtmlToMarkdown(html, html);
+    }
+    
+    @Test
+    public void testTableWithStrong() throws Exception {
+        String html = "<table>\n"
+                + "<tr>\n"
+                + "<td><strong>Hi</strong></td>\n"
+                + "</tr>\n"
+                + "</table>\n";
+        ConverterTest.assertHtmlToMarkdown(html, html);
+    }
+   
     // convert markdown to html
 
         // fix bugs
