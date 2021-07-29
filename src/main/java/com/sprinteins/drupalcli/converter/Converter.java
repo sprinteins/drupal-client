@@ -4,6 +4,7 @@ import com.sprinteins.drupalcli.extensions.CustomFlexmarkExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -54,10 +55,11 @@ public class Converter {
 
 
         // add options to the HtmlConverter
-        MutableDataSet options = new MutableDataSet()
+        DataHolder options = new MutableDataSet()
                 .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
                 .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
-                .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()));
+                .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()))
+                .toImmutable();
 
         return FlexmarkHtmlConverter.builder(options).build().convert(document.html());
     }
