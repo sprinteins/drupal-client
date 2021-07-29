@@ -21,6 +21,13 @@ public class ConverterTest {
     }
 
     @Test
+    void testAnchorTargetBlank() throws Exception {
+        String html = "<a target=\"_blank\" href=\"/test/123/site\">Link</a>\n";
+        assertHtmlToMarkdown(html, html);
+    }
+    
+    // ids in headings
+    @Test
     void testRemoveIdsFromHeadings() throws Exception {
         String html = "<h1 id=\"test\">h1</h1>\n"+
                 "<h2 id=\"test\">h2</h2>\n"+
@@ -52,8 +59,8 @@ public class ConverterTest {
 
     @Test
     void testIgnoreDivTags() throws Exception {
-        String html = "<div>TEST ME</div>";
-        String expected = "<div>\n" +
+        String html = "<div class=\"something\">TEST ME</div>";
+        String expected = "<div class=\"something\">\n" +
                 "TEST ME\n" +
                 "</div>\n";
         assertHtmlToMarkdown(html, expected);

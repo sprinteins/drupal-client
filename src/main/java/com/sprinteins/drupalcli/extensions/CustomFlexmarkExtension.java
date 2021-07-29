@@ -2,20 +2,17 @@ package com.sprinteins.drupalcli.extensions;
 
 import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.html2md.converter.*;
+import com.vladsch.flexmark.html2md.converter.internal.HtmlConverterCoreNodeRenderer;
 import com.vladsch.flexmark.util.data.DataHolder;
-import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
-import com.vladsch.flexmark.util.format.TableFormatOptions;
-import com.vladsch.flexmark.util.html.CellAlignment;
-import com.vladsch.flexmark.util.misc.Ref;
-import com.vladsch.flexmark.util.sequence.LineAppendable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class CustomFlexmarkExtension {
 
@@ -75,20 +72,60 @@ public class CustomFlexmarkExtension {
     }
 
     static class CustomTagConverter implements HtmlNodeRenderer {
+
+        private Set<HtmlNodeRendererHandler<?>> defaultRenderers;
+
         public CustomTagConverter(DataHolder options) {
-
+            defaultRenderers = new HtmlConverterCoreNodeRenderer(options).getHtmlNodeRendererHandlers();
         }
-
+        
         @Override
         public Set<HtmlNodeRendererHandler<?>> getHtmlNodeRendererHandlers() {
             return new HashSet<>(List.of(
-                    new HtmlNodeRendererHandler<>("div", Element.class, this::processHtml),
-                    new HtmlNodeRendererHandler<>("table", Element.class, this::processHtml)
+                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.A_NODE, Element.class, this::processAnchor),
+                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.IMG_NODE, Element.class, this::processImg),
+                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.DIV_NODE, Element.class, this::processDiv),
+                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.TABLE_NODE, Element.class, this::renderUnchanged)
             ));
         }
+        
+        private void renderDefault(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            defaultRenderers.stream()
+                    .filter(h -> h.getTagName().equals(node.tagName()))
+                    .findFirst()
+                    .orElseThrow()
+                    .render(node, context, out); 
+        }
 
-        private void processHtml(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+        private void renderUnchanged(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            node.select(".flexmark-whitespace-wrapper").unwrap();
             out.append(node.outerHtml());
+        }
+        
+        private void processImg(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            if (node.hasAttr("class")) {
+                renderUnchanged(node, context, out);
+            } else {
+                renderDefault(node, context, out);
+            }
+        }
+        
+        private void processDiv(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            // if the div has any attributes keep everything as is
+            if (node.attributes().size() > 0) {
+                renderUnchanged(node, context, out);
+            } else {
+                renderDefault(node, context, out);
+            }
+        }
+        
+        private void processAnchor(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            // if the anchor has any attributes other than href
+            if (node.hasAttr("href") && node.attributes().size() > 1) {
+                renderUnchanged(node, context, out);
+            } else {
+                renderDefault(node, context, out);
+            }
         }
 
         static class Factory implements HtmlNodeRendererFactory {
