@@ -7,26 +7,21 @@ public class ConverterTest {
 
     @Test
     void testRemoveUnderlineTag() throws Exception {
-        Converter converter = new Converter();
         String html = "<u>im not underlined</u>";
         String expected = "im not underlined\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
     void testMakeAbsoluteLinksRelative() throws Exception {
-        Converter converter = new Converter();
         String html = "<a href=\"https://example.com/test/123/site\">Link</a>\n" +
                 "<a href=\"https://sub.example.com/test/123/site\">Link</a>";
         String expected = "[Link](/test/123/site) [Link](https://sub.example.com/test/123/site)\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
     void testRemoveIdsFromHeadings() throws Exception {
-        Converter converter = new Converter();
         String html = "<h1 id=\"test\">h1</h1>\n"+
                 "<h2 id=\"test\">h2</h2>\n"+
                 "<h3 id=\"test\">h3</h3>\n"+
@@ -39,8 +34,7 @@ public class ConverterTest {
                 "#### h4\n\n" +
                 "##### h5\n\n" +
                 "###### h6\n\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     public static void assertHtmlToMarkdown(String html, String expected){
@@ -51,27 +45,29 @@ public class ConverterTest {
 
     @Test
     void testFixLongDash() throws Exception {
-        Converter converter = new Converter();
         String html = "<p>Hallo – na wie gehts?</p>";
         String expected = "Hallo - na wie gehts?\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
     void testIgnoreDivTags() throws Exception {
-        Converter converter = new Converter();
         String html = "<div>TEST ME</div>";
         String expected = "<div>\n" +
                 "TEST ME\n" +
                 "</div>\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
+    }
+    
+    @Test
+    void testDivWithId() throws Exception {
+        String html = "<div id=test>TEST ME</div>";
+        String expected = "<div id=\"test\">\nTEST ME\n</div>\n";
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
     void testIgnoreTableTags() throws Exception {
-        Converter converter = new Converter();
         String html = "<table>\n" +
                 "  <thead>\n" +
                 "    <tr><th> Head 1 </th><th> Head 2 </th><th> Head 3 </th></tr>\n" +
@@ -108,8 +104,7 @@ public class ConverterTest {
                 "</tr>\n" +
                 "</tbody>\n" +
                 "</table>\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
@@ -152,13 +147,33 @@ public class ConverterTest {
     @Test
     public void testTableWithStrong() throws Exception {
         String html = "<table>\n"
+                + "<tbody>\n"
                 + "<tr>\n"
                 + "<td><strong>Hi</strong></td>\n"
                 + "</tr>\n"
+                + "</tbody>\n"
                 + "</table>\n";
         ConverterTest.assertHtmlToMarkdown(html, html);
     }
-   
+    
+    @Test
+    public void testTableWithHeight() throws Exception {
+        String html = "<table>\n"
+                + "<tbody>\n"
+                + "<tr height=\"45\">\n"
+                + "<td height=\"45\">Hi</td>\n"
+                + "</tr>\n"
+                + "</tbody>\n"
+                + "</table>\n";
+        ConverterTest.assertHtmlToMarkdown(html, html);
+    }
+    
+    @Test
+    public void testAccordion() throws Exception {
+        String html = "<a class=\"btn btn-primary\" data-parent=\"#accordion\" data-toggle=\"collapse\" href=\"#collapse2\">EventAirCode</a>\n";
+        ConverterTest.assertHtmlToMarkdown(html, html);
+    }
+    
     // convert markdown to html
 
         // fix bugs
