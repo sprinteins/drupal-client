@@ -24,6 +24,13 @@ public class Converter {
         Document document = Jsoup.parse(input, baseUri);
         Whitelist whitelist = Whitelist.relaxed();
         whitelist.removeTags("u");
+        whitelist.addAttributes("table", "style", "class", "align", "border", "cellpadding", "cellspacing");
+        whitelist.addAttributes("tr", "style", "class", "height");
+        whitelist.addAttributes("td", "style", "class", "height");
+        whitelist.addAttributes("p", "style", "class");
+        whitelist.addAttributes("div", "id", "class");
+        whitelist.addAttributes("col", "style");
+        whitelist.addAttributes("a", "class", "data-parent", "data-toggle", "target");
         whitelist.preserveRelativeLinks(false);
 
         Cleaner cleaner = new Cleaner(whitelist);
@@ -41,7 +48,7 @@ public class Converter {
                 element.after(" ");
             }
             // this prevents flexmark from adding unnecessary whitespace if a tag follows
-            element.wrap("<span></span>");
+            element.wrap("<span class=flexmark-whitespace-wrapper></span>");
         }
 
 
