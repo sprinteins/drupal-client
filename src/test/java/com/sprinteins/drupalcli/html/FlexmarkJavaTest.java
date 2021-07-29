@@ -64,7 +64,7 @@ public class FlexmarkJavaTest {
                 Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
                 //get html
-                String html = doc.html();
+                String html = doc.body().html();
 
                 //save html
                 Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));
@@ -106,7 +106,7 @@ public class FlexmarkJavaTest {
                 Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
                 //convert to md
-                String html = doc.html();
+                String html = doc.body().html();
 
                 //save html
                 Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));

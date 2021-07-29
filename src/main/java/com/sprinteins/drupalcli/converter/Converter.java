@@ -70,7 +70,7 @@ public class Converter {
             .render(Parser.builder()
                     .build()
                     .parse(input));
-        return Jsoup.parse(html).html();
+        return Jsoup.parse(html).body().html();
     }
 
 }
