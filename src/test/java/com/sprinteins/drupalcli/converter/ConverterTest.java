@@ -5,16 +5,6 @@ import org.junit.jupiter.api.Test;
 
 public class ConverterTest {
 
-// convert html to markdown
-    @Test
-    void testConvertHtmlToMarkdown() throws Exception {
-        Converter converter = new Converter();
-        String html = "<u>im underlined</u> <strong>im strong</strong>";
-        String expected = "im underlined **im strong**";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
-    }
-
     // remove underline
     @Test
     void testRemoveUnderlineTag() throws Exception {
@@ -75,7 +65,9 @@ public class ConverterTest {
     void testIgnoreDivTags() throws Exception {
         Converter converter = new Converter();
         String html = "<div>TEST ME</div>";
-        String expected = "<div>TEST ME</div>";
+        String expected = "<div>\n" +
+                "TEST ME\n" +
+                "</div>\n";
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
     }
@@ -91,19 +83,35 @@ public class ConverterTest {
                 "  <tbody>\n" +
                 "    <tr><td> First Value 1 </td><td> First Value 2 </td><td> First Value 3 </td></tr>\n" +
                 "    <tr><td> Second Value 1 </td><td> Second Value 2 </td><td> Second Value 3 </td></tr>\n" +
-                "    <tr><td> Third Value 1 </td><td> Third Value 2 </td><td> 3 </td></tr>\n" +
-                "  </tbody>\n" +
-                "</table>";
-        String expected = "<table>\n" +
-                "  <thead>\n" +
-                "    <tr><th> Head 1 </th><th> Head 2 </th><th> Head 3 </th></tr>\n" +
-                "  </thead>\n" +
-                "  <tbody>\n" +
-                "    <tr><td> First Value 1 </td><td> First Value 2 </td><td> First Value 3 </td></tr>\n" +
-                "    <tr><td> Second Value 1 </td><td> Second Value 2 </td><td> Second Value 3 </td></tr>\n" +
                 "    <tr><td> Third Value 1 </td><td> Third Value 2 </td><td> Third Value 3 </td></tr>\n" +
                 "  </tbody>\n" +
                 "</table>";
+        String expected = "<table>\n" +
+                "<thead>\n" +
+                "<tr>\n" +
+                "<th> Head 1 </th>\n" +
+                "<th> Head 2 </th>\n" +
+                "<th> Head 3 </th>\n" +
+                "</tr>\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+                "<tr>\n" +
+                "<td> First Value 1 </td>\n" +
+                "<td> First Value 2 </td>\n" +
+                "<td> First Value 3 </td>\n" +
+                "</tr>\n" +
+                "<tr>\n" +
+                "<td> Second Value 1 </td>\n" +
+                "<td> Second Value 2 </td>\n" +
+                "<td> Second Value 3 </td>\n" +
+                "</tr>\n" +
+                "<tr>\n" +
+                "<td> Third Value 1 </td>\n" +
+                "<td> Third Value 2 </td>\n" +
+                "<td> Third Value 3 </td>\n" +
+                "</tr>\n" +
+                "</tbody>\n" +
+                "</table>\n";
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
     }
