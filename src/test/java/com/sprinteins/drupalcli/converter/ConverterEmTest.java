@@ -14,7 +14,7 @@ public class ConverterEmTest {
     @Test
     public void testEmInsidePre() throws Exception {
         String html = "<pre><em>429</em></pre>";
-        String expected = "```\n429\n```\n\n";
+        String expected = "    429\n\n";
         ConverterTest.assertHtmlToMarkdown(html, expected);
     }
 

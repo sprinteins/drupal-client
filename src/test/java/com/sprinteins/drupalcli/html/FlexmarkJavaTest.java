@@ -95,8 +95,10 @@ public class FlexmarkJavaTest {
                         .getValue()
                         .toLowerCase(Locale.ROOT)
                         .replace(" ", "-") + ".html"), parsedHtml);
+                
+                String markdownHtmlToMarkdown = converter.convertHtmlToMarkdown(parsedHtml, link);
 
-//                Assertions.assertEquals(html, parsedHtml);
+                Assertions.assertEquals(markdown, markdownHtmlToMarkdown);
 
             }
 
@@ -137,7 +139,9 @@ public class FlexmarkJavaTest {
                         .toLowerCase(Locale.ROOT)
                         .replace(" ", "-") + ".html"), parsedHtml);
 
-//                Assertions.assertEquals(html, parsedHtml);
+                String markdownHtmlToMarkdown = converter.convertHtmlToMarkdown(parsedHtml, link);
+
+                Assertions.assertEquals(markdown, markdownHtmlToMarkdown);
             }
         }
 

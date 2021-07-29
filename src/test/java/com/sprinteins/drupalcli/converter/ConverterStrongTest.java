@@ -14,7 +14,7 @@ public class ConverterStrongTest {
     @Test
     public void testStrongInsidePre() throws Exception {
         String html = "<pre><strong>429</strong></pre>";
-        String expected = "```\n429\n```\n\n";
+        String expected = "    429\n\n";
         ConverterTest.assertHtmlToMarkdown(html, expected);
     }
 
