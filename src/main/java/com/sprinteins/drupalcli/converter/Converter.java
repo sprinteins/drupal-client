@@ -52,7 +52,18 @@ public class Converter {
             // this prevents flexmark from adding unnecessary whitespace if a tag follows
             element.wrap("<span class=flexmark-whitespace-wrapper></span>");
         }
-
+        
+        for(Element element : document.select("h1,h2,h3,h4,h5,h6,p,ol,ul")){
+            if (element.text().isBlank()) {
+                element.remove();
+            }
+        }
+        
+        for(Element element : document.select("pre")){
+            if (element.select("code").isEmpty()) {
+                element.unwrap().wrap("<pre><code></code></pre>");
+            }
+        }
 
         // add options to the HtmlConverter
         DataHolder options = new MutableDataSet()
@@ -61,7 +72,7 @@ public class Converter {
                 .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()))
                 .toImmutable();
 
-        return FlexmarkHtmlConverter.builder(options).build().convert(document.html());
+        return FlexmarkHtmlConverter.builder(options).build().convert(document.body().html());
     }
 
     public String convertMarkdownToHtml(String input){

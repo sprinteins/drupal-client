@@ -6,6 +6,58 @@ import org.junit.jupiter.api.Test;
 public class ConverterTest {
 
     @Test
+    void testPre() throws Exception {
+        String html = "<pre><code>429\n"
+                + "</code></pre>";
+        String expected = "    429\n\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
+    @Test
+    void testList() throws Exception {
+        String html = "<ol> \n"
+                + " <li>Packet</li> \n"
+                + " <li>Airwaybill</li> \n"
+                + " <li>Customs</li> \n"
+                + "</ol> ";
+        String expected = "1. Packet\n2. Airwaybill\n3. Customs\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
+    @Test
+    void testListAgain() throws Exception {
+        String html = "<p>&nbsp;</p> \n"
+                + "<p>Generally, the API provides:</p> \n"
+                + "<ol> \n"
+                + " <li>Packet</li> \n"
+                + " <li>Airwaybill</li> \n"
+                + " <li>Customs</li> \n"
+                + "</ol> \n"
+                + "<p>&nbsp;</p> ";
+        String expected = "Generally, the API provides:\n\n1. Packet\n2. Airwaybill\n3. Customs\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
+    @Test
+    void testLinebreaksRemovalEasy() throws Exception {
+        String html = "<p>Hi</p><p><br /></p>";
+        String expected = "Hi\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+    
+    @Test
+    void testLinebreaksRemovalMoreComplex() throws Exception {
+        String html = "<p><strong><span style=\"color:#d40511;\">Note: </span></strong>Usage of HTTP PUT and DELETE is not enabled.</p> \n"
+                + "<p>&nbsp;</p> \n"
+                + "<h3>&nbsp;</h3> \n"
+                + "<ul> \n"
+                + "</ul> \n"
+                + "<p><br> &nbsp;</p>";
+        String expected = "**Note:** Usage of HTTP PUT and DELETE is not enabled.\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+    
+    @Test
     void testRemoveUnderlineTag() throws Exception {
         String html = "<u>im not underlined</u>";
         String expected = "im not underlined\n";
@@ -22,8 +74,9 @@ public class ConverterTest {
 
     @Test
     void testAnchorTargetBlank() throws Exception {
-        String html = "<a target=\"_blank\" href=\"/test/123/site\">Link</a>\n";
-        assertHtmlToMarkdown(html, html);
+        String html = "<p><a target=\"_blank\" href=\"/test/123/site\">Link</a></p>\n";
+        String expected = "<a target=\"_blank\" href=\"/test/123/site\">Link</a>\n";
+        assertHtmlToMarkdown(html, expected);
     }
     
     // ids in headings
@@ -48,6 +101,9 @@ public class ConverterTest {
         Converter converter = new Converter();
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
+        String markdownToHtml = converter.convertMarkdownToHtml(markdown);
+        String htmlToMarkdown = converter.convertHtmlToMarkdown(markdownToHtml, "https://example.com");
+        Assertions.assertEquals(markdown, htmlToMarkdown);
     }
 
     @Test
@@ -61,7 +117,7 @@ public class ConverterTest {
     void testIgnoreDivTags() throws Exception {
         String html = "<div class=\"something\">TEST ME</div>";
         String expected = "<div class=\"something\">\n" +
-                "TEST ME\n" +
+                "  TEST ME\n" +
                 "</div>\n";
         assertHtmlToMarkdown(html, expected);
     }
@@ -69,7 +125,7 @@ public class ConverterTest {
     @Test
     void testDivWithId() throws Exception {
         String html = "<div id=test>TEST ME</div>";
-        String expected = "<div id=\"test\">\nTEST ME\n</div>\n";
+        String expected = "<div id=\"test\">\n  TEST ME\n</div>\n";
         assertHtmlToMarkdown(html, expected);
     }
 
@@ -86,30 +142,30 @@ public class ConverterTest {
                 "  </tbody>\n" +
                 "</table>";
         String expected = "<table>\n" +
-                "<thead>\n" +
-                "<tr>\n" +
-                "<th> Head 1 </th>\n" +
-                "<th> Head 2 </th>\n" +
-                "<th> Head 3 </th>\n" +
-                "</tr>\n" +
-                "</thead>\n" +
-                "<tbody>\n" +
-                "<tr>\n" +
-                "<td> First Value 1 </td>\n" +
-                "<td> First Value 2 </td>\n" +
-                "<td> First Value 3 </td>\n" +
-                "</tr>\n" +
-                "<tr>\n" +
-                "<td> Second Value 1 </td>\n" +
-                "<td> Second Value 2 </td>\n" +
-                "<td> Second Value 3 </td>\n" +
-                "</tr>\n" +
-                "<tr>\n" +
-                "<td> Third Value 1 </td>\n" +
-                "<td> Third Value 2 </td>\n" +
-                "<td> Third Value 3 </td>\n" +
-                "</tr>\n" +
-                "</tbody>\n" +
+                " <thead>\n" +
+                "  <tr>\n" +
+                "   <th> Head 1 </th>\n" +
+                "   <th> Head 2 </th>\n" +
+                "   <th> Head 3 </th>\n" +
+                "  </tr>\n" +
+                " </thead>\n" +
+                " <tbody>\n" +
+                "  <tr>\n" +
+                "   <td> First Value 1 </td>\n" +
+                "   <td> First Value 2 </td>\n" +
+                "   <td> First Value 3 </td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "   <td> Second Value 1 </td>\n" +
+                "   <td> Second Value 2 </td>\n" +
+                "   <td> Second Value 3 </td>\n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "   <td> Third Value 1 </td>\n" +
+                "   <td> Third Value 2 </td>\n" +
+                "   <td> Third Value 3 </td>\n" +
+                "  </tr>\n" +
+                " </tbody>\n" +
                 "</table>\n";
         assertHtmlToMarkdown(html, expected);
     }
@@ -119,7 +175,7 @@ public class ConverterTest {
         Converter converter = new Converter();
         String html = "<div class=\"table-responsive\">TEST ME</div>";
         String expected = "<div class=\"table-responsive\">\n" +
-                "TEST ME\n" +
+                "  TEST ME\n" +
                 "</div>\n";
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
@@ -130,7 +186,7 @@ public class ConverterTest {
         Converter converter = new Converter();
         String html = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">TEST ME</table>";
         String expected = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">\n" +
-                "TEST ME\n" +
+                "  TEST ME\n" +
                 "</table>\n";
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
         Assertions.assertEquals(expected, markdown);
@@ -139,14 +195,14 @@ public class ConverterTest {
     @Test
     public void testTableWithStyle() throws Exception {
         String html = "<table align=\"center\" border=\"1\" cellpadding=\"1\" cellspacing=\"1\" style=\"width: 569px;\">\n"
-                + "<tbody>\n"
-                + "<tr>\n"
-                + "<td> <p class=\"text-align-center\">Packet Tracked</p> </td>\n"
-                + "<td style=\"width: 103px;\"> <p class=\"text-align-center\">Packet Plus</p> </td>\n"
-                + "<td style=\"width: 205px;\"> <p class=\"text-align-center\">Packet (Standard / Priority)</p> </td>\n"
-                + "<td style=\"width: 149px;\"> <p class=\"text-align-center\">Packet Return</p> </td>\n"
-                + "</tr>\n"
-                + "</tbody>\n"
+                + " <tbody>\n"
+                + "  <tr>\n"
+                + "   <td> <p class=\"text-align-center\">Packet Tracked</p> </td>\n"
+                + "   <td style=\"width: 103px;\"> <p class=\"text-align-center\">Packet Plus</p> </td>\n"
+                + "   <td style=\"width: 205px;\"> <p class=\"text-align-center\">Packet (Standard / Priority)</p> </td>\n"
+                + "   <td style=\"width: 149px;\"> <p class=\"text-align-center\">Packet Return</p> </td>\n"
+                + "  </tr>\n"
+                + " </tbody>\n"
                 + "</table>\n";
         ConverterTest.assertHtmlToMarkdown(html, html);
     }
@@ -154,11 +210,11 @@ public class ConverterTest {
     @Test
     public void testTableWithStrong() throws Exception {
         String html = "<table>\n"
-                + "<tbody>\n"
-                + "<tr>\n"
-                + "<td><strong>Hi</strong></td>\n"
-                + "</tr>\n"
-                + "</tbody>\n"
+                + " <tbody>\n"
+                + "  <tr>\n"
+                + "   <td><strong>Hi</strong></td>\n"
+                + "  </tr>\n"
+                + " </tbody>\n"
                 + "</table>\n";
         ConverterTest.assertHtmlToMarkdown(html, html);
     }
@@ -166,11 +222,11 @@ public class ConverterTest {
     @Test
     public void testTableWithHeight() throws Exception {
         String html = "<table>\n"
-                + "<tbody>\n"
-                + "<tr height=\"45\">\n"
-                + "<td height=\"45\">Hi</td>\n"
-                + "</tr>\n"
-                + "</tbody>\n"
+                + " <tbody>\n"
+                + "  <tr height=\"45\">\n"
+                + "   <td height=\"45\">Hi</td>\n"
+                + "  </tr>\n"
+                + " </tbody>\n"
                 + "</table>\n";
         ConverterTest.assertHtmlToMarkdown(html, html);
     }
