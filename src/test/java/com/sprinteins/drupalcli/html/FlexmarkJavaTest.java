@@ -10,10 +10,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
-import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.ast.Node;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -54,10 +51,8 @@ public class FlexmarkJavaTest {
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var releaseNoteParagraphModelParagraphClient = applicationContext.releaseNoteParagraphClient();
-        Parser parser = Parser.builder().build();
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
-
-
+        Converter converter = new Converter();
+        
         for(String link: linkList){
             NodeModel nodeModel = nodeClient.getByUri(link);
 
@@ -80,7 +75,7 @@ public class FlexmarkJavaTest {
                         .replace(" ", "-") + ".html"), html);
 
                 //convert to markdown
-                String markdown = new Converter().convertHtmlToMarkdown(html, link);
+                String markdown = converter.convertHtmlToMarkdown(html, link);
 
                 //save markdown
                 Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
@@ -91,13 +86,7 @@ public class FlexmarkJavaTest {
                         .replace(" ", "-") + ".markdown"), markdown);
 
                 //reconvert markdown to html
-                Node document = parser.parse(markdown);
-                String newHtml = renderer.render(document);
-
-                Document newDoc = Jsoup.parse(newHtml);
-
-                //get html
-                String parsedHtml = newDoc.html();
+                String parsedHtml = converter.convertMarkdownToHtml(markdown);
 
                 //save new html
                 Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));
@@ -138,13 +127,7 @@ public class FlexmarkJavaTest {
                         .replace(" ", "-") + ".markdown"), markdown);
 
                 //reconvert markdown to html
-                Node document = parser.parse(markdown);
-                String newHtml = renderer.render(document);
-
-                Document newDoc = Jsoup.parse(newHtml);
-
-                //get html
-                String parsedHtml = newDoc.html();
+                String parsedHtml = converter.convertMarkdownToHtml(markdown);
 
                 //save new html
                 Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));

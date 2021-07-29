@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.converter;
 
 import com.sprinteins.drupalcli.extensions.CustomFlexmarkExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.MutableDataSet;
@@ -62,7 +63,12 @@ public class Converter {
     }
 
     public String convertMarkdownToHtml(String input){
-        return "";
+        String html = HtmlRenderer.builder()
+            .build()
+            .render(Parser.builder()
+                    .build()
+                    .parse(input));
+        return Jsoup.parse(html).html();
     }
 
 }
