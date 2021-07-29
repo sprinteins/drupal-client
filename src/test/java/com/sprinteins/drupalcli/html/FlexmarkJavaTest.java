@@ -61,6 +61,8 @@ public class FlexmarkJavaTest {
         for(String link: linkList){
             NodeModel nodeModel = nodeClient.getByUri(link);
 
+            String workingDir = "./target/test-compare-html";
+            
             for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
                 GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
                 DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
@@ -70,8 +72,8 @@ public class FlexmarkJavaTest {
                 String html = doc.html();
 
                 //save html
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html", getStartedParagraph
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html", getStartedParagraph
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
@@ -81,8 +83,8 @@ public class FlexmarkJavaTest {
                 String markdown = new Converter().convertHtmlToMarkdown(html, link);
 
                 //save markdown
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown", getStartedParagraph
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown", getStartedParagraph
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
@@ -98,8 +100,8 @@ public class FlexmarkJavaTest {
                 String parsedHtml = newDoc.html();
 
                 //save new html
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml", getStartedParagraph
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml", getStartedParagraph
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
@@ -118,8 +120,8 @@ public class FlexmarkJavaTest {
                 String html = doc.html();
 
                 //save html
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html", releaseNoteParagraphModel
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "html", releaseNoteParagraphModel
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
@@ -128,8 +130,8 @@ public class FlexmarkJavaTest {
                 String markdown = new Converter().convertHtmlToMarkdown(html, link);
 
                 //save markdown
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown", releaseNoteParagraphModel
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "markdown", releaseNoteParagraphModel
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
@@ -145,8 +147,8 @@ public class FlexmarkJavaTest {
                 String parsedHtml = newDoc.html();
 
                 //save new html
-                Files.createDirectories(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));
-                Files.writeString(Paths.get(".tests", nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml", releaseNoteParagraphModel
+                Files.createDirectories(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml"));
+                Files.writeString(Paths.get(workingDir, nodeModel.getOrCreateFirstDisplayTitle().getValue(), "newHtml", releaseNoteParagraphModel
                         .getOrCreateFirstTitle()
                         .getValue()
                         .toLowerCase(Locale.ROOT)
