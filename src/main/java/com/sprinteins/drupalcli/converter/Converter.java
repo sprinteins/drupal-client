@@ -3,22 +3,15 @@ package com.sprinteins.drupalcli.converter;
 import com.sprinteins.drupalcli.extensions.CustomFlexmarkExtension;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.misc.Extension;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
-import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class Converter {
 
@@ -52,11 +45,11 @@ public class Converter {
         }
 
 
+        // add options to the HtmlConverter
         MutableDataSet options = new MutableDataSet()
                 .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
                 .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
                 .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()));
-        // add options to the HtmlConverter
 
         return FlexmarkHtmlConverter.builder(options).build().convert(document.html());
     }
