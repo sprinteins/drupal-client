@@ -98,6 +98,9 @@ public class CustomFlexmarkExtension {
         }
 
         private void renderUnchanged(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            if (node.isBlock()) {
+                out.blankLine();
+            }
             node.select(".flexmark-whitespace-wrapper").unwrap();
             out.preserveSpaces();
             out.append(node.outerHtml());
