@@ -7,8 +7,6 @@ import com.vladsch.flexmark.util.data.MutableDataHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Element;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class CustomFlexmarkExtension {
@@ -39,12 +37,12 @@ public class CustomFlexmarkExtension {
         
         @Override
         public Set<HtmlNodeRendererHandler<?>> getHtmlNodeRendererHandlers() {
-            return new HashSet<>(List.of(
-                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.A_NODE, Element.class, this::processAnchor),
-                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.IMG_NODE, Element.class, this::processImg),
-                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.DIV_NODE, Element.class, this::processDiv),
-                    new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.TABLE_NODE, Element.class, this::renderUnchanged)
-            ));
+            return Set.of(
+                new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.A_NODE, Element.class, this::processAnchor),
+                new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.IMG_NODE, Element.class, this::processImg),
+                new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.DIV_NODE, Element.class, this::processDiv),
+                new HtmlNodeRendererHandler<>(FlexmarkHtmlConverter.TABLE_NODE, Element.class, this::renderUnchanged)
+            );
         }
         
         private void renderDefault(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
