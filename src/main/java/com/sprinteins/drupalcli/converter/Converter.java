@@ -58,7 +58,7 @@ public class Converter {
             element.wrap("<span class=flexmark-whitespace-wrapper></span>");
         }
         
-        for(Element element : document.select("p,h1,h2,h3,h4,h5,h6")){
+        for(Element element : document.select("p,h1,h2,h3,h4,h5,h6,ol,ul,li")){
             for (int i = 0; i < element.childNodeSize(); i++) {
                 Node childNode = element.childNode(i);
                 if (childNode instanceof TextNode) {
