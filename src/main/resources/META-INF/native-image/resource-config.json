@@ -1,7 +1,5 @@
 {
   "resources":{
-  "includes":[
-    {"pattern":"\\QEmojiReference.txt\\E"}
-  ]},
+  "includes":[{"pattern":"\\QEmojiReference.txt\\E"}]},
   "bundles":[]
 }

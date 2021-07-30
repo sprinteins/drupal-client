@@ -14,7 +14,8 @@
 {
   "name":"com.sprinteins.drupalcli.commands.Export",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true
+  "allDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"com.sprinteins.drupalcli.commands.Update",
@@ -24,12 +25,6 @@
 },
 {
   "name":"com.sprinteins.drupalcli.file.FileUploadModel",
-  "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allDeclaredConstructors":true
-},
-{
-  "name":"com.sprinteins.drupalcli.getstartedparagraph.GetStartedParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
@@ -60,6 +55,12 @@
 },
 {
   "name":"com.sprinteins.drupalcli.models.LongValueModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.models.ReleaseNoteElementModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
@@ -122,6 +123,23 @@
 },
 {
   "name":"com.sprinteins.drupalcli.node.SourceFileModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.paragraph.ParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true
+},
+{
+  "name":"com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
