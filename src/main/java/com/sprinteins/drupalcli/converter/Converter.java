@@ -26,6 +26,8 @@ public class Converter {
         // microsoft word aka long dash is replaced with regular minus
         input = input.replace("–","-");
         input = input.replace("&nbsp;", " ");
+        input = input.replaceAll("\s*<br>\s*", "<br>");
+        input = input.replaceAll("\s*<br\s*/>\s*", "<br/>");
         Document document = Jsoup.parse(input, baseUri);
         Whitelist whitelist = Whitelist.relaxed();
         whitelist.removeTags("u");
