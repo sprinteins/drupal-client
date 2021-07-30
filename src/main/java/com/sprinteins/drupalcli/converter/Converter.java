@@ -11,9 +11,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
-import org.jsoup.select.Elements;
 
 import java.util.Collections;
 
@@ -55,22 +55,54 @@ public class Converter {
             // this prevents flexmark from adding unnecessary whitespace if a tag follows
             element.wrap("<span class=flexmark-whitespace-wrapper></span>");
         }
-
-
+        
         for(Element element : document.select("p,h1,h2,h3,h4,h5,h6")){
-            Node lastNode = element.childNode(element.childNodeSize() -1 );
-            if(lastNode instanceof Element){
-                Element lastElement = (Element)lastNode;
-                if(lastElement.tagName().equals("br")){
-                    lastElement.remove();
+            for (int i = 0; i < element.childNodeSize(); i++) {
+                Node childNode = element.childNode(i);
+                if (childNode instanceof TextNode) {
+                    TextNode textNode = (TextNode) childNode;
+                    if (textNode.isBlank()) {
+                        textNode.remove();
+                        // set iterator back by one since we removed a child node
+                        i = Math.max(-1, i - 1);
+                    } else {
+                        break;
+                    }
+                } else if (childNode instanceof Element) {
+                    Element childElement = (Element) childNode;
+                    if (childElement.tagName().equals("br")) {
+                        childElement.remove();
+                        // set iterator back by one since we removed a child node
+                        i = Math.max(-1, i - 1);
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
                 }
             }
-
-            Node firstNode = element.childNode(0);
-            if(firstNode instanceof Element){
-                Element firstElement = (Element)firstNode;
-                if(firstElement.tagName().equals("br")){
-                    firstElement.remove();
+            for (int i = element.childNodeSize() - 1; i >= 0; i--) {
+                Node childNode = element.childNode(i);
+                if (childNode instanceof TextNode) {
+                    TextNode textNode = (TextNode) childNode;
+                    if (textNode.isBlank()) {
+                        textNode.remove();
+                        // set iterator back by one since we removed a child node
+                        i = Math.min(element.childNodeSize(), i + 1);
+                    } else {
+                        break;
+                    }
+                } else if (childNode instanceof Element) {
+                    Element childElement = (Element) childNode;
+                    if (childElement.tagName().equals("br")) {
+                        childElement.remove();
+                        // set iterator back by one since we removed a child node
+                        i = Math.min(element.childNodeSize(), i + 1);
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
                 }
             }
         }
@@ -80,13 +112,12 @@ public class Converter {
                 element.remove();
             }
         }
-
+        
         for(Element element : document.select("pre")){
             if (element.select("code").isEmpty()) {
                 element.unwrap().wrap("<pre><code></code></pre>");
             }
         }
-
 
         // add options to the HtmlConverter
         DataHolder options = new MutableDataSet()
