@@ -65,6 +65,23 @@ public class Converter {
             }
         }
 
+        for(Element element : document.select("p")){
+            Element lastElement = element.children().last();
+            if(lastElement != null){
+                if(lastElement.tagName().equals("br")){
+                    lastElement.remove();
+                }
+
+            }
+            Element firstElement = element.children().first();
+            if(firstElement != null){
+                if(firstElement.tagName().equals("br")){
+                    firstElement.remove();
+                }
+
+            }
+        }
+
         // add options to the HtmlConverter
         DataHolder options = new MutableDataSet()
                 .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
