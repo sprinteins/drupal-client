@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.commands;
 
 import com.sprinteins.drupalcli.ApplicationContext;
+import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.models.DescriptionModel;
@@ -54,6 +55,7 @@ public class Export implements Callable<Integer> {
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
+        Converter converter = applicationContext.converter();
 
         Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY));
         Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY));
@@ -79,11 +81,8 @@ public class Export implements Callable<Integer> {
             // download all images
             downloadImages(imageClient, doc);
 
-            //cleanup
-            String cleanedHtml = cleanUpHtml(doc.html());
-
             //convert to md
-            String markdown = convertToHtml(cleanedHtml);
+            String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
 
             //save markdown
             Files.writeString(Paths.get(API_DOCS_DIRECTORY, getStartedParagraph
@@ -101,11 +100,8 @@ public class Export implements Callable<Integer> {
 
             Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
-            //cleanup
-            String cleanedHtml = cleanUpHtml(doc.html());
-
             //convert to md
-            String markdown = convertToHtml(cleanedHtml);
+            String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
 
             //save markdown
             Files.writeString(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY, releaseNoteParagraphModel
@@ -129,7 +125,7 @@ public class Export implements Callable<Integer> {
         // finish up main markdown and add description list
         mainMarkdown.add("---");
         String description = nodeModel.getOrCreateFirstListDescription().getValue();
-        String markdown = convertToHtml(cleanUpHtml(description));
+        String markdown = converter.convertHtmlToMarkdown(description, link);
         mainMarkdown.add(markdown);
 
 
@@ -155,18 +151,6 @@ public class Export implements Callable<Integer> {
             // change source attribute
             image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
         }
-    }
-
-    private String cleanUpHtml(String html) {
-        html = html.replace(" </strong>", " </strong> ");
-        return html;
-    }
-
-    private String convertToHtml(String html) {
-        MutableDataSet options = new MutableDataSet();
-        // add options to the HtmlConverter
-
-        return FlexmarkHtmlConverter.builder(options).build().convert(html);
     }
 
     private String readApiKey() {
