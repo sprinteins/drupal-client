@@ -13,14 +13,12 @@ import java.nio.file.Path;
 public class ApiReferenceFileClient {
 
     private final ObjectMapper objectMapper;
-    private final String baseUri;
     private final String apiKey;
     private final String uploadBaseUri;
 
     public ApiReferenceFileClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
         this.uploadBaseUri = baseUri + "/file/upload/media/file/field_media_file";
-        this.baseUri = baseUri;
         this.apiKey = apiKey;
     }
 
