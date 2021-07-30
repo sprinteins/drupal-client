@@ -16,8 +16,19 @@ public class ConverterTest {
     
     @Test
     void testP() throws Exception {
-        String html = "<p>  <br>  <br>  <br>  Hi<br>   <br>  <br>  <br>  &nbsp;</p>";
-        String expected = "Hi\n";
+        String html = "<p>  <br>  &nbsp;<br>&nbsp;  &nbsp;<br>&nbsp;  Hi &nbsp;<br>&nbsp; There  <br>  <br>  <br>  &nbsp;</p>";
+        String expected = "Hi  \nThere\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
+    @Test
+    void testListAgainAndAgain() throws Exception {
+        String html = "<ol>\n"
+                + " <li>From the <a href=\"/user/apps\">My Apps</a> screen, click on the name of your app.<br> The Details screen appears.&nbsp;</li> \n"
+                + " <li>If you have access to more than one API, click the name of the relevant API.&nbsp;<br><strong>Note:</strong> The APIs are listed under the “Credentials” section.&nbsp;</li> \n"
+                + " <li>Click the <strong>Show </strong>link below the asterisks that is hiding the <em>Consumer Key</em>.&nbsp;<br> The <em>Consumer Key</em> appears.&nbsp;&nbsp; &nbsp;</li> \n"
+                + "</ol>";
+        String expected = "Hi  \nThere\n";
         assertHtmlToMarkdown(html, expected);
     }
 
