@@ -13,6 +13,13 @@ public class ConverterTest {
         String expected = "    429\n\n";
         assertHtmlToMarkdown(html, expected);
     }
+    
+    @Test
+    void testP() throws Exception {
+        String html = "<p>  <br>  <br>  <br>  Hi<br>   <br>  <br>  <br>  &nbsp;</p>";
+        String expected = "Hi\n";
+        assertHtmlToMarkdown(html, expected);
+    }
 
     @Test
     void testList() throws Exception {
