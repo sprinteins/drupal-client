@@ -28,8 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.joining;
-
 @Command(name = "update", description = "Update description")
 public class Update implements Callable<Integer> {
 
@@ -111,10 +109,6 @@ public class Update implements Callable<Integer> {
             if(Files.exists(docPath)){
                 String markdown = Files.readString(docPath);
 
-                // remove frontmatter
-                String cleanedMarkdown = removeFrontmatter(markdown);
-                cleanedMarkdown = correctMarkdownStructure(cleanedMarkdown);
-
                 // get all the images
                 Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
                 Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
@@ -122,7 +116,7 @@ public class Update implements Callable<Integer> {
                 // loop over set and search in markdown -> replace with new imagesource
                 for (Path imagePath :setOfImages){
                     String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
-                    if(cleanedMarkdown.contains(filename)){
+                    if(markdown.contains(filename)){
 
                         int status = imageClient.head(imagePath);
                         if (status != 200) {
@@ -130,7 +124,7 @@ public class Update implements Callable<Integer> {
                             FileUploadModel imageModel = imageClient.upload(imagePath);
 
                             if(imageModel != null){
-                                cleanedMarkdown = replaceImageTag(cleanedMarkdown, imagePath, imageModel);
+                                markdown = replaceImageTag(markdown, imagePath, imageModel);
                             }
                         } else {
                             System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
@@ -140,8 +134,8 @@ public class Update implements Callable<Integer> {
 
                 DescriptionModel fieldDescription = getStartedParagraph
                         .getOrCreateFirstDescription();
-                fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
-                fieldDescription.setValue(cleanedMarkdown);
+                fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+                fieldDescription.setValue(applicationContext.converter().convertMarkdownToHtml(markdown));
 
                 getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
                 System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
@@ -186,25 +180,6 @@ public class Update implements Callable<Integer> {
         } catch (IOException e) {
             throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
         }
-    }
-
-    private String correctMarkdownStructure(String markdown) {
-        List<String> lines = Arrays.asList(markdown.split("\r?\n"));
-        return lines.stream().map(line -> {
-            // the markdown structure should support "normal" header levels starting with h1
-            // but currently the API page requires the uploaded structure to start with h3
-            // so we add two levels to the header level
-            // this only supports atx-style headers
-            if (line.startsWith("#")) {
-                return "##" + line;
-            }
-            return line;
-        }).collect(joining("\n"));
-    }
-
-    public String removeFrontmatter(String markdown){
-        String[] cleanedMarkdown = markdown.split("---");
-        return cleanedMarkdown[cleanedMarkdown.length-1];
     }
 
     public Set<Path> listFilesUsingFilesList(Path dir) throws IOException {
