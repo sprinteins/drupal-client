@@ -13,6 +13,8 @@ import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class FlexmarkJavaTest {
     }
 
     @Test
+    @Disabled
     void testCompareHtml() throws IOException, InterruptedException {
         List<String> linkList = new ArrayList<>();
         linkList.add("http://dhl.docker.amazee.io/api-reference/deutsche-post-international-post-parcel-germany");
