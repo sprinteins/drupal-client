@@ -22,6 +22,16 @@ public class ConverterTest {
     }
 
     @Test
+    void testHtmlCommentBetweenLists() throws Exception {
+        String html = "<ul><li>Test</li></ul>"
+                + "<ul><li>Test</li></ul>";
+        String expected = "* Test\n"
+                + "\n\n"
+                + "* Test\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
+    @Test
     void testListAgainAndAgain() throws Exception {
         String html = "<ol>\n"
                 + " <li>From the <a href=\"/user/apps\">My Apps</a> screen, click on the name of your app.<br> The Details screen appears.&nbsp;</li> \n"
