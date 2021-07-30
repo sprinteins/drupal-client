@@ -272,8 +272,20 @@ public class ConverterTest {
         assertHtmlToMarkdown(html, expected);
     }
 
+    @Test
+    public void testBrOnEndOfPTag() throws Exception {
+        String html = "<p>The Revoke Access Token API call provides you an option to revoke your Access Token, which not yet expired.<br> &nbsp;</p> ";
+        String exprected = "The Revoke Access Token API call provides you an option to revoke your Access Token, which not yet expired.\n";
         ConverterTest.assertHtmlToMarkdown(html, exprected);
     }
+
+    @Test
+    public void testBrOnStartOfPTag() throws Exception {
+        String html = "<p><br> <strong>Discover when a shipment will arrive&nbsp;</strong></p>\n";
+        String exprected = "**Discover when a shipment will arrive**\n";
+        ConverterTest.assertHtmlToMarkdown(html, exprected);
+    }
+
     // convert markdown to html
 
         // fix bugs
