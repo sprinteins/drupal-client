@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.converter;
 
 import com.sprinteins.drupalcli.extensions.CustomFlexmarkExtension;
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
@@ -151,8 +152,9 @@ public class Converter {
     public String convertMarkdownToHtml(String input){
         DataHolder options = new MutableDataSet()
                 .set(Parser.LISTS_END_ON_DOUBLE_BLANK, true)
+                .set(Parser.EXTENSIONS, Collections.singleton(YamlFrontMatterExtension.create()))
                 .toImmutable();
-        String html = HtmlRenderer.builder()
+        String html = HtmlRenderer.builder(options)
             .build()
             .render(Parser.builder(options)
                     .build()

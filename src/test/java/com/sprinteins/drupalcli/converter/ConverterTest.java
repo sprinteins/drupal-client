@@ -339,10 +339,14 @@ public class ConverterTest {
         String exprected = "![Test 256](https://dhl.docker.amazee.io/sites/default/files/api-docs/test256_1.png)\n";
         ConverterTest.assertHtmlToMarkdown(html, exprected);
     }
-
-
-
-
+    
+    @Test
+    public void testFrontmatter() throws Exception {
+        String input = "---\ntitle: Bla\n---\n# Hi";
+        String expected = "<h3>Hi</h3>";
+        String actual = new Converter().convertMarkdownToHtml(input);
+        Assertions.assertEquals(expected, actual);
+    }
 
     // convert markdown to html
 
@@ -350,14 +354,7 @@ public class ConverterTest {
             // markdown table is not converted
             // strong bugs
 
-        // modify headline - h3 -> h1
-
         // modify image tags - set image ids
-
-
-
-
-
 
 }
 
