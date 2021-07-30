@@ -124,18 +124,14 @@ public class ConverterTest {
     // ids in headings
     @Test
     void testRemoveIdsFromHeadings() throws Exception {
-        String html = "<h1 id=\"test\">h1</h1>\n"+
-                "<h2 id=\"test\">h2</h2>\n"+
-                "<h3 id=\"test\">h3</h3>\n"+
+        String html = "<h3 id=\"test\">h3</h3>\n"+
                 "<h4 id=\"test\">h4</h4>\n"+
                 "<h5 id=\"test\">h5</h5>\n"+
                 "<h6 id=\"test\">h6</h6>";
-        String expected = "# h1\n\n" +
-                "## h2\n\n" +
-                "### h3\n\n" +
-                "#### h4\n\n" +
-                "##### h5\n\n" +
-                "###### h6\n\n";
+        String expected = "# h3\n\n" +
+                "## h4\n\n" +
+                "### h5\n\n" +
+                "#### h6\n\n";
         assertHtmlToMarkdown(html, expected);
     }
 
