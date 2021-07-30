@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import static java.util.function.Predicate.not;
+
 @Command(name = "export", description = "Export page")
 public class Export implements Callable<Integer> {
 
@@ -139,8 +141,16 @@ public class Export implements Callable<Integer> {
     private void downloadImages(ImageClient imageClient, Document doc) throws IOException {
         Elements images = doc.select("img");
         for(Element image: images){
-            String imageName = Paths.get(URI.create(image.attr("src")).getPath()).getFileName().toString();
-            byte[] imageByte = imageClient.download(image.attr("src"));
+            String srcAttribute = image.attr("src");
+            String imageName = Optional.of(srcAttribute)
+                    .filter(not(String::isBlank))
+                    .map(URI::create)
+                    .map(URI::getPath)
+                    .map(Paths::get)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .orElseThrow();
+            byte[] imageByte = imageClient.download(srcAttribute);
             Files.write(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY, imageName), imageByte);
             // change source attribute
             image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
