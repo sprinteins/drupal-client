@@ -131,6 +131,11 @@ public class Converter {
                 element.unwrap().wrap("<pre><code></code></pre>");
             }
         }
+        
+        document.select("h3").tagName("h1");
+        document.select("h4").tagName("h2");
+        document.select("h5").tagName("h3");
+        document.select("h6").tagName("h4");
 
         // add options to the HtmlConverter
         DataHolder options = new MutableDataSet()
@@ -152,7 +157,14 @@ public class Converter {
             .render(Parser.builder(options)
                     .build()
                     .parse(input));
-        return Jsoup.parse(html).body().html();
+        Document document = Jsoup.parse(html);
+
+        document.select("h4").tagName("h6");
+        document.select("h3").tagName("h5");
+        document.select("h2").tagName("h4");
+        document.select("h1").tagName("h3");
+
+        return document.body().html();
     }
 
 }
