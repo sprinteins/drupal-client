@@ -38,7 +38,12 @@ public class ConverterTest {
                 + " <li>If you have access to more than one API, click the name of the relevant API.&nbsp;<br><strong>Note:</strong> The APIs are listed under the “Credentials” section.&nbsp;</li> \n"
                 + " <li>Click the <strong>Show </strong>link below the asterisks that is hiding the <em>Consumer Key</em>.&nbsp;<br> The <em>Consumer Key</em> appears.&nbsp;&nbsp; &nbsp;</li> \n"
                 + "</ol>";
-        String expected = "Hi  \nThere\n";
+        String expected = "1. From the [My Apps](/user/apps) screen, click on the name of your app.  \n"
+                + "   The Details screen appears.\n"
+                + "2. If you have access to more than one API, click the name of the relevant API.  \n"
+                + "   **Note:** The APIs are listed under the \"Credentials\" section.\n"
+                + "3. Click the **Show** link below the asterisks that is hiding the *Consumer Key*.  \n"
+                + "   The *Consumer Key* appears.\n";
         assertHtmlToMarkdown(html, expected);
     }
 
