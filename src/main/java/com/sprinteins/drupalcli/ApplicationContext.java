@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
@@ -16,6 +17,7 @@ public class ApplicationContext {
     private final ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient;
     private final ImageClient imageClient;
     private final ApiReferenceFileClient apiReferenceFileClient;
+    private final Converter converter = new Converter();
 
     public ApplicationContext(String baseUri, String apiKey) {
          objectMapper = new ObjectMapper();
@@ -66,6 +68,10 @@ public class ApplicationContext {
 
     public ApiReferenceFileClient apiReferenceFileClient() {
         return apiReferenceFileClient;
+    }
+
+    public Converter converter() {
+        return converter;        
     }
     
     
