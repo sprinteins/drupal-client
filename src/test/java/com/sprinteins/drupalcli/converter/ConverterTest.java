@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.converter;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ConverterTest {
@@ -285,6 +286,18 @@ public class ConverterTest {
         String exprected = "**Discover when a shipment will arrive**\n";
         ConverterTest.assertHtmlToMarkdown(html, exprected);
     }
+
+    @Test
+    @Disabled
+    public void testNonBreakingSpaceBeforeBrTag() throws Exception {
+        String html = "<p>Test:&nbsp;<br> with non breaking space before br</p>\n" +
+                "<p>Test:&nbsp; with non breaking space without br</p>\n";
+        String exprected = "**Discover when a shipment will arrive**\n";
+        ConverterTest.assertHtmlToMarkdown(html, exprected);
+    }
+
+
+
 
     // convert markdown to html
 
