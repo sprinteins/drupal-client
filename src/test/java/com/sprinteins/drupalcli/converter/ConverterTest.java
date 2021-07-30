@@ -45,7 +45,15 @@ public class ConverterTest {
         String expected = "Hi\n";
         assertHtmlToMarkdown(html, expected);
     }
-    
+
+    @Test
+    void testLinebreaksRemovalEasyPartTwo() throws Exception {
+        String html = "<p>Hello<br />World</p>";
+        String expected = "Hello  \n" +
+                "World\n";
+        assertHtmlToMarkdown(html, expected);
+    }
+
     @Test
     void testLinebreaksRemovalMoreComplex() throws Exception {
         String html = "<p><strong><span style=\"color:#d40511;\">Note: </span></strong>Usage of HTTP PUT and DELETE is not enabled.</p> \n"
@@ -295,6 +303,14 @@ public class ConverterTest {
         String exprected = "**Discover when a shipment will arrive**\n";
         ConverterTest.assertHtmlToMarkdown(html, exprected);
     }
+
+    @Test
+    public void testImgTagWithinPTag() throws Exception {
+        String html = "<p><img src=\"https://dhl.docker.amazee.io/sites/default/files/api-docs/test256_1.png\" alt=\"Test 256\"></p>";
+        String exprected = "![Test 256](https://dhl.docker.amazee.io/sites/default/files/api-docs/test256_1.png)\n";
+        ConverterTest.assertHtmlToMarkdown(html, exprected);
+    }
+
 
 
 

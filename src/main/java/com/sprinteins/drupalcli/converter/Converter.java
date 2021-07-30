@@ -10,8 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 
 import java.util.Collections;
 
@@ -23,6 +25,7 @@ public class Converter {
     public String convertHtmlToMarkdown(String input, String baseUri){
         // microsoft word aka long dash is replaced with regular minus
         input = input.replace("–","-");
+        input = input.replace("&nbsp;", " ");
         Document document = Jsoup.parse(input, baseUri);
         Whitelist whitelist = Whitelist.relaxed();
         whitelist.removeTags("u");
@@ -52,35 +55,38 @@ public class Converter {
             // this prevents flexmark from adding unnecessary whitespace if a tag follows
             element.wrap("<span class=flexmark-whitespace-wrapper></span>");
         }
-        
+
+
+        for(Element element : document.select("p,h1,h2,h3,h4,h5,h6")){
+            Node lastNode = element.childNode(element.childNodeSize() -1 );
+            if(lastNode instanceof Element){
+                Element lastElement = (Element)lastNode;
+                if(lastElement.tagName().equals("br")){
+                    lastElement.remove();
+                }
+            }
+
+            Node firstNode = element.childNode(0);
+            if(firstNode instanceof Element){
+                Element firstElement = (Element)firstNode;
+                if(firstElement.tagName().equals("br")){
+                    firstElement.remove();
+                }
+            }
+        }
+
         for(Element element : document.select("h1,h2,h3,h4,h5,h6,p,ol,ul")){
-            if (element.text().isBlank()) {
+            if (element.children().isEmpty() && element.text().isBlank()) {
                 element.remove();
             }
         }
-        
+
         for(Element element : document.select("pre")){
             if (element.select("code").isEmpty()) {
                 element.unwrap().wrap("<pre><code></code></pre>");
             }
         }
 
-        for(Element element : document.select("p")){
-            Element lastElement = element.children().last();
-            if(lastElement != null){
-                if(lastElement.tagName().equals("br")){
-                    lastElement.remove();
-                }
-
-            }
-            Element firstElement = element.children().first();
-            if(firstElement != null){
-                if(firstElement.tagName().equals("br")){
-                    firstElement.remove();
-                }
-
-            }
-        }
 
         // add options to the HtmlConverter
         DataHolder options = new MutableDataSet()

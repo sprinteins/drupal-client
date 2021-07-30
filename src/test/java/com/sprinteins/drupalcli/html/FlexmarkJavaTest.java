@@ -45,6 +45,7 @@ public class FlexmarkJavaTest {
     void testCompareHtml() throws IOException, InterruptedException {
         List<String> linkList = new ArrayList<>();
         linkList.add("http://dhl.docker.amazee.io/api-reference/deutsche-post-international-post-parcel-germany");
+        linkList.add("http://dhl.docker.amazee.io/api-reference/clone-deutsche-post-international-post-parcel-germany");
         linkList.add("http://dhl.docker.amazee.io/api-reference/parcel-eu");
         linkList.add("http://dhl.docker.amazee.io/api-reference/shipment-tracking");
         linkList.add("http://dhl.docker.amazee.io/api-reference/dgf-freight-tracking");
