@@ -236,7 +236,44 @@ public class ConverterTest {
         String html = "<a class=\"btn btn-primary\" data-parent=\"#accordion\" data-toggle=\"collapse\" href=\"#collapse2\">EventAirCode</a>\n";
         ConverterTest.assertHtmlToMarkdown(html, html);
     }
-    
+
+    @Test
+    public void testOrderedListAfterTable() {
+        String html = "<table align=\"center\" border=\"1\" cellpadding=\"1\" cellspacing=\"1\" style=\"width: 569px;\">\n" +
+                " <tbody>\n" +
+                "  <tr>\n" +
+                "   <td> <p class=\"text-align-center\">Packet Tracked</p> </td>\n" +
+                "   <td style=\"width: 103px;\"> <p class=\"text-align-center\">Packet Plus</p> </td>\n" +
+                "   <td style=\"width: 205px;\"> <p class=\"text-align-center\">Packet (Standard / Priority)</p> </td>\n" +
+                "   <td style=\"width: 149px;\"> <p class=\"text-align-center\">Packet Return</p> </td>\n" +
+                "  </tr>\n" +
+                " </tbody>\n" +
+                "</table>\n" +
+                "<ol> \n" +
+                " <li>Packet label</li> \n" +
+                " <li>Airwaybill (AWB = transportation document)</li> \n" +
+                " <li>Customs document (CN22)</li> \n" +
+                "</ol> \n";
+        String expected = "<table align=\"center\" border=\"1\" cellpadding=\"1\" cellspacing=\"1\" style=\"width: 569px;\">\n" +
+                " <tbody>\n" +
+                "  <tr>\n" +
+                "   <td> <p class=\"text-align-center\">Packet Tracked</p> </td>\n" +
+                "   <td style=\"width: 103px;\"> <p class=\"text-align-center\">Packet Plus</p> </td>\n" +
+                "   <td style=\"width: 205px;\"> <p class=\"text-align-center\">Packet (Standard / Priority)</p> </td>\n" +
+                "   <td style=\"width: 149px;\"> <p class=\"text-align-center\">Packet Return</p> </td>\n" +
+                "  </tr>\n" +
+                " </tbody>\n" +
+                "</table>\n" +
+                "\n" +
+                "1. Packet label\n" +
+                "2. Airwaybill (AWB = transportation document)\n" +
+                "3. Customs document (CN22)\n";
+
+        assertHtmlToMarkdown(html, expected);
+    }
+
+        ConverterTest.assertHtmlToMarkdown(html, exprected);
+    }
     // convert markdown to html
 
         // fix bugs

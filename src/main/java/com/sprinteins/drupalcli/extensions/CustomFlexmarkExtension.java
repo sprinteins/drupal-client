@@ -104,6 +104,8 @@ public class CustomFlexmarkExtension {
             node.select(".flexmark-whitespace-wrapper").unwrap();
             out.preserveSpaces();
             out.append(node.outerHtml());
+            // disable again to prevent wrong line breaks for each node that follows
+            out.noPreserveSpaces();
         }
         
         private void processImg(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
