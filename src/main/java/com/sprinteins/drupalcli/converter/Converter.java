@@ -125,6 +125,7 @@ public class Converter {
         DataHolder options = new MutableDataSet()
                 .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
                 .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
+                .set(FlexmarkHtmlConverter.LISTS_END_ON_DOUBLE_BLANK, true)
                 .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()))
                 .toImmutable();
 
@@ -132,9 +133,12 @@ public class Converter {
     }
 
     public String convertMarkdownToHtml(String input){
+        DataHolder options = new MutableDataSet()
+                .set(Parser.LISTS_END_ON_DOUBLE_BLANK, true)
+                .toImmutable();
         String html = HtmlRenderer.builder()
             .build()
-            .render(Parser.builder()
+            .render(Parser.builder(options)
                     .build()
                     .parse(input));
         return Jsoup.parse(html).body().html();
