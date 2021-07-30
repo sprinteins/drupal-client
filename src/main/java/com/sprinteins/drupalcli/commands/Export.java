@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 @Command(name = "export", description = "Export page")
@@ -115,7 +116,10 @@ public class Export implements Callable<Integer> {
 
         // fetch api reference docs file
         String sourceFileLink = nodeModel.getOrCreateFirstSourceFile().getUrl();
-        String fileName = Paths.get(sourceFileLink).getFileName().toString();
+        String fileName = Optional.of(Paths.get(sourceFileLink))
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .orElseThrow();
         byte[] apiReferenceBytes = apiReferenceFileClient.download(sourceFileLink);
         Files.write(Paths.get(API_DOCS_DIRECTORY, fileName), apiReferenceBytes);
 
