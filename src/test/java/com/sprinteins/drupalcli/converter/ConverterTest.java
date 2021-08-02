@@ -137,10 +137,10 @@ public class ConverterTest {
 
     public static void assertHtmlToMarkdown(String html, String expected){
         Converter converter = new Converter();
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
+        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com/api-reference/location-finder");
         Assertions.assertEquals(expected, markdown);
         String markdownToHtml = converter.convertMarkdownToHtml(markdown);
-        String htmlToMarkdown = converter.convertHtmlToMarkdown(markdownToHtml, "https://example.com");
+        String htmlToMarkdown = converter.convertHtmlToMarkdown(markdownToHtml, "https://example.com/api-reference/location-finder");
         Assertions.assertEquals(markdown, htmlToMarkdown);
     }
 
@@ -210,24 +210,20 @@ public class ConverterTest {
 
     @Test
     void testIgnoreDivTagsWithAttributes() throws Exception {
-        Converter converter = new Converter();
         String html = "<div class=\"table-responsive\">TEST ME</div>";
         String expected = "<div class=\"table-responsive\">\n" +
                 "  TEST ME\n" +
                 "</div>\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
 
     @Test
     void testIgnoreTableTagsWithAttributes() throws Exception {
-        Converter converter = new Converter();
         String html = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">TEST ME</table>";
         String expected = "<table class=\"table table-hover table-striped\" cellspacing=\"1\" cellpadding=\"1\" border=\"1\">\n" +
                 "  TEST ME\n" +
                 "</table>\n";
-        String markdown = converter.convertHtmlToMarkdown(html, "https://example.com");
-        Assertions.assertEquals(expected, markdown);
+        assertHtmlToMarkdown(html, expected);
     }
     
     @Test

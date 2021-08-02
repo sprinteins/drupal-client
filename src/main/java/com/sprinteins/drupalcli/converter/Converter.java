@@ -16,6 +16,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 
+import java.net.URI;
 import java.util.Collections;
 
 public class Converter {
@@ -23,11 +24,11 @@ public class Converter {
     public Converter() {
     }
 
-    public String convertHtmlToMarkdown(String input, String baseUri){
+    public String convertHtmlToMarkdown(String input, String link){
         // microsoft word aka long dash is replaced with regular minus
         input = input.replace("–","-");
         input = input.replace("&nbsp;", " ");
-        Document document = Jsoup.parse(input, baseUri);
+        Document document = Jsoup.parse(input, link);
         Whitelist whitelist = Whitelist.relaxed();
         whitelist.removeTags("u");
         whitelist.addAttributes("table", "style", "class", "align", "border", "cellpadding", "cellspacing");
@@ -56,8 +57,12 @@ public class Converter {
         }
 
         for(Element anchorTag: document.select("a")){
-            String uri = anchorTag.attr("href");
-            anchorTag.attr("href", StringUtils.removeStart(uri, baseUri));
+            URI uri = URI.create(link);
+            String baseUri = uri.getScheme() + "://" + uri.getHost();
+            String href = anchorTag.attr("href");
+            href = StringUtils.removeStart(href, link);
+            href = StringUtils.removeStart(href, baseUri);
+            anchorTag.attr("href", href);
         }
 
         for (Element element : document.select("strong,em")) {
