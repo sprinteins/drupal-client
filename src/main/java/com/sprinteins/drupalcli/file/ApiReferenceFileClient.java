@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.file;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
+import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,6 +34,8 @@ public class ApiReferenceFileClient {
 
             HttpResponse<String> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
+            
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
         } catch (IOException | InterruptedException e) {
@@ -49,6 +52,8 @@ public class ApiReferenceFileClient {
 
             HttpResponse<byte[]> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.ofByteArray());
+            
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return httpResponse.body();
         } catch (IOException | InterruptedException e) {

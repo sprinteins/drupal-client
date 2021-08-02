@@ -77,6 +77,8 @@ public class ImageClient {
 
             HttpResponse<byte[]> httpResponse = HttpClientBuilderFactory.create().build()
                     .send(request, HttpResponse.BodyHandlers.ofByteArray());
+            
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
             return httpResponse.body();
         } catch (IOException | InterruptedException e) {
