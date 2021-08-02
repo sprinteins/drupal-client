@@ -123,18 +123,9 @@ public class Update implements Callable<Integer> {
                 for (Path imagePath :setOfImages){
                     String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
                     if(markdown.contains(filename)){
-
-                        int status = imageClient.head(imagePath);
-                        if (status != 200) {
-                            System.out.println("Uploading " + imagePath.getFileName() + "...");
-                            FileUploadModel imageModel = imageClient.upload(imagePath);
-
-                            if(imageModel != null){
-                                markdown = replaceImageTag(markdown, imagePath, imageModel);
-                            }
-                        } else {
-                            System.out.println("Skipping " +imagePath.getFileName() + " (not changed)");
-                        }
+                        System.out.println("Uploading " + imagePath.getFileName() + "...");
+                        FileUploadModel imageModel = imageClient.upload(imagePath);
+                        markdown = replaceImageTag(markdown, imagePath, imageModel);
                     }
                 }
 
