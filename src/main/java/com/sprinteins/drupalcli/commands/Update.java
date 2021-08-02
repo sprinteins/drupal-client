@@ -98,6 +98,12 @@ public class Update implements Callable<Integer> {
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
         
         NodeModel nodeModel = nodeClient.get(nodeId);
+        
+        if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
+            throw new Exception("The page titles do not match. Are you updating the wrong API page?\n" +
+                    " Supplied title: " + title + "\n" +
+                    " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+        }
 
         for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()){
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
