@@ -18,7 +18,7 @@ public class ApiReferenceFileClient {
 
     public ApiReferenceFileClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
         this.objectMapper = objectMapper;
-        this.uploadBaseUri = baseUri + "/file/upload/media/file/field_media_file";
+        this.uploadBaseUri = baseUri + "/file/upload/node/api_reference/field_source_file";
         this.apiKey = apiKey;
     }
 
