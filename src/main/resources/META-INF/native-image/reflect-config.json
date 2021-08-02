@@ -145,6 +145,10 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.vladsch.flexmark.util.ast.TextContainer$Flags",
+  "allPublicFields":true
+},
+{
   "name":"com.vladsch.flexmark.util.sequence.BasedOptionsHolder$Options",
   "allPublicFields":true
 },
