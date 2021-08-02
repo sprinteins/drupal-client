@@ -337,6 +337,13 @@ public class ConverterTest {
     }
     
     @Test
+    public void testRelativeImage() throws Exception {
+        String html = "<p><img src=\"/images/test256_1.png\" alt=\"Test 256\"></p>";
+        String exprected = "![Test 256](/images/test256_1.png)\n";
+        ConverterTest.assertHtmlToMarkdown(html, exprected);
+    }
+    
+    @Test
     public void testFrontmatter() throws Exception {
         String input = "---\ntitle: Bla\n---\n# Hi";
         String expected = "<h3>Hi</h3>";

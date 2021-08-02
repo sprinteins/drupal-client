@@ -38,7 +38,7 @@ public class Converter {
         whitelist.addAttributes("div", "id", "class");
         whitelist.addAttributes("col", "style");
         whitelist.addAttributes("a", "class", "data-parent", "data-toggle", "target");
-        whitelist.preserveRelativeLinks(false);
+        whitelist.preserveRelativeLinks(true);
 
         Cleaner cleaner = new Cleaner(whitelist);
         document = cleaner.clean(document);
