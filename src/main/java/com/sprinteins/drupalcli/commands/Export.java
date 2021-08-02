@@ -40,6 +40,9 @@ public class Export implements Callable<Integer> {
 
      @Option(names = { "--link" }, description = "Link to the api page that needs to be exported", required = true)
      String link;
+     
+     @Option(names = { "--debug" }, description = "Enable debug mode")
+     boolean debug;
 
     @Override
     public Integer call() throws Exception {
