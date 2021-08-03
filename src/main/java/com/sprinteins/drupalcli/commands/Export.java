@@ -88,12 +88,17 @@ public class Export implements Callable<Integer> {
 
             // download all images
             downloadImages(imageClient, doc);
+            
+            List<String> markdown = new ArrayList<>();
+            markdown.add("---");
+            markdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+            markdown.add("---");
 
             //convert to md
-            String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
+            markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
 
             //save markdown
-            Files.writeString(apiPageDirectory.resolve(getStartedParagraph
+            Files.write(apiPageDirectory.resolve(getStartedParagraph
                     .getOrCreateFirstTitle()
                     .getValue()
                     .toLowerCase(Locale.ROOT)
