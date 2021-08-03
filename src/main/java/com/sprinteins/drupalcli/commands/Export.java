@@ -91,7 +91,7 @@ public class Export implements Callable<Integer> {
             
             List<String> markdown = new ArrayList<>();
             markdown.add("---");
-            markdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+            markdown.add("title: " + getStartedParagraph.getOrCreateFirstTitle().getValue());
             markdown.add("---");
 
             //convert to md
