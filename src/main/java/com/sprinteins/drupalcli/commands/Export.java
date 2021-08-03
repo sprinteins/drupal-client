@@ -9,12 +9,14 @@ import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
 import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
-import com.sprinteins.drupalcli.paragraph.*;
+import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
@@ -34,21 +36,21 @@ import static java.util.function.Predicate.not;
 public class Export implements Callable<Integer> {
 
     public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
-    public static final String API_DOCS_DIRECTORY = "api-docs";
     public static final String API_DOCS_IMAGE_DIRECTORY = "images";
     public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
+    
+    @Mixin
+    private GlobalOptions globalOptions;
 
      @Option(names = { "--link" }, description = "Link to the api page that needs to be exported", required = true)
      String link;
      
-     @Option(names = { "--debug" }, description = "Enable debug mode")
-     boolean debug;
-
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
         String apiKey = readApiKey();
+        Path apiPageDirectory = globalOptions.apiPageDirectory;
 
         ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
         NodeClient nodeClient = applicationContext.nodeClient();
@@ -58,8 +60,8 @@ public class Export implements Callable<Integer> {
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         Converter converter = applicationContext.converter();
 
-        Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY));
-        Files.createDirectories(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY));
+        Files.createDirectories(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY));
+        Files.createDirectories(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY));
 
         NodeModel nodeModel = nodeClient.getByUri(link);
 
@@ -86,7 +88,7 @@ public class Export implements Callable<Integer> {
             String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
 
             //save markdown
-            Files.writeString(Paths.get(API_DOCS_DIRECTORY, getStartedParagraph
+            Files.writeString(apiPageDirectory.resolve(getStartedParagraph
                     .getOrCreateFirstTitle()
                     .getValue()
                     .toLowerCase(Locale.ROOT)
@@ -105,7 +107,7 @@ public class Export implements Callable<Integer> {
             String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
 
             //save markdown
-            Files.writeString(Paths.get(API_DOCS_DIRECTORY, API_DOCS_RELEASE_NOTES_DIRECTORY, releaseNoteParagraphModel
+            Files.writeString(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY).resolve(releaseNoteParagraphModel
                     .getOrCreateFirstTitle()
                     .getValue()
                     .toLowerCase(Locale.ROOT)
@@ -120,7 +122,7 @@ public class Export implements Callable<Integer> {
                 .map(Path::toString)
                 .orElseThrow();
         byte[] apiReferenceBytes = apiReferenceFileClient.download(sourceFileLink);
-        Files.write(Paths.get(API_DOCS_DIRECTORY, fileName), apiReferenceBytes);
+        Files.write(apiPageDirectory.resolve(fileName), apiReferenceBytes);
 
 
         // finish up main markdown and add description list
@@ -130,7 +132,7 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add(markdown);
 
 
-        Files.write(Paths.get(API_DOCS_DIRECTORY, "main.markdown"), mainMarkdown);
+        Files.write(apiPageDirectory.resolve("main.markdown"), mainMarkdown);
 
         return 0;
     }
@@ -148,7 +150,7 @@ public class Export implements Callable<Integer> {
                     .map(Path::toString)
                     .orElseThrow();
             byte[] imageByte = imageClient.download(srcAttribute);
-            Files.write(Paths.get(API_DOCS_DIRECTORY, API_DOCS_IMAGE_DIRECTORY, imageName), imageByte);
+            Files.write(globalOptions.apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
             // change source attribute
             image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
         }

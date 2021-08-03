@@ -15,13 +15,13 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.net.ProxySelector;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
@@ -32,24 +32,20 @@ import java.util.stream.Collectors;
 public class Update implements Callable<Integer> {
 
     public static final String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
-    public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
+    
+    @Mixin
+    private GlobalOptions globalOptions;
 
     @Option(names = { "--api-page" , "-a"}, description = "API page ID", required = true)
     Long nodeId;
-
-    @Option(names = { "--api-page-directory" , "-d"}, description = "Local path to the API page documentation", required = true)
-    String directory;
 
     @Option(names = { "--portal-environment" , "-p"}, description = "Portal environment to update")
     String portalEnv;
 
     @Option(names = { "--explicitly-disable-checks" , "-e"}, description = "Explicitly disabled checks")
     ArrayList<String> disabledChecks;
-
-    @Option(names = { "--debug" }, description = "Enable debug mode")
-    boolean debug;
 
     @Override
     public Integer call() throws Exception{
@@ -60,14 +56,14 @@ public class Update implements Callable<Integer> {
             ProxySelector.setDefault(proxySelector);
         }
 
-        Path workingDir = Paths.get(directory);
+        Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
 
         String apiKey = readApiKey();
 
         boolean markdownFileExists = Files.exists(mainFilePath);
         if(!markdownFileExists) {
-            throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + directory + ")");
+            throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
         String baseUri = DEFAULT_BASE_URI;
@@ -156,11 +152,7 @@ public class Update implements Callable<Integer> {
     }
 
     private String readApiKey() {
-        String apiKeyFile = System.getenv(API_KEY_ENV_KEY);
-        if (apiKeyFile == null || apiKeyFile.isEmpty() ) {
-            throw new IllegalArgumentException("API key file not found : DHL_API_DEVELOPER_PORTAL_TOKEN_FILE environment variable not set");
-        }
-        Path path = Paths.get(apiKeyFile);
+        Path path = globalOptions.tokenFile;
         if (Files.notExists(path)) {
             throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
         }
