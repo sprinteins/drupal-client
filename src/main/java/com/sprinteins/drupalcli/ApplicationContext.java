@@ -3,11 +3,19 @@ package com.sprinteins.drupalcli;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprinteins.drupalcli.commands.GlobalOptions;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
-import com.sprinteins.drupalcli.paragraph.*;
+import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.paragraph.ParagraphClient;
+import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 public class ApplicationContext {
 
@@ -19,6 +27,10 @@ public class ApplicationContext {
     private final ApiReferenceFileClient apiReferenceFileClient;
     private final Converter converter = new Converter();
 
+    public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
+        this(baseUri, readApiKey(globalOptions.tokenFile));
+    }
+    
     public ApplicationContext(String baseUri, String apiKey) {
          objectMapper = new ObjectMapper();
          objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -46,6 +58,25 @@ public class ApplicationContext {
                 baseUri,
                 apiKey,
                 ReleaseNoteParagraphModel.class);
+    }
+    
+    private static String readApiKey(Path path) {
+        if (Files.notExists(path)) {
+            throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
+        }
+        try {
+            List<String> apiKeyLines = Files.readAllLines(path);
+            if (apiKeyLines.isEmpty()) {
+                throw new IllegalArgumentException("API key invalid: " + path + " is empty");
+            }
+            String apiKey = apiKeyLines.get(0);
+            if (apiKey.isEmpty() ) {
+                throw new IllegalArgumentException("API key invalid : first line of " + path + " is empty");
+            }
+            return apiKey;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
+        }
     }
     
     public ObjectMapper objectMapper() {

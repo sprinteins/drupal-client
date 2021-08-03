@@ -72,8 +72,6 @@ public class Update implements Callable<Integer> {
         Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
 
-        String apiKey = readApiKey();
-
         boolean markdownFileExists = Files.exists(mainFilePath);
         if(!markdownFileExists) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
@@ -94,7 +92,7 @@ public class Update implements Callable<Integer> {
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
         
-        ApplicationContext applicationContext = new ApplicationContext(portalEnv, apiKey);
+        ApplicationContext applicationContext = new ApplicationContext(portalEnv, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
@@ -158,26 +156,6 @@ public class Update implements Callable<Integer> {
 
         System.out.println("Finished processing node: " + nodeId);
         return 0;
-    }
-
-    private String readApiKey() {
-        Path path = globalOptions.tokenFile;
-        if (Files.notExists(path)) {
-            throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
-        }
-        try {
-            List<String> apiKeyLines = Files.readAllLines(path);
-            if (apiKeyLines.isEmpty()) {
-                throw new IllegalArgumentException("API key invalid: " + path + " is empty");
-            }
-            String apiKey = apiKeyLines.get(0);
-            if (apiKey.isEmpty() ) {
-                throw new IllegalArgumentException("API key invalid : first line of " + path + " is empty");
-            }
-            return apiKey;
-        } catch (IOException e) {
-            throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
-        }
     }
 
     public Set<Path> listFilesUsingFilesList(Path dir) throws IOException {

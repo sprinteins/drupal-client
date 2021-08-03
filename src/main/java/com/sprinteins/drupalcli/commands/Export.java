@@ -38,7 +38,6 @@ import static java.util.function.Predicate.not;
         )
 public class Export implements Callable<Integer> {
 
-    public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
     public static final String API_DOCS_IMAGE_DIRECTORY = "images";
     public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
     
@@ -56,10 +55,9 @@ public class Export implements Callable<Integer> {
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
-        String apiKey = readApiKey();
         Path apiPageDirectory = globalOptions.apiPageDirectory;
 
-        ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
@@ -163,27 +161,4 @@ public class Export implements Callable<Integer> {
         }
     }
 
-    private String readApiKey() {
-        String apiKeyFile = System.getenv(API_KEY_ENV_KEY);
-        if (apiKeyFile == null || apiKeyFile.isEmpty() ) {
-            throw new IllegalArgumentException("API key file not found : DHL_API_DEVELOPER_PORTAL_TOKEN_FILE environment variable not set");
-        }
-        Path path = Paths.get(apiKeyFile);
-        if (Files.notExists(path)) {
-            throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
-        }
-        try {
-            List<String> apiKeyLines = Files.readAllLines(path);
-            if (apiKeyLines.isEmpty()) {
-                throw new IllegalArgumentException("API key invalid: " + path + " is empty");
-            }
-            String apiKey = apiKeyLines.get(0);
-            if (apiKey.isEmpty() ) {
-                throw new IllegalArgumentException("API key invalid : first line of " + path + " is empty");
-            }
-            return apiKey;
-        } catch (IOException e) {
-            throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
-        }
-    }
 }
