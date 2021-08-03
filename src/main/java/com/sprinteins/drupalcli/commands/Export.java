@@ -82,7 +82,9 @@ public class Export implements Callable<Integer> {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 
-            mainMarkdown.add("  - " + getStartedParagraph.getOrCreateFirstTitle().getValue());
+            String paragraphTitle = getStartedParagraph.getOrCreateFirstTitle().getValue();
+
+            mainMarkdown.add("  - " + paragraphTitle);
 
             Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
@@ -91,16 +93,14 @@ public class Export implements Callable<Integer> {
             
             List<String> markdown = new ArrayList<>();
             markdown.add("---");
-            markdown.add("title: " + getStartedParagraph.getOrCreateFirstTitle().getValue());
+            markdown.add("title: " + paragraphTitle);
             markdown.add("---");
 
             //convert to md
             markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
 
             //save markdown
-            Files.write(apiPageDirectory.resolve(getStartedParagraph
-                    .getOrCreateFirstTitle()
-                    .getValue()
+            Files.write(apiPageDirectory.resolve(paragraphTitle
                     .toLowerCase(Locale.ROOT)
                     .replace(" ", "-") + ".markdown"), markdown);
 
