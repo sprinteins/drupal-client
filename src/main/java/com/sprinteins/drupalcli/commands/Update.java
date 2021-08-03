@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
         )
 public class Update implements Callable<Integer> {
 
-    public static final String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
     
@@ -80,12 +79,8 @@ public class Update implements Callable<Integer> {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
-        String baseUri = DEFAULT_BASE_URI;
-        if (portalEnv.length() > 1) {
-            baseUri = portalEnv;
-        }
-        if (baseUri.endsWith("/")) {
-            baseUri = baseUri.substring(0, baseUri.length() - 1);
+        if (portalEnv.endsWith("/")) {
+            portalEnv = portalEnv.substring(0, portalEnv.length() - 1);
         }
 
         OpenAPI apiSpec = new OpenAPI(workingDir);
@@ -99,7 +94,7 @@ public class Update implements Callable<Integer> {
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
         
-        ApplicationContext applicationContext = new ApplicationContext(baseUri, apiKey);
+        ApplicationContext applicationContext = new ApplicationContext(portalEnv, apiKey);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
