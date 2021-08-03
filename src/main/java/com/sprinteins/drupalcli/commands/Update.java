@@ -52,7 +52,7 @@ public class Update implements Callable<Integer> {
             description = "Portal environment to update",
             defaultValue = "http://dhl.docker.amazee.io"
             )
-    String portalEnv;
+    String portalEnv = "http://dhl.docker.amazee.io";
 
     @Option(
             names = { "--explicitly-disable-checks" , "-e"},
