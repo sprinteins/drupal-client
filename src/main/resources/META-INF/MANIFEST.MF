@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Created-By: Maven Jar Plugin 3.2.0
+Build-Jdk-Spec: 11
+Implementation-Title: drupal-client
+Implementation-Version: 0.0.1-SNAPSHOT
+Main-Class: com.sprinteins.drupalcli.DrupalClientApplication
+

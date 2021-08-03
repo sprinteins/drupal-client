@@ -24,6 +24,12 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"com.sprinteins.drupalcli.commands.ManifestVersionProvider",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"com.sprinteins.drupalcli.commands.Update",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,

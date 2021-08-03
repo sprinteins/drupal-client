@@ -1,14 +1,18 @@
 package com.sprinteins.drupalcli;
 
 import com.sprinteins.drupalcli.commands.Export;
+import com.sprinteins.drupalcli.commands.ManifestVersionProvider;
 import com.sprinteins.drupalcli.commands.Update;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name ="drupal-client",
+@Command(
+        name ="drupal-client",
         subcommands = {Update.class, Export.class, CommandLine.HelpCommand.class},
         description = "Test description",
-        mixinStandardHelpOptions = true)
+        mixinStandardHelpOptions = true,
+        versionProvider = ManifestVersionProvider.class
+        )
 class DrupalClientApplication implements Runnable {
 
     @Override
