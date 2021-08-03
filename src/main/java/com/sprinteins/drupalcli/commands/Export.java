@@ -32,7 +32,10 @@ import java.util.concurrent.Callable;
 
 import static java.util.function.Predicate.not;
 
-@Command(name = "export", description = "Export page")
+@Command(
+        name = "export",
+        description = "Export page"
+        )
 public class Export implements Callable<Integer> {
 
     public static final String API_KEY_ENV_KEY = "DHL_API_DEVELOPER_PORTAL_TOKEN_FILE";
@@ -42,7 +45,11 @@ public class Export implements Callable<Integer> {
     @Mixin
     private GlobalOptions globalOptions;
 
-     @Option(names = { "--link" }, description = "Link to the api page that needs to be exported", required = true)
+     @Option(
+             names = { "--link" },
+             description = "Link to the api page that needs to be exported",
+             required = true
+             )
      String link;
      
     @Override

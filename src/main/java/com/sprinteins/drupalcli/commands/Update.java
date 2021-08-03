@@ -28,7 +28,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Command(name = "update", description = "Update description")
+@Command(
+        name = "update",
+        description = "Update description"
+        )
 public class Update implements Callable<Integer> {
 
     public static final String DEFAULT_BASE_URI = "http://dhl.docker.amazee.io";
@@ -38,13 +41,24 @@ public class Update implements Callable<Integer> {
     @Mixin
     private GlobalOptions globalOptions;
 
-    @Option(names = { "--api-page" , "-a"}, description = "API page ID", required = true)
+    @Option(
+            names = { "--api-page" , "-a"},
+            description = "API page ID",
+            required = true
+            )
     Long nodeId;
 
-    @Option(names = { "--portal-environment" , "-p"}, description = "Portal environment to update")
+    @Option(
+            names = { "--portal-environment" , "-p"},
+            description = "Portal environment to update",
+            defaultValue = "http://dhl.docker.amazee.io"
+            )
     String portalEnv;
 
-    @Option(names = { "--explicitly-disable-checks" , "-e"}, description = "Explicitly disabled checks")
+    @Option(
+            names = { "--explicitly-disable-checks" , "-e"},
+            description = "Explicitly disabled checks"
+            )
     ArrayList<String> disabledChecks;
 
     @Override

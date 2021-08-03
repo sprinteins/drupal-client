@@ -8,10 +8,17 @@ import java.nio.file.Path;
 @Command
 public class GlobalOptions {
     
-    @Option(names = { "--debug" }, description = "Enable debug mode")
+    @Option(
+            names = { "--debug" },
+            description = "Enable debug mode"
+            )
     public boolean debug;
     
-    @Option(names = { "--api-page-directory" , "-d"}, description = "Local path to the API page documentation", defaultValue = "api-docs")
+    @Option(
+            names = { "--api-page-directory" , "-d"},
+            description = "Local path to the API page documentation",
+            defaultValue = "api-docs"
+            )
     public Path apiPageDirectory;
     
     @Option(
