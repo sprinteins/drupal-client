@@ -6,6 +6,7 @@ import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -85,18 +86,29 @@ public class ImageClient {
             throw new IllegalStateException("Download failed", e);
         }
     }
-
-    public String generateMd5Hash(Path path) throws IOException, NoSuchAlgorithmException {
-        char[] hexCode = "0123456789ABCDEF".toCharArray();
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(Files.readAllBytes(path));
-        byte[] digest = md.digest();
-        StringBuilder hash = new StringBuilder(digest.length*2);
-
-        for ( byte b : digest) {
-            hash.append(hexCode[(b >> 4) & 0xF]);
-            hash.append(hexCode[(b & 0xF)]);
+    
+    public String generateMd5Hash(Path path) {
+        try {
+            return generateMd5Hash(Files.readAllBytes(path));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        return hash.toString().toUpperCase(Locale.ROOT);
+    }
+
+    public String generateMd5Hash(byte[] bytes) {
+        try {
+            char[] hexCode = "0123456789ABCDEF".toCharArray();
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(bytes);
+            byte[] digest = md.digest();
+            StringBuilder hash = new StringBuilder(digest.length*2);
+            for ( byte b : digest) {
+                hash.append(hexCode[b >> 4 & 0xF]);
+                hash.append(hexCode[b & 0xF]);
+            }
+            return hash.toString().toUpperCase(Locale.ROOT);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

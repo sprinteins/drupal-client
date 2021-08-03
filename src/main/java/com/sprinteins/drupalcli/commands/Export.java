@@ -11,6 +11,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -160,6 +161,8 @@ public class Export implements Callable<Integer> {
                     .map(Path::toString)
                     .orElseThrow();
             byte[] imageByte = imageClient.download(srcAttribute);
+            String md5Hash = imageClient.generateMd5Hash(imageByte);
+            imageName = StringUtils.removeStart(imageName, md5Hash);
             Files.write(globalOptions.apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
             // change source attribute
             image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
