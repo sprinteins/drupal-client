@@ -23,8 +23,8 @@ public class GlobalOptions {
     
     @Option(
             names = { "--token-file"},
-            description = "Path to the file containing the authentication token.\n"
-                    + "Can also be set via environment variable DHL_API_DEVELOPER_PORTAL_TOKEN_FILE",
+            description = { "Path to the file containing the authentication token.",
+                    "Can also be set via environment variable DHL_API_DEVELOPER_PORTAL_TOKEN_FILE" },
             defaultValue = "${env:DHL_API_DEVELOPER_PORTAL_TOKEN_FILE}",
             required = true
             )
