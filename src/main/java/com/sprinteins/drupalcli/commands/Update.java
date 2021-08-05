@@ -156,14 +156,10 @@ public class Update implements Callable<Integer> {
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
                     images.attr("src", currentImage.attr("src"));
                     images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
-                    if (currentImage.hasAttr("data-entity-id")) {
-                        images.attr("data-entity-id", currentImage.attr("data-entity-id")); 
-                    }
                 } else {
                     FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
                     images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
                     images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
-                    images.attr("data-entity-id", "" + imageModel.getOrCreateFirstFid().getValue());
                 }
             }
 
