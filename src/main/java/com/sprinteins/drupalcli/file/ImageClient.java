@@ -32,13 +32,13 @@ public class ImageClient {
         this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
     }
 
-    public FileUploadModel upload(Path path) throws NoSuchAlgorithmException {
+    public FileUploadModel upload(Path path, String filename) throws NoSuchAlgorithmException {
         try {
             HttpRequest request = HttpRequestBuilderFactory
                     .create(URI.create(uploadBaseUri + "?_format=json"), apiKey)
                     .POST(HttpRequest.BodyPublishers.ofFile(path))
                     .header("Content-Type", "application/octet-stream")
-                    .header("Content-Disposition", "file; filename=\"" + generateMd5Hash(path) + path.getFileName() + "\"")
+                    .header("Content-Disposition", "file; filename=\"" + filename + "\"")
                     .build();
 
             HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()

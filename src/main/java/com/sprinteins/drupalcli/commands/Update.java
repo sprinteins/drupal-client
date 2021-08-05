@@ -14,19 +14,19 @@ import com.sprinteins.drupalcli.models.ValueFormat;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
-import java.io.IOException;
 import java.net.ProxySelector;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Command(
         name = "update",
@@ -36,7 +36,7 @@ public class Update implements Callable<Integer> {
 
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
-    
+
     @Mixin
     private GlobalOptions globalOptions;
 
@@ -61,7 +61,7 @@ public class Update implements Callable<Integer> {
     ArrayList<String> disabledChecks;
 
     @Override
-    public Integer call() throws Exception{
+    public Integer call() throws Exception {
         ProxySearch proxySearch = new ProxySearch();
         proxySearch.addStrategy(Strategy.ENV_VAR);
         ProxySelector proxySelector = proxySearch.getProxySelector();
@@ -73,7 +73,7 @@ public class Update implements Callable<Integer> {
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
 
         boolean markdownFileExists = Files.exists(mainFilePath);
-        if(!markdownFileExists) {
+        if (!markdownFileExists) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
@@ -91,7 +91,7 @@ public class Update implements Callable<Integer> {
         String title = titleList.get(0);
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
-        
+
         ApplicationContext applicationContext = new ApplicationContext(portalEnv, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
@@ -99,115 +99,90 @@ public class Update implements Callable<Integer> {
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
-        
+
         NodeModel nodeModel = nodeClient.get(nodeId);
-        
+
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
-            throw new Exception("The page titles do not match. Are you updating the wrong API page?\n" +
-                    " Supplied title: " + title + "\n" +
-                    " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+            throw new Exception(
+                    "The page titles do not match. Are you updating the wrong API page?\n" + " Supplied title: " + title
+                            + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         }
 
-        for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()){
+        for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElement()) {
+
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
 
-            GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
+            GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient
+                    .get(getStartedDocsElement.getTargetId());
 
-            Path docPath = workingDir.resolve(getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ROOT).replace(" ", "-") + ".markdown");
+            Path docPath = workingDir.resolve(
+                    getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ROOT).replace(" ", "-")
+                            + ".markdown");
 
-            if(Files.exists(docPath)){
-                String markdown = Files.readString(docPath);
+            if (!Files.exists(docPath)) {
+                throw new IllegalStateException("File " + docPath + " not found");
+            }
 
-                // get all the images
-                Path imageFolder = workingDir.resolve(IMAGE_FOLDER_NAME);
-                Set<Path> setOfImages = listFilesUsingFilesList(imageFolder);
+            Document currentParagraphDocument = Jsoup
+                    .parse(getStartedParagraph.getOrCreateFirstDescription().getProcessed());
+            Document newParagraphDocument = Jsoup
+                    .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(docPath)));
 
-                // loop over set and search in markdown -> replace with new imagesource
-                for (Path imagePath :setOfImages){
-                    String filename = Optional.ofNullable(imagePath.getFileName()).map(Path::toString).orElseThrow();
-                    if(markdown.contains(filename)){
-                        System.out.println("Uploading " + imagePath.getFileName() + "...");
-                        FileUploadModel imageModel = imageClient.upload(imagePath);
-                        markdown = replaceImageTag(markdown, imagePath, imageModel);
-                    }
+            for (Element imageElement : newParagraphDocument.select("img")) {
+                
+                if (imageElement.hasAttr("data-entity-type")) {
+                    continue;
                 }
+                
+                String imageSrc = imageElement.attr("src");
+                Path imagePath = workingDir.resolve(imageSrc);
 
-                DescriptionModel fieldDescription = getStartedParagraph
-                        .getOrCreateFirstDescription();
-                fieldDescription.setFormat(ValueFormat.BASIC_HTML);
-                fieldDescription.setValue(applicationContext.converter().convertMarkdownToHtml(markdown));
+                if (!Files.exists(imagePath)) {
+                    throw new IllegalStateException("File " + imagePath + " not found");
+                }
+                
+                String filename = Optional.of(imagePath)
+                        .map(Path::getFileName)
+                        .map(Path::toString)
+                        .orElseThrow();
+                System.out.println("Uploading " + filename + "...");
+                
+                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
+                images.attr("data-entity-type", "file");
 
-                getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
-                System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
+                String md5 = imageClient.generateMd5Hash(imagePath);
+
+                Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
+                if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
+                    images.attr("src", currentImage.attr("src"));
+                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    if (currentImage.hasAttr("data-entity-id")) {
+                        images.attr("data-entity-id", currentImage.attr("data-entity-id")); 
+                    }
+                } else {
+                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
+                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
+                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
+                    images.attr("data-entity-id", "" + imageModel.getOrCreateFirstFid().getValue());
+                }
             }
-            else {
-                System.out.println("Skipping " + docPath + " (file is not present)");
-            }
+
+            DescriptionModel fieldDescription = getStartedParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            fieldDescription.setValue(newParagraphDocument.body().html());
+
+            getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
+            System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
         }
 
-        FileUploadModel apiReferenceModel =
-                apiReferenceFileClient
-                        .upload(swaggerPath);
+        FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
 
         NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
-        nodeClient
-                .patch(nodeId, patchNodeModel);
+        nodeClient.patch(nodeId, patchNodeModel);
 
         System.out.println("Finished processing node: " + nodeId);
         return 0;
     }
 
-    public Set<Path> listFilesUsingFilesList(Path dir) throws IOException {
-            return Files.list(dir)
-                    .filter(file -> !Files.isDirectory(file))
-                    .collect(Collectors.toSet());
-    }
-
-    public List<String> findString(String input, String regex){
-
-        List<String> matches = new ArrayList<>();
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-
-        while(matcher.find()){
-            matches.add(input.substring(matcher.start(), matcher.end()));
-        }
-        return matches;
-    }
-
-    public List<String> extractAltTexts(List<String> inputList, String regex) {
-
-        List<String> altTexts = new ArrayList<>();
-
-        for(String input: inputList) {
-            List<String> result = findString(input, regex);
-            altTexts.add(result.get(0).substring(1, result.get(0).length() - 1));
-        }
-        return altTexts;
-    }
-
-
-    public String replaceImageTag(String markdown, Path imagePath, FileUploadModel imageModel ){
-
-        // find image string
-        String imageRegexPattern = "!\\[[^]]*]\\("+ IMAGE_FOLDER_NAME + "/" + imagePath.getFileName() +"\\)";
-        List<String> markdownImages = findString(markdown, imageRegexPattern);
-
-        // get alt text
-        String altTextRegexPattern = "\\[[^]]*]";
-        List<String> altTexts = extractAltTexts(markdownImages, altTextRegexPattern);
-
-        // replace image tag
-        String uuid = imageModel.getUuid().get(0).getValue();
-        String src = imageModel.getUri().get(0).getUrl();
-
-        for(int index = 0; index < markdownImages.size(); index++){
-            String imageTag = "<img alt=\"" + altTexts.get(index) + "\" data-align=\"center\" data-entity-type=\"file\" data-entity-uuid=\"" + uuid + "\" src=\""+ src +"\" />";
-            markdown = markdown.replace(markdownImages.get(index), imageTag);
-        }
-
-        return markdown;
-    }
 }
-

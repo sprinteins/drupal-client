@@ -1,10 +1,12 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sprinteins.drupalcli.models.DateValueModel;
 import com.sprinteins.drupalcli.models.LongValueModel;
 import com.sprinteins.drupalcli.models.StringValueModel;
 import com.sprinteins.drupalcli.models.UriValueModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,39 @@ public class FileUploadModel {
     private List<DateValueModel> created;
     private List<DateValueModel> changed;
 
+    @JsonIgnore
+    public StringValueModel getOrCreateFirstUuid() {
+        if (uuid == null) {
+            uuid = new ArrayList<>();
+        }
+        if (uuid.isEmpty()) {
+            uuid.add(new StringValueModel());
+        }
+        return uuid.get(0);
+    }
+    
+    @JsonIgnore
+    public LongValueModel getOrCreateFirstFid() {
+        if (fid == null) {
+            fid = new ArrayList<>();
+        }
+        if (fid.isEmpty()) {
+            fid.add(new LongValueModel());
+        }
+        return fid.get(0);
+    }
+    
+    @JsonIgnore
+    public UriValueModel getOrCreateFirstUri() {
+        if (uri == null) {
+            uri = new ArrayList<>();
+        }
+        if (uri.isEmpty()) {
+            uri.add(new UriValueModel());
+        }
+        return uri.get(0);
+    }
+    
     public List<LongValueModel> getFid() {
         return Optional.ofNullable(fid).map(List::copyOf).orElse(null);
     }
