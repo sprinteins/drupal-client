@@ -12,6 +12,7 @@ import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,6 +23,7 @@ import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,9 +130,10 @@ public class Export implements Callable<Integer> {
 
         // fetch api reference docs file
         String sourceFileLink = nodeModel.getOrCreateFirstSourceFile().getUrl();
-        String fileName = Optional.of(Paths.get(sourceFileLink))
-                .map(Path::getFileName)
-                .map(Path::toString)
+        String fileName = Optional.of(sourceFileLink)
+                .map(URI::create)
+                .map(URI::getPath)
+                .map(FilenameUtils::getName)
                 .orElseThrow();
         byte[] apiReferenceBytes = apiReferenceFileClient.download(sourceFileLink);
         Files.write(apiPageDirectory.resolve(fileName), apiReferenceBytes);
@@ -156,9 +159,7 @@ public class Export implements Callable<Integer> {
                     .filter(not(String::isBlank))
                     .map(URI::create)
                     .map(URI::getPath)
-                    .map(Paths::get)
-                    .map(Path::getFileName)
-                    .map(Path::toString)
+                    .map(FilenameUtils::getName)
                     .orElseThrow();
             byte[] imageByte = imageClient.download(srcAttribute);
             String md5Hash = imageClient.generateMd5Hash(imageByte);
