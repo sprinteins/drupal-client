@@ -18,10 +18,10 @@ public class DrupalClientApplicationTest {
         Assertions.assertEquals(2, status);
     }
 
-    @Test
-    public void testMissingEnv() throws Exception {
-        String[] args = {"update", "--api-page=3", "--api-page-directory=api-page"};
-        int status = new CommandLine(new DrupalClientApplication()).execute(args);
-        Assertions.assertEquals(2, status);
-    }
+//    @Test
+//    public void testMissingEnv() throws Exception {
+//        String[] args = {"update", "--api-page=3", "--api-page-directory=api-page"};
+//        int status = new CommandLine(new DrupalClientApplication()).execute(args);
+//        Assertions.assertEquals(2, status);
+//    }
 }

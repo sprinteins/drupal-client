@@ -23,6 +23,7 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.net.ProxySelector;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -40,19 +41,26 @@ public class Update implements Callable<Integer> {
     @Mixin
     private GlobalOptions globalOptions;
 
-    @Option(
-            names = { "--api-page" , "-a"},
-            description = "API page ID",
-            required = true
-            )
-    Long nodeId;
+//    @Option(
+//            names = { "--api-page" , "-a"},
+//            description = "API page ID",
+//            required = true
+//            )
+//    Long nodeId;
 
     @Option(
-            names = { "--portal-environment" , "-p"},
-            description = "Portal environment to update",
-            defaultValue = "http://dhl.docker.amazee.io"
-            )
-    String portalEnv = "http://dhl.docker.amazee.io";
+            names = { "--link" },
+            description = "Link to the api page that needs to be exported",
+            required = true
+    )
+    String link;
+
+//    @Option(
+//            names = { "--portal-environment" , "-p"},
+//            description = "Portal environment to update",
+//            defaultValue = "http://dhl.docker.amazee.io"
+//            )
+//    String portalEnv = "http://dhl.docker.amazee.io";
 
     @Option(
             names = { "--explicitly-disable-checks" , "-e"},
@@ -69,6 +77,8 @@ public class Update implements Callable<Integer> {
             ProxySelector.setDefault(proxySelector);
         }
 
+        URI uri = URI.create(link);
+        String baseUri = uri.getScheme() + "://" + uri.getHost();
         Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
 
@@ -77,9 +87,9 @@ public class Update implements Callable<Integer> {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
-        if (portalEnv.endsWith("/")) {
-            portalEnv = portalEnv.substring(0, portalEnv.length() - 1);
-        }
+//        if (portalEnv.endsWith("/")) {
+//            portalEnv = portalEnv.substring(0, portalEnv.length() - 1);
+//        }
 
         OpenAPI apiSpec = new OpenAPI(workingDir);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
@@ -92,15 +102,18 @@ public class Update implements Callable<Integer> {
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
-        ApplicationContext applicationContext = new ApplicationContext(portalEnv, globalOptions);
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
+        NodeModel nodeModel = nodeClient.getByUri(link);
+        Long nodeId = nodeModel.getNid().get(0).getValue();
+
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
 
-        NodeModel nodeModel = nodeClient.get(nodeId);
+//        NodeModel nodeModel = nodeClient.get(nodeId);
 
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
             throw new Exception(
@@ -175,6 +188,8 @@ public class Update implements Callable<Integer> {
 
         NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
+        nodeClient.patch(nodeId, patchNodeModel);
+
         nodeClient.patch(nodeId, patchNodeModel);
 
         System.out.println("Finished processing node: " + nodeId);
