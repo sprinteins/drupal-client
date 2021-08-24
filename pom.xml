@@ -144,6 +144,11 @@
             <version>0.62.2</version>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.bidib.com.github.markusbernhardt</groupId>
             <artifactId>proxy-vole</artifactId>
             <version>1.0.15</version>
