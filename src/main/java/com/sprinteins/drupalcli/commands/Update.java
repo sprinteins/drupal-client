@@ -168,7 +168,11 @@ public class Update implements Callable<Integer> {
 
         NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
-        nodeClient.patch(nodeId, patchNodeModel);
+
+        Document newMainDocument = Jsoup
+                .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(mainFilePath)));
+        patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
+        patchNodeModel.getOrCreateFirstListDescription().setFormat(ValueFormat.BASIC_HTML);
 
         nodeClient.patch(nodeId, patchNodeModel);
 
