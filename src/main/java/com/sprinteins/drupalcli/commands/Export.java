@@ -23,7 +23,6 @@ import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,9 +67,11 @@ public class Export implements Callable<Integer> {
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         Converter converter = applicationContext.converter();
 
+        System.out.println("Creating directories...");
         Files.createDirectories(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY));
         Files.createDirectories(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY));
 
+        System.out.println("Download node information...");
         NodeModel nodeModel = nodeClient.getByUri(link);
 
         // create main.markdown
@@ -79,19 +80,18 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         mainMarkdown.add("menu:");
 
-
-        // fetch get started elements
         for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 
             String paragraphTitle = getStartedParagraph.getOrCreateFirstTitle().getValue();
+            System.out.println("Download information from " + paragraphTitle + " ...");
 
             mainMarkdown.add("  - " + paragraphTitle);
 
             Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
-            // download all images
+            System.out.println("Downloading images...");
             downloadImages(imageClient, doc);
             
             List<String> markdown = new ArrayList<>();
@@ -99,27 +99,25 @@ public class Export implements Callable<Integer> {
             markdown.add("title: " + paragraphTitle);
             markdown.add("---");
 
-            //convert to md
             markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
 
-            //save markdown
+            System.out.println("Create markdown file...");
             Files.write(apiPageDirectory.resolve(paragraphTitle
                     .toLowerCase(Locale.ROOT)
                     .replace(" ", "-") + ".markdown"), markdown);
 
         }
 
-        // fetch release notes
+        System.out.println("Download release notes ...");
         for(ReleaseNoteElementModel releaseNoteElementModel: nodeModel.getReleaseNotesElement()){
             ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
             DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
 
             Document doc = Jsoup.parse(descriptionModel.getProcessed());
 
-            //convert to md
             String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
 
-            //save markdown
+            System.out.println("Create markdown file...");
             Files.writeString(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY).resolve(releaseNoteParagraphModel
                     .getOrCreateFirstTitle()
                     .getValue()
@@ -128,7 +126,7 @@ public class Export implements Callable<Integer> {
         }
 
 
-        // fetch api reference docs file
+        System.out.println("Download OpenAPI spec file ...");
         String sourceFileLink = nodeModel.getOrCreateFirstSourceFile().getUrl();
         String fileName = Optional.of(sourceFileLink)
                 .map(URI::create)
@@ -145,7 +143,7 @@ public class Export implements Callable<Integer> {
         String markdown = converter.convertHtmlToMarkdown(description, link);
         mainMarkdown.add(markdown);
 
-
+        System.out.println("Creating main.markdown file...");
         Files.write(apiPageDirectory.resolve("main.markdown"), mainMarkdown);
 
         return 0;

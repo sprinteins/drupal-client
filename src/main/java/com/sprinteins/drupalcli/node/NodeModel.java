@@ -59,6 +59,17 @@ public class NodeModel {
         return displayTitle.get(0);
     }
 
+    @JsonIgnore
+    public LongValueModel getOrCreateFirstNid() {
+        if (nid == null) {
+            nid = new ArrayList<>();
+        }
+        if (nid.isEmpty()) {
+            nid.add(new LongValueModel());
+        }
+        return nid.get(0);
+    }
+
 
     public List<TypeModel> getType() {
         return Optional.ofNullable(type).map(List::copyOf).orElse(null);

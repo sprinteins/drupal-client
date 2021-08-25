@@ -41,26 +41,12 @@ public class Update implements Callable<Integer> {
     @Mixin
     private GlobalOptions globalOptions;
 
-//    @Option(
-//            names = { "--api-page" , "-a"},
-//            description = "API page ID",
-//            required = true
-//            )
-//    Long nodeId;
-
     @Option(
             names = { "--link" },
             description = "Link to the api page that needs to be exported",
             required = true
     )
     String link;
-
-//    @Option(
-//            names = { "--portal-environment" , "-p"},
-//            description = "Portal environment to update",
-//            defaultValue = "http://dhl.docker.amazee.io"
-//            )
-//    String portalEnv = "http://dhl.docker.amazee.io";
 
     @Option(
             names = { "--explicitly-disable-checks" , "-e"},
@@ -87,10 +73,6 @@ public class Update implements Callable<Integer> {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
-//        if (portalEnv.endsWith("/")) {
-//            portalEnv = portalEnv.substring(0, portalEnv.length() - 1);
-//        }
-
         OpenAPI apiSpec = new OpenAPI(workingDir);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
 
@@ -109,11 +91,9 @@ public class Update implements Callable<Integer> {
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
         NodeModel nodeModel = nodeClient.getByUri(link);
-        Long nodeId = nodeModel.getNid().get(0).getValue();
+        Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
 
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
-
-//        NodeModel nodeModel = nodeClient.get(nodeId);
 
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
             throw new Exception(
