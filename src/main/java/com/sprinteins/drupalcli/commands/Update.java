@@ -1,7 +1,5 @@
 package com.sprinteins.drupalcli.commands;
 
-import com.github.markusbernhardt.proxy.ProxySearch;
-import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
@@ -22,7 +20,6 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
-import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,13 +53,6 @@ public class Update implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        ProxySearch proxySearch = new ProxySearch();
-        proxySearch.addStrategy(Strategy.ENV_VAR);
-        ProxySelector proxySelector = proxySearch.getProxySelector();
-        if (proxySelector != null) {
-            ProxySelector.setDefault(proxySelector);
-        }
-
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
         Path workingDir = globalOptions.apiPageDirectory;
