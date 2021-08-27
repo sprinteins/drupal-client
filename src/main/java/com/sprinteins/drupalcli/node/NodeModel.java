@@ -70,6 +70,16 @@ public class NodeModel {
         return nid.get(0);
     }
 
+    @JsonIgnore
+    public ReleaseNoteElementModel getOrCreateFirstReleaseNotesElement() {
+        if (releaseNotesElement == null) {
+            releaseNotesElement = new ArrayList<>();
+        }
+        if (releaseNotesElement.isEmpty()) {
+            releaseNotesElement.add(new ReleaseNoteElementModel());
+        }
+        return releaseNotesElement.get(0);
+    }
 
     public List<TypeModel> getType() {
         return Optional.ofNullable(type).map(List::copyOf).orElse(null);

@@ -99,6 +99,8 @@ public class Update implements Callable<Integer> {
                             + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         }
 
+        NodeModel patchNodeModel = new NodeModel();
+
         for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElement()) {
 
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
@@ -177,8 +179,12 @@ public class Update implements Callable<Integer> {
                     .get(releaseNoteElement.getTargetId());
 
             TitleModel titleModel = releaseNoteParagraph.getOrCreateFirstTitle();
+            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
+
             titleModel.setValue(releaseNote.select("h3").html());
+            dateValueModel.setValue(releaseNote.select("h4").html());
             releaseNote.select("h3").remove();
+            releaseNote.select("h4").remove();
 
             DescriptionModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
             fieldDescription.setFormat(ValueFormat.BASIC_HTML);
@@ -186,12 +192,52 @@ public class Update implements Callable<Integer> {
 
             releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
+        }
 
+        patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
+
+        while(releaseNoteBody.childNodeSize() > 0) {
+            System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
+
+            var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
+
+            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
+
+            for ( ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList){
+                newReleaseNoteElementList.add(releaseNoteElementModel);
+            }
+
+            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
+
+            ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
+
+            TitleModel titleModel = releaseNoteParagraph.getOrCreateFirstTitle();
+            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
+
+            titleModel.setValue(releaseNote.select("h3").html());
+            dateValueModel.setValue(releaseNote.select("h4").html());
+            releaseNote.select("h3").remove();
+            releaseNote.select("h4").remove();
+
+            DescriptionModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            fieldDescription.setValue(releaseNote.html());
+            ReleaseNoteParagraphModel newReleaseNoteParagraph =  releaseNoteParagraphClient.post(releaseNoteParagraph);
+
+            ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
+            newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
+            newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
+            newReleaseNoteElement.setTargetType(TargetType.PARAGRAPH);
+            newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
+
+            newReleaseNoteElementList.add(newReleaseNoteElement);
+
+            patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
         }
 
         FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
 
-        NodeModel patchNodeModel = new NodeModel();
+
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
 
         Document newMainDocument = Jsoup
@@ -229,7 +275,7 @@ public class Update implements Callable<Integer> {
                 releaseNoteDocument.body().append(releaseNoteBody.childNode(index).outerHtml());
             }
 
-            for(int index = 0 ; index < releaseNoteBody.childNodeSize(); index++) {
+            while(releaseNoteBody.childNodeSize() > 0) {
                 releaseNoteBody.childNode(0).remove();
             }
         }

@@ -4,10 +4,7 @@ import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
-import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
-import com.sprinteins.drupalcli.models.TitleModel;
+import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
@@ -115,13 +112,14 @@ public class Export implements Callable<Integer> {
             ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
             DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
             TitleModel titleModel = releaseNoteParagraphModel.getOrCreateFirstTitle();
+            DateValueModel dateValueModel = releaseNoteParagraphModel.getOrCreateFirstDate();
 
             Document releaseNote = new Document("");
             releaseNote.append("<h3>" + titleModel.getValue() + "</h3>");
+            releaseNote.append("<h4>" + dateValueModel.getValue() + "</h4>");
             releaseNote.append(descriptionModel.getProcessed());
-            Document cleanReleaseNote = Jsoup.parse(releaseNote.html());
 
-            stringBuilder.append(converter.convertHtmlToMarkdown(cleanReleaseNote.html(), link));
+            stringBuilder.append(converter.convertHtmlToMarkdown(releaseNote.html(), link));
         }
 
         System.out.println("Create markdown file...");
