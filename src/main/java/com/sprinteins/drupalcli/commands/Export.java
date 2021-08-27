@@ -7,6 +7,7 @@ import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.models.DescriptionModel;
 import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
 import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.models.TitleModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
@@ -16,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -69,7 +71,6 @@ public class Export implements Callable<Integer> {
 
         System.out.println("Creating directories...");
         Files.createDirectories(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY));
-        Files.createDirectories(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY));
 
         System.out.println("Download node information...");
         NodeModel nodeModel = nodeClient.getByUri(link);
@@ -109,21 +110,22 @@ public class Export implements Callable<Integer> {
         }
 
         System.out.println("Download release notes ...");
+        StringBuilder stringBuilder = new StringBuilder();
         for(ReleaseNoteElementModel releaseNoteElementModel: nodeModel.getReleaseNotesElement()){
             ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
             DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
+            TitleModel titleModel = releaseNoteParagraphModel.getOrCreateFirstTitle();
 
-            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+            Document releaseNote = new Document("");
+            releaseNote.append("<h3>" + titleModel.getValue() + "</h3>");
+            releaseNote.append(descriptionModel.getProcessed());
+            Document cleanReleaseNote = Jsoup.parse(releaseNote.html());
 
-            String markdown = converter.convertHtmlToMarkdown(doc.html(), link);
-
-            System.out.println("Create markdown file...");
-            Files.writeString(apiPageDirectory.resolve(API_DOCS_RELEASE_NOTES_DIRECTORY).resolve(releaseNoteParagraphModel
-                    .getOrCreateFirstTitle()
-                    .getValue()
-                    .toLowerCase(Locale.ROOT)
-                    .replace(" ", "-") + ".markdown"), markdown);
+            stringBuilder.append(converter.convertHtmlToMarkdown(cleanReleaseNote.html(), link));
         }
+
+        System.out.println("Create markdown file...");
+        Files.writeString(apiPageDirectory.resolve("release-notes.markdown"), stringBuilder.toString());
 
 
         System.out.println("Download OpenAPI spec file ...");

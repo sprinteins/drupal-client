@@ -6,12 +6,11 @@ import com.sprinteins.drupalcli.OpenAPI;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
-import com.sprinteins.drupalcli.models.ValueFormat;
+import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,6 +22,7 @@ import picocli.CommandLine.Option;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -33,6 +33,7 @@ import java.util.concurrent.Callable;
 public class Update implements Callable<Integer> {
 
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
+    public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
 
     @Mixin
@@ -57,10 +58,16 @@ public class Update implements Callable<Integer> {
         String baseUri = uri.getScheme() + "://" + uri.getHost();
         Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
+        Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
+
 
         boolean markdownFileExists = Files.exists(mainFilePath);
         if (!markdownFileExists) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
+        }
+
+        if (!Files.exists(releaseNoteFilePath)) {
+            throw new IllegalStateException("File " + releaseNoteFilePath + " not found");
         }
 
         OpenAPI apiSpec = new OpenAPI(workingDir);
@@ -77,6 +84,7 @@ public class Update implements Callable<Integer> {
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
 
@@ -154,6 +162,33 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
         }
 
+
+        Document newReleaseNoteDocument = Jsoup
+                .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
+
+        Element releaseNoteBody = newReleaseNoteDocument.body();
+
+        for (ReleaseNoteElementModel releaseNoteElement : nodeModel.getReleaseNotesElement()) {
+            System.out.println("Updating release note: " + releaseNoteElement.getTargetId() + " ...");
+
+            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
+
+            ReleaseNoteParagraphModel releaseNoteParagraph = releaseNoteParagraphClient
+                    .get(releaseNoteElement.getTargetId());
+
+            TitleModel titleModel = releaseNoteParagraph.getOrCreateFirstTitle();
+            titleModel.setValue(releaseNote.select("h3").html());
+            releaseNote.select("h3").remove();
+
+            DescriptionModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            fieldDescription.setValue(releaseNote.html());
+
+            releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
+            System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
+
+        }
+
         FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
 
         NodeModel patchNodeModel = new NodeModel();
@@ -170,4 +205,35 @@ public class Update implements Callable<Integer> {
         return 0;
     }
 
+    public Element extractFirstReleaseNote(Element releaseNoteBody) {
+        Elements headlines = releaseNoteBody.select("h3");
+
+        List<Integer> titleIds = new ArrayList<>();
+
+        for (Element headline : headlines){
+            titleIds.add(headline.siblingIndex());
+        }
+
+        Document releaseNoteDocument = Jsoup.parse("");
+
+        if(titleIds.size() > 1){
+            for(int index = titleIds.get(0) ; index < titleIds.get(1); index++) {
+                releaseNoteDocument.body().append(releaseNoteBody.childNode(index).outerHtml());
+            }
+
+            for(int index = titleIds.get(0) ; index < titleIds.get(1); index++) {
+                releaseNoteBody.childNode(0).remove();
+            }
+        } else {
+            for(int index = 0 ; index < releaseNoteBody.childNodeSize(); index++) {
+                releaseNoteDocument.body().append(releaseNoteBody.childNode(index).outerHtml());
+            }
+
+            for(int index = 0 ; index < releaseNoteBody.childNodeSize(); index++) {
+                releaseNoteBody.childNode(0).remove();
+            }
+        }
+
+        return releaseNoteDocument.body();
+    }
 }
