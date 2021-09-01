@@ -3,6 +3,8 @@ package com.sprinteins.drupalcli;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 import com.sprinteins.drupalcli.commands.GlobalOptions;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -119,9 +121,11 @@ public class ApplicationContext {
     private static HttpClient buildHttpClient(boolean insecureHttps) {
         Builder httpClientBuilder = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL);
-        ProxySelector proxy = ProxySelector.getDefault();
-        if (proxy != null) {
-            httpClientBuilder.proxy(proxy);
+        ProxySearch proxySearch = new ProxySearch();
+        proxySearch.addStrategy(Strategy.ENV_VAR);
+        ProxySelector proxySelector = proxySearch.getProxySelector();
+        if (proxySelector != null) {
+            httpClientBuilder.proxy(proxySelector); 
         }
         if (insecureHttps) {
             try {
