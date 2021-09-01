@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 public class ApplicationContext {
@@ -103,16 +104,14 @@ public class ApplicationContext {
     private static TrustManager[] trustAllCerts = new TrustManager[]{
             new X509TrustManager() {
                 @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
                 }
                 @Override
-                public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
                 @Override
-                public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] certs, String authType) {
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }
         };
