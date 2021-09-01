@@ -13,6 +13,12 @@ public class GlobalOptions {
             description = "Enable debug mode"
             )
     public boolean debug;
+
+    @Option(
+            names = { "--insecure", "-k" },
+            description = "Allow insecure server connections when using SSL"
+            )
+    public boolean insecureHttps;
     
     @Option(
             names = { "--api-page-directory" },

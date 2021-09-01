@@ -12,10 +12,19 @@ import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import java.io.IOException;
+import java.net.ProxySelector;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Builder;
+import java.net.http.HttpClient.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.util.List;
 
 public class ApplicationContext {
@@ -29,11 +38,15 @@ public class ApplicationContext {
     private final Converter converter = new Converter();
 
     public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
-        this(baseUri, readApiKey(globalOptions.tokenFile));
+        this(baseUri, readApiKey(globalOptions.tokenFile), globalOptions.insecureHttps);
     }
     
     public ApplicationContext(String baseUri, String apiKey) {
-        HttpClient httpClient = HttpClientBuilderFactory.create().build();
+        this(baseUri, apiKey, false);
+    }
+    
+    public ApplicationContext(String baseUri, String apiKey, boolean insecureHttps) {
+        HttpClient httpClient = buildHttpClient(insecureHttps);
 
          objectMapper = new ObjectMapper();
          objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -85,6 +98,42 @@ public class ApplicationContext {
         } catch (IOException e) {
             throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
         }
+    }
+    
+    private static TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                @Override
+                public void checkClientTrusted(
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                }
+                @Override
+                public void checkServerTrusted(
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+    
+    private static HttpClient buildHttpClient(boolean insecureHttps) {
+        Builder httpClientBuilder = HttpClient.newBuilder()
+                .followRedirects(Redirect.NORMAL);
+        ProxySelector proxy = ProxySelector.getDefault();
+        if (proxy != null) {
+            httpClientBuilder.proxy(proxy);
+        }
+        if (insecureHttps) {
+            try {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustAllCerts, new SecureRandom());
+                httpClientBuilder.sslContext(sslContext);
+            } catch (GeneralSecurityException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return httpClientBuilder.build();
     }
     
     public ObjectMapper objectMapper() {
