@@ -1,13 +1,13 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
@@ -23,13 +23,15 @@ public class ImageClient {
     private final String baseUri;
     private final String apiKey;
     private final String apiDocsDirectory;
+    private final HttpClient httpClient;
 
-    public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
+    public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey, HttpClient httpClient) {
         this.objectMapper = objectMapper;
         this.uploadBaseUri = baseUri + "/file/upload/media/file/field_media_file";
         this.baseUri = baseUri;
         this.apiKey = apiKey;
         this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
+        this.httpClient = httpClient;
     }
 
     public FileUploadModel upload(Path path, String filename) throws NoSuchAlgorithmException {
@@ -41,8 +43,7 @@ public class ImageClient {
                     .header("Content-Disposition", "file; filename=\"" + filename + "\"")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
-                    .build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
             
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
@@ -60,7 +61,7 @@ public class ImageClient {
                     .method("HEAD", HttpRequest.BodyPublishers.noBody())
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create().build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             return httpResponse.statusCode();
@@ -76,7 +77,7 @@ public class ImageClient {
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 
-            HttpResponse<byte[]> httpResponse = HttpClientBuilderFactory.create().build()
+            HttpResponse<byte[]> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofByteArray());
             
             HttpResponseStatusHandler.checkStatusCode(httpResponse);

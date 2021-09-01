@@ -1,12 +1,12 @@
 package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
@@ -15,11 +15,13 @@ public class NodeClient {
     private final ObjectMapper objectMapper;
     private final String baseUri;
     private final String apiKey;
+    private final HttpClient httpClient;
 
-    public NodeClient(ObjectMapper objectMapper, String baseUri, String apiKey) {
+    public NodeClient(ObjectMapper objectMapper, String baseUri, String apiKey, HttpClient httpClient) {
         this.objectMapper = objectMapper;
         this.baseUri = baseUri + "/node/";
         this.apiKey = apiKey;
+        this.httpClient = httpClient;
     }
 
     public void patch(long id, NodeModel nodeModel) {
@@ -33,7 +35,7 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<Void> httpResponse = HttpClientBuilderFactory.create().build()
+            HttpResponse<Void> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.discarding());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
@@ -50,8 +52,7 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
-                    .build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
@@ -70,8 +71,7 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
-                    .build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);

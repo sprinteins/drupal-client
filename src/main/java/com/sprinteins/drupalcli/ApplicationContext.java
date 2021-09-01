@@ -13,6 +13,7 @@ import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -32,6 +33,8 @@ public class ApplicationContext {
     }
     
     public ApplicationContext(String baseUri, String apiKey) {
+        HttpClient httpClient = HttpClientBuilderFactory.create().build();
+
          objectMapper = new ObjectMapper();
          objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
          objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -39,25 +42,30 @@ public class ApplicationContext {
          nodeClient = new NodeClient(
                  objectMapper,
                  baseUri,
-                 apiKey);
+                 apiKey,
+                 httpClient);
          getStartedParagraphClient = new ParagraphClient<>(
                  objectMapper,
                  baseUri,
                  apiKey,
-                 GetStartedParagraphModel.class);
+                 GetStartedParagraphModel.class,
+                 httpClient);
          imageClient = new ImageClient(
                  objectMapper,
                  baseUri,
-                 apiKey);
+                 apiKey,
+                 httpClient);
          apiReferenceFileClient = new ApiReferenceFileClient(
                  objectMapper,
                  baseUri,
-                 apiKey);
+                 apiKey,
+                 httpClient);
         releaseNoteParagraphClient = new ParagraphClient<>(
                 objectMapper,
                 baseUri,
                 apiKey,
-                ReleaseNoteParagraphModel.class);
+                ReleaseNoteParagraphModel.class,
+                httpClient);
     }
     
     private static String readApiKey(Path path) {

@@ -1,13 +1,12 @@
 package com.sprinteins.drupalcli.paragraph;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.HttpClientBuilderFactory;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
@@ -18,13 +17,15 @@ public class ParagraphClient<R extends ParagraphModel> {
     private final String baseUri;
     private final String apiKey;
     private final Class<R> modelClass;
+    private final HttpClient httpClient;
 
-    public ParagraphClient(ObjectMapper objectMapper, String baseUri, String apiKey, Class<R> modelClass) {
+    public ParagraphClient(ObjectMapper objectMapper, String baseUri, String apiKey, Class<R> modelClass, HttpClient httpClient) {
         this.objectMapper = objectMapper;
         this.postUri = baseUri + "/entity/paragraph";
         this.baseUri = baseUri + "/entity/paragraph/";
         this.apiKey = apiKey;
         this.modelClass = modelClass;
+        this.httpClient = httpClient;
     }
 
     public R post(R paragraphModel) throws IOException, InterruptedException {
@@ -36,7 +37,7 @@ public class ParagraphClient<R extends ParagraphModel> {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create().build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
@@ -57,7 +58,7 @@ public class ParagraphClient<R extends ParagraphModel> {
                 .header("Content-Type", "application/json")
                 .build();
 
-        HttpResponse<Void> httpResponse = HttpClientBuilderFactory.create().build()
+        HttpResponse<Void> httpResponse = httpClient
                 .send(request, HttpResponse.BodyHandlers.discarding());
 
         HttpResponseStatusHandler.checkStatusCode(httpResponse);
@@ -71,8 +72,7 @@ public class ParagraphClient<R extends ParagraphModel> {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<String> httpResponse = HttpClientBuilderFactory.create()
-                    .build()
+            HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
