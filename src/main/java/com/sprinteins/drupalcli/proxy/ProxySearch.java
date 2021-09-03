@@ -125,6 +125,17 @@ public class ProxySearch implements ProxySearchStrategy {
 	}
 
 	/*************************************************************************
+     * Adds an search strategy to the list of proxy searches strategies.
+     * 
+     * @param strategy
+     *            the search strategy to add.
+     ************************************************************************/
+
+    public void addStrategy(ProxySearchStrategy strategy) {
+        this.strategies.add(strategy);
+    }
+
+	/*************************************************************************
 	 * Adds an search strategy to the list of proxy searches strategies.
 	 * 
 	 * @param strategy
