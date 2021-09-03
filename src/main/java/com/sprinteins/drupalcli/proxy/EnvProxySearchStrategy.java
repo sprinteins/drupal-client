@@ -116,8 +116,12 @@ public class EnvProxySearchStrategy implements ProxySearchStrategy {
 
 		ProxySelector httpsPS = ProxyUtil.parseProxySettings(this.httpsProxy);
 		if (httpsPS != null) {		    
-		    Logger.log(getClass(), LogLevel.TRACE, "Https Proxy is {}", httpsPS == null ? this.httpsProxy : httpsPS);
-		    ps.setSelector("https", httpsPS != null ? httpsPS : httpPS);
+		    Logger.log(getClass(), LogLevel.TRACE, "Https Proxy is {}", this.httpsProxy);
+		    ps.setSelector("https", httpsPS);
+		} else if (httpPS != null) {
+		    // fallback to http proxy
+		    Logger.log(getClass(), LogLevel.TRACE, "Https Proxy is {}", this.httpProxy);
+		    ps.setSelector("https", httpPS);
 		}
 
 		ProxySelector ftpPS = ProxyUtil.parseProxySettings(this.ftpProxy);
