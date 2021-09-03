@@ -121,8 +121,8 @@ public class ApplicationContext {
         Builder httpClientBuilder = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL);
         ProxySearch proxySearch = new ProxySearch();
-        proxySearch.addStrategy(Strategy.ENV_VAR);
         proxySearch.addStrategy(new GlobalOptionsProxySearchStrategy(globalOptions));
+        proxySearch.addStrategy(Strategy.ENV_VAR);
         ProxySelector proxySelector = proxySearch.getProxySelector();
         if (proxySelector != null) {
             httpClientBuilder.proxy(proxySelector); 
