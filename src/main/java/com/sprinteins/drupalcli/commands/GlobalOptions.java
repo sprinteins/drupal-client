@@ -21,6 +21,18 @@ public class GlobalOptions {
     public boolean insecureHttps;
     
     @Option(
+            names = { "--proxy", "-x" },
+            description = "Use this proxy"
+            )
+    public String proxy;
+    
+    @Option(
+            names = { "--noproxy" },
+            description = "List of hosts which do not use proxy"
+            )
+    public String noProxy;
+    
+    @Option(
             names = { "--api-page-directory" },
             description = "Local path to the API page documentation",
             defaultValue = "api-docs"
