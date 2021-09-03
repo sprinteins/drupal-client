@@ -106,25 +106,29 @@ public class EnvProxySearchStrategy implements ProxySearchStrategy {
 
 		Logger.log(getClass(), LogLevel.TRACE, "Inspecting environment variables.");
 
-		// Check if http_proxy var is set.
+		ProtocolDispatchSelector ps = new ProtocolDispatchSelector();
+
 		ProxySelector httpPS = ProxyUtil.parseProxySettings(this.httpProxy);
-		if (httpPS == null) {
-			return null;
+		if (httpPS != null) {		    
+		    Logger.log(getClass(), LogLevel.TRACE, "Http Proxy is {}", this.httpProxy);
+		    ps.setSelector("http", httpPS);
 		}
 
-		Logger.log(getClass(), LogLevel.TRACE, "Http Proxy is {}", this.httpProxy);
-		ProtocolDispatchSelector ps = new ProtocolDispatchSelector();
-		ps.setSelector("http", httpPS);
-
 		ProxySelector httpsPS = ProxyUtil.parseProxySettings(this.httpsProxy);
-		Logger.log(getClass(), LogLevel.TRACE, "Https Proxy is {}", httpsPS == null ? this.httpsProxy : httpsPS);
-		ps.setSelector("https", httpsPS != null ? httpsPS : httpPS);
+		if (httpsPS != null) {		    
+		    Logger.log(getClass(), LogLevel.TRACE, "Https Proxy is {}", httpsPS == null ? this.httpsProxy : httpsPS);
+		    ps.setSelector("https", httpsPS != null ? httpsPS : httpPS);
+		}
 
 		ProxySelector ftpPS = ProxyUtil.parseProxySettings(this.ftpProxy);
 		if (ftpPS != null) {
 			Logger.log(getClass(), LogLevel.TRACE, "Ftp Proxy is {}", this.ftpProxy);
 			ps.setSelector("ftp", ftpPS);
 		}
+
+		if (httpPS == null && httpsPS == null && ftpPS != null) {
+            return null;
+        }
 
 		// Wrap with white list support
 		ProxySelector result = ps;
