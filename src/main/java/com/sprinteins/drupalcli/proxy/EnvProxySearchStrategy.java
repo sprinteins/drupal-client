@@ -126,7 +126,7 @@ public class EnvProxySearchStrategy implements ProxySearchStrategy {
 			ps.setSelector("ftp", ftpPS);
 		}
 
-		if (httpPS == null && httpsPS == null && ftpPS != null) {
+		if (httpPS == null && httpsPS == null && ftpPS == null) {
             return null;
         }
 
