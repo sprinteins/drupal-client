@@ -11,6 +11,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+import com.sprinteins.drupalcli.proxy.GlobalOptionsProxySearchStrategy;
 import com.sprinteins.drupalcli.proxy.ProxySearch;
 import com.sprinteins.drupalcli.proxy.ProxySearch.Strategy;
 
@@ -41,16 +42,14 @@ public class ApplicationContext {
     private final Converter converter = new Converter();
 
     public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
-        this(baseUri, readApiKey(globalOptions.tokenFile), globalOptions.insecureHttps);
+        this(baseUri, readApiKey(globalOptions.tokenFile), buildHttpClient(globalOptions));
     }
     
     public ApplicationContext(String baseUri, String apiKey) {
-        this(baseUri, apiKey, false);
+        this(baseUri, apiKey, buildHttpClient(new GlobalOptions()));
     }
     
-    public ApplicationContext(String baseUri, String apiKey, boolean insecureHttps) {
-        HttpClient httpClient = buildHttpClient(insecureHttps);
-
+    public ApplicationContext(String baseUri, String apiKey, HttpClient httpClient) {
          objectMapper = new ObjectMapper();
          objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
          objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -118,16 +117,17 @@ public class ApplicationContext {
             }
         };
     
-    private static HttpClient buildHttpClient(boolean insecureHttps) {
+    private static HttpClient buildHttpClient(GlobalOptions globalOptions) {
         Builder httpClientBuilder = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL);
         ProxySearch proxySearch = new ProxySearch();
         proxySearch.addStrategy(Strategy.ENV_VAR);
+        proxySearch.addStrategy(new GlobalOptionsProxySearchStrategy(globalOptions));
         ProxySelector proxySelector = proxySearch.getProxySelector();
         if (proxySelector != null) {
             httpClientBuilder.proxy(proxySelector); 
         }
-        if (insecureHttps) {
+        if (globalOptions.insecureHttps) {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(null, trustAllCerts, new SecureRandom());
