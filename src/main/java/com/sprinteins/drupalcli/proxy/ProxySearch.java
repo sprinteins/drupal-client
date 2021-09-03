@@ -8,7 +8,6 @@ import com.github.markusbernhardt.proxy.search.desktop.gnome.GnomeDConfProxySear
 import com.github.markusbernhardt.proxy.search.desktop.gnome.GnomeProxySearchStrategy;
 import com.github.markusbernhardt.proxy.search.desktop.kde.KdeProxySearchStrategy;
 import com.github.markusbernhardt.proxy.search.desktop.win.WinProxySearchStrategy;
-import com.github.markusbernhardt.proxy.search.env.EnvProxySearchStrategy;
 import com.github.markusbernhardt.proxy.search.java.JavaProxySearchStrategy;
 import com.github.markusbernhardt.proxy.search.wpad.WpadProxySearchStrategy;
 import com.github.markusbernhardt.proxy.selector.misc.BufferedProxySelector;
