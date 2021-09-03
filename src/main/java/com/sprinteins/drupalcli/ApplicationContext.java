@@ -3,8 +3,6 @@ package com.sprinteins.drupalcli;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.markusbernhardt.proxy.ProxySearch;
-import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 import com.sprinteins.drupalcli.commands.GlobalOptions;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
@@ -13,6 +11,8 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+import com.sprinteins.drupalcli.proxy.ProxySearch;
+import com.sprinteins.drupalcli.proxy.ProxySearch.Strategy;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
