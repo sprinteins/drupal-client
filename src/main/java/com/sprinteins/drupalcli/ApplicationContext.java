@@ -11,9 +11,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
-import com.sprinteins.drupalcli.proxy.GlobalOptionsProxySearchStrategy;
-import com.sprinteins.drupalcli.proxy.ProxySearch;
-import com.sprinteins.drupalcli.proxy.ProxySearch.Strategy;
+import com.sprinteins.drupalcli.proxy.CustomProxySearchStrategy;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -120,10 +118,9 @@ public class ApplicationContext {
     private static HttpClient buildHttpClient(GlobalOptions globalOptions) {
         Builder httpClientBuilder = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL);
-        ProxySearch proxySearch = new ProxySearch();
-        proxySearch.addStrategy(new GlobalOptionsProxySearchStrategy(globalOptions));
-        proxySearch.addStrategy(Strategy.ENV_VAR);
-        ProxySelector proxySelector = proxySearch.getProxySelector();
+        CustomProxySearchStrategy searchStrategy =
+                new CustomProxySearchStrategy(globalOptions, System.getenv());
+        ProxySelector proxySelector = searchStrategy.getProxySelector();
         if (proxySelector != null) {
             httpClientBuilder.proxy(proxySelector); 
         }
