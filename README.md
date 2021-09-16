@@ -40,6 +40,10 @@ To be able to call the client from everywhere some setup is needed:
 6. Edit the `Path` variable and add `%USERPROFILE%\bin` to it
 7. Open a new Command Line Prompt and try `drupal-client --version`
 
+#### Updating the client
+
+`Invoke-WebRequest -Uri 'https://github.com/sprinteins/drupal-client/releases/latest/download/drupal-client-windows.exe' -OutFile $env:USERPROFILE\bin\drupal-client.exe`
+
 #### Setting up a global API Key
 
 With a global API key you can skip the `--token-file` parameter for the client invocations.
