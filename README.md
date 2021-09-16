@@ -4,6 +4,12 @@
 
 ### Linux
 
+#### Using the client in automation environments like Jenkins
+
+The easiest way to ensure you're always running the latest version is using this script
+
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sprinteins/drupal-client/HEAD/run-latest-client.sh)" --version`
+
 #### API Key in an Environment variable
 
 **! We do absolutely do not recommend passing secrets via environment variables !**
@@ -14,6 +20,11 @@ If you have *absolutely no* other choice you can pass the token to the client li
 
 `drupal-client update --token-file=<(echo "${DHL_API_DEVELOPER_PORTAL_TOKEN}")`
 
+or set the environment variable like this
+
+`DHL_API_DEVELOPER_PORTAL_TOKEN_FILE=<(echo "${DHL_API_DEVELOPER_PORTAL_TOKEN}") sh ./some-script-that-calls-the-client.sh`
+
+Be aware that it only works for the one call so *exporting the variable does not work*.
 
 ### Windows
 
