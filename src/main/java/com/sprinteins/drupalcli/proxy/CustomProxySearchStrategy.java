@@ -26,46 +26,42 @@ public class CustomProxySearchStrategy implements ProxySearchStrategy {
         return "custom";
     }
 
-    public Optional<String> getValueIgnoringCase(String key) {
-        String value = variables.get(key);
-        if (value != null) {
-            return Optional.of(value);
-        }
-        return variables.entrySet()
-                .stream()
-                .filter(e -> e.getKey().equalsIgnoreCase(key))
-                .filter(e -> !e.getValue().isBlank())
-                .findFirst()
-                .map(Entry::getValue)
-                .map(String::trim);
-    }
-
-    private Optional<ProxySelector> parseProxySettings(String proxy) {
-        return Optional.ofNullable(ProxyUtil.parseProxySettings(proxy));
-    }
-
     @Override
     public ProxySelector getProxySelector() {
-        var httpSelector = parseProxySettings(globalOptions.proxy)
-                .or(() -> getValueIgnoringCase("http_proxy")
-                    .flatMap(this::parseProxySettings));
-        var httpsSelector = getValueIgnoringCase("https_proxy")
-                .flatMap(this::parseProxySettings)
-                .or(() -> httpSelector);
-        
         ProtocolDispatchSelector result = new ProtocolDispatchSelector();
-        httpSelector.ifPresent(ps -> result.setSelector("http", ps));
-        httpsSelector.ifPresent(ps -> result.setSelector("https", ps));
+        
+        parseProxySettings(globalOptions.proxy)
+                .or(() -> getValueIgnoringCase("http_proxy")
+                    .flatMap(this::parseProxySettings))
+                .ifPresent(ps -> {
+                    result.setSelector("http", ps);
+                    result.setSelector("https", ps);
+                });
+        getValueIgnoringCase("https_proxy")
+                .flatMap(this::parseProxySettings)
+                .ifPresent(ps -> result.setSelector("https", ps));
         
         if (result.size() == 0) {
             return null;
         }
         
-        Optional<ProxySelector> noProxy = Optional.ofNullable(globalOptions.noProxy)
-                .map(String::trim)
+        return Optional.ofNullable(globalOptions.noProxy)
                 .or(() -> getValueIgnoringCase("no_proxy"))
-                .map(np -> new ProxyBypassListSelector(np, result));
-        return noProxy.orElse(result);
+                .map(noProxy -> (ProxySelector) new ProxyBypassListSelector(noProxy, result))
+                .orElse(result);
+    }
+    
+    private Optional<String> getValueIgnoringCase(String key) {
+        return Optional.ofNullable(variables.get(key))
+                .or(() -> variables.entrySet()
+                        .stream()
+                        .filter(e -> e.getKey().equalsIgnoreCase(key))
+                        .findFirst()
+                        .map(Entry::getValue));
+    }
+
+    private Optional<ProxySelector> parseProxySettings(String proxy) {
+        return Optional.ofNullable(ProxyUtil.parseProxySettings(proxy));
     }
 
 }
