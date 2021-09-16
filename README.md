@@ -28,7 +28,11 @@ Be aware that it only works for the one call so *exporting the variable does not
 
 ### Windows
 
-#### Installing the client
+#### Installing/Updating the client with PowerShell
+
+`Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/sprinteins/drupal-client/HEAD/install-latest-client.ps1'))`
+
+#### Installing the client manually
 
 To be able to call the client from everywhere some setup is needed:
 
@@ -39,10 +43,6 @@ To be able to call the client from everywhere some setup is needed:
 5. Press `Win+R` and execute `rundll32 sysdm.cpl,EditEnvironmentVariables`
 6. Edit the `Path` variable and add `%USERPROFILE%\bin` to it
 7. Open a new Command Line Prompt and try `drupal-client --version`
-
-#### Updating the client
-
-`Invoke-WebRequest -Uri 'https://github.com/sprinteins/drupal-client/releases/latest/download/drupal-client-windows.exe' -OutFile $env:USERPROFILE\bin\drupal-client.exe`
 
 #### Setting up a global API Key
 
