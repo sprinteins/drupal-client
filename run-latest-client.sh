@@ -29,4 +29,4 @@ chmod +x "./drupal-client"
 
 "./drupal-client" --version
 
-"./drupal-client" "${@}"
+"./drupal-client" "$@"
