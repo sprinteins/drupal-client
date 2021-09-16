@@ -8,7 +8,7 @@
 
 The easiest way to ensure you're always running the latest version is using this script
 
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sprinteins/drupal-client/HEAD/run-latest-client.sh)" --version`
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sprinteins/drupal-client/HEAD/run-latest-client.sh) --version"`
 
 #### API Key in an Environment variable
 
