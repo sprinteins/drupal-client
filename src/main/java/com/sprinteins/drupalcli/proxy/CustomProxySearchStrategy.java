@@ -10,6 +10,7 @@ import java.net.ProxySelector;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class CustomProxySearchStrategy implements ProxySearchStrategy {
 
@@ -47,6 +48,7 @@ public class CustomProxySearchStrategy implements ProxySearchStrategy {
         
         return Optional.ofNullable(globalOptions.noProxy)
                 .or(() -> getValueIgnoringCase("no_proxy"))
+                .filter(Predicate.not(String::isBlank))
                 .map(noProxy -> (ProxySelector) new ProxyBypassListSelector(noProxy, result))
                 .orElse(result);
     }

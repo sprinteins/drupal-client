@@ -3,7 +3,10 @@ package com.sprinteins.drupalcli.proxy;
 import com.sprinteins.drupalcli.commands.GlobalOptions;
 import org.junit.jupiter.api.Test;
 
+import java.net.Proxy;
 import java.net.ProxySelector;
+import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +43,28 @@ public class CustomProxySearchStrategyTest {
         ProxySelector proxySelector = getProxySelector(globalOptions);
         assertThat(proxySelector).isNull();
     }
-
+    
+    @Test
+    void testProxyAndNoProxyIsEmpty() throws Exception {
+        GlobalOptions globalOptions = new GlobalOptions();
+        globalOptions.proxy = "http://localhost:8888";
+        globalOptions.noProxy = "";
+        ProxySelector proxySelector = getProxySelector(globalOptions);
+        assertThat(proxySelector).isNotNull();
+        List<Proxy> select = proxySelector.select(URI.create("https://dhl.com"));
+        assertThat(select.get(0).type()).isEqualTo(Proxy.Type.HTTP);
+    }
+    
+    @Test
+    void testProxyAndNoProxyIsStar() throws Exception {
+        GlobalOptions globalOptions = new GlobalOptions();
+        globalOptions.proxy = "http://localhost:8888";
+        globalOptions.noProxy = "*";
+        ProxySelector proxySelector = getProxySelector(globalOptions);
+        assertThat(proxySelector).isNotNull();
+        List<Proxy> select = proxySelector.select(URI.create("https://dhl.com"));
+        assertThat(select.get(0).type()).isEqualTo(Proxy.Type.DIRECT);
+    }
     
     @Test
     void testUnsetVariables() throws Exception {
