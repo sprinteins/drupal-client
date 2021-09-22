@@ -24,7 +24,7 @@ public class NodeClient {
         this.httpClient = httpClient;
     }
 
-    public void patch(long id, NodeModel nodeModel) {
+    public NodeModel patch(long id, NodeModel nodeModel) {
         try {
             String patchRequestBody = objectMapper
                     .writeValueAsString(nodeModel);
@@ -35,10 +35,12 @@ public class NodeClient {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HttpResponse<Void> httpResponse = httpClient
-                    .send(request, HttpResponse.BodyHandlers.discarding());
+            HttpResponse<String> httpResponse = httpClient
+                    .send(request, HttpResponse.BodyHandlers.ofString());
 
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
+            
+            return objectMapper.readValue(httpResponse.body(), NodeModel.class);
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Patch failed", e);
         }
