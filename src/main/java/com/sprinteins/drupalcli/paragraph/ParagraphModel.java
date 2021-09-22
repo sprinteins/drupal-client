@@ -22,6 +22,11 @@ public abstract class ParagraphModel {
     public ParagraphModel(TypeModel type){
         this.type = Collections.singletonList(type);
     }
+    
+    @JsonIgnore
+    public long id() {
+        return getOrCreateFirstId().getValue();
+    }
 
     @JsonIgnore
     public LongValueModel getOrCreateFirstId() {
