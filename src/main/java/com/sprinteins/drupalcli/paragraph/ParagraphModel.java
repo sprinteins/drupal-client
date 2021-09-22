@@ -27,6 +27,11 @@ public abstract class ParagraphModel {
     public long id() {
         return getOrCreateFirstId().getValue();
     }
+    
+    @JsonIgnore
+    public String title() {
+        return getOrCreateFirstTitle().getValue();
+    }
 
     @JsonIgnore
     public LongValueModel getOrCreateFirstId() {
