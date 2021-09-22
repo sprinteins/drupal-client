@@ -2,6 +2,7 @@ package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.models.*;
 
 import java.util.ArrayList;
@@ -97,6 +98,7 @@ public abstract class ParagraphModel {
         this.id = Optional.ofNullable(id).map(List::copyOf).orElse(null);
     }
 
+    @JsonProperty("revision_id")
     public List<LongValueModel> getRevisionId() {
         return Optional.ofNullable(revisionId).map(List::copyOf).orElse(null);
     }

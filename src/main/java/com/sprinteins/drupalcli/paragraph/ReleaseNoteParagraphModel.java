@@ -24,21 +24,10 @@ public class ReleaseNoteParagraphModel extends ParagraphModel{
         return super.getDescription();
     }
 
+    @Override
     @JsonProperty("field_p_release_note_date")
     public List<DateValueModel> getDate() {
         return super.getDate();
     }
 
-    @JsonProperty("id")
-    public List<LongValueModel> getId() {
-        return super.getId();
-    }
-
-    @JsonProperty("revision_id")
-    public List<LongValueModel> getRevisionId() {
-        return super.getRevisionId();
-    }
-
-    @JsonProperty("uuid")
-    public List<StringValueModel> getUuid() { return super.getUuid(); }
 }
