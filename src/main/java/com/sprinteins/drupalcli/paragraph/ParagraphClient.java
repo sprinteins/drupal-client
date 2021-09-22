@@ -28,9 +28,9 @@ public class ParagraphClient<R extends ParagraphModel> {
         this.httpClient = httpClient;
     }
 
-    public R post(R paragraphModel) throws IOException, InterruptedException {
-        String postRequestBody = objectMapper.writeValueAsString(paragraphModel);
+    public R post(R paragraphModel) {
         try {
+            String postRequestBody = objectMapper.writeValueAsString(paragraphModel);
             HttpRequest request = HttpRequestBuilderFactory
                     .create(URI.create(postUri + "?_format=json"), apiKey)
                     .method("POST", HttpRequest.BodyPublishers.ofString(postRequestBody))
@@ -47,24 +47,33 @@ public class ParagraphClient<R extends ParagraphModel> {
             throw new IllegalStateException("Post Paragraph failed", e);
         }
     }
-
-    public void patch(long id, R paragraphModel) throws IOException, InterruptedException {
-
-        String patchRequestBody = objectMapper.writeValueAsString(paragraphModel);
-
-        HttpRequest request = HttpRequestBuilderFactory
-                .create(URI.create(baseUri + id + "?_format=json"), apiKey)
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
-                .header("Content-Type", "application/json")
-                .build();
-
-        HttpResponse<Void> httpResponse = httpClient
-                .send(request, HttpResponse.BodyHandlers.discarding());
-
-        HttpResponseStatusHandler.checkStatusCode(httpResponse);
+    
+    public R patch(R paragraphModel) {
+        return patch(paragraphModel.getOrCreateFirstId().getValue(), paragraphModel);
     }
 
-    public R get(long id) throws IOException, InterruptedException {
+    public R patch(long id, R paragraphModel) {
+        try {
+            String patchRequestBody = objectMapper.writeValueAsString(paragraphModel);
+    
+            HttpRequest request = HttpRequestBuilderFactory
+                    .create(URI.create(baseUri + id + "?_format=json"), apiKey)
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(patchRequestBody))
+                    .header("Content-Type", "application/json")
+                    .build();
+    
+            HttpResponse<String> httpResponse = httpClient
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+    
+            HttpResponseStatusHandler.checkStatusCode(httpResponse);
+            
+            return objectMapper.readValue(httpResponse.body(), modelClass);
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException("Get Paragraph failed", e);
+        }
+    }
+
+    public R get(long id) {
         try {
             HttpRequest request = HttpRequestBuilderFactory
                     .create(URI.create(baseUri + id + "?_format=json"), apiKey)
