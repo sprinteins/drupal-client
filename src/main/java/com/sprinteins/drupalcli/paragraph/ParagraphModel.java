@@ -18,7 +18,6 @@ public abstract class ParagraphModel {
     private List<DescriptionModel> description;
     private List<TitleModel> title;
     private List<TypeModel> type;
-    private List<DateValueModel> date;
 
     public ParagraphModel(TypeModel type){
         this.type = Collections.singletonList(type);
@@ -79,17 +78,6 @@ public abstract class ParagraphModel {
         return title.get(0);
     }
 
-    @JsonIgnore
-    public DateValueModel getOrCreateFirstDate() {
-        if (date == null) {
-            date = new ArrayList<>();
-        }
-        if (date.isEmpty()) {
-            date.add(new DateValueModel());
-        }
-        return date.get(0);
-    }
-
     public List<LongValueModel> getId() {
         return Optional.ofNullable(id).map(List::copyOf).orElse(null);
     }
@@ -138,14 +126,6 @@ public abstract class ParagraphModel {
 
     public void setType(List<TypeModel> type) {
         this.type = Optional.ofNullable(type).map(List::copyOf).orElse(null);
-    }
-
-    public List<DateValueModel> getDate() {
-        return Optional.ofNullable(date).map(List::copyOf).orElse(null);
-    }
-
-    public void setDate(List<DateValueModel> date) {
-        this.date = Optional.ofNullable(date).map(List::copyOf).orElse(null);
     }
 
 }
