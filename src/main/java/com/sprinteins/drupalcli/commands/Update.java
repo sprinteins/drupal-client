@@ -59,9 +59,7 @@ public class Update implements Callable<Integer> {
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
 
-
-        boolean markdownFileExists = Files.exists(mainFilePath);
-        if (!markdownFileExists) {
+        if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
 
@@ -72,11 +70,9 @@ public class Update implements Callable<Integer> {
         OpenAPI apiSpec = new OpenAPI(workingDir);
         String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
 
-        String content = Files.readString(mainFilePath);
-        FrontMatterReader frontMatter = new FrontMatterReader();
-        Map<String, List<String>> data = frontMatter.readFromString(content);
-        List<String> titleList = data.get("title");
-        String title = titleList.get(0);
+        String mainFileContent = Files.readString(mainFilePath);
+        Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
+        String title = frontmatter.get("title").get(0);
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
