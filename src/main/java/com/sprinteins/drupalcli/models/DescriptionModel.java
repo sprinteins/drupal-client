@@ -5,7 +5,17 @@ public class DescriptionModel {
     private String value;
     private ValueFormat format;
     private String processed;
-
+    
+    public static DescriptionModel basicHtml(String html) {
+        DescriptionModel result = new DescriptionModel();
+        result.value = html;
+        result.format = ValueFormat.BASIC_HTML;
+        return result;
+    }
+    
+    public DescriptionModel() {
+    }
+    
     public String getValue() {
         return value;
     }
