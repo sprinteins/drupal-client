@@ -73,6 +73,7 @@ public class Update implements Callable<Integer> {
         String mainFileContent = Files.readString(mainFilePath);
         Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
         String title = frontmatter.get("title").get(0);
+        List<String> menuItems = frontmatter.get("menu");
 
         Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
@@ -94,9 +95,21 @@ public class Update implements Callable<Integer> {
                             + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         }
 
-        NodeModel patchNodeModel = new NodeModel();
+        NodeModel getStartedParagraphPatchNodeModel = new NodeModel();
 
-        for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
+        var getStartedDocsElements = new ArrayList<>(nodeModel.getGetStartedDocsElements());
+        for (int i = getStartedDocsElements.size(); i < menuItems.size(); i++) {
+            GetStartedParagraphModel paragraph = new GetStartedParagraphModel(menuItems.get(i), DescriptionModel.basicHtml("..."));
+            paragraph = getStartedParagraphClient.post(paragraph);
+            GetStartedDocsElementModel elementModel = new GetStartedDocsElementModel(paragraph);
+            getStartedDocsElements.add(elementModel);
+            getStartedParagraphPatchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
+        }
+        if (getStartedParagraphPatchNodeModel.getGetStartedDocsElements() != null) {
+            nodeClient.patch(nodeId, getStartedParagraphPatchNodeModel);
+        }
+
+        for (GetStartedDocsElementModel getStartedDocsElement : getStartedDocsElements) {
 
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
 
@@ -189,6 +202,7 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
         }
 
+        NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
 
         while(releaseNoteBody.childNodeSize() > 0) {
