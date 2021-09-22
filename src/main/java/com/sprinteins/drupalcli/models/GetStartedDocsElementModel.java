@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 
 public class GetStartedDocsElementModel {
 
@@ -8,6 +9,15 @@ public class GetStartedDocsElementModel {
     private Long targetRevisionId;
     private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
+    
+    public GetStartedDocsElementModel() {
+    }
+    
+    public GetStartedDocsElementModel(GetStartedParagraphModel paragraph) {
+        setTargetId(paragraph.getOrCreateFirstId().getValue());
+        setTargetRevisionId(paragraph.getOrCreateFirstRevisionId().getValue());
+        setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
+    }
 
     @JsonProperty("target_id")
     public Long getTargetId() {
