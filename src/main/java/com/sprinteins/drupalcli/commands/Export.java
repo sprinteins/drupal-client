@@ -81,7 +81,7 @@ public class Export implements Callable<Integer> {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 
-            String paragraphTitle = getStartedParagraph.getOrCreateFirstTitle().getValue();
+            String paragraphTitle = getStartedParagraph.title();
             System.out.println("Download information from " + paragraphTitle + " ...");
 
             mainMarkdown.add("  - " + paragraphTitle);
