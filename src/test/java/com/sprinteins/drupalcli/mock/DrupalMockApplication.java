@@ -1,16 +1,14 @@
 package com.sprinteins.drupalcli.mock;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @SpringBootApplication
 @RestController
 @RequestMapping("/entity/paragraph")
 public class DrupalMockApplication {
     @PatchMapping("/{id}")
-    public void patch(@PathVariable() long id) {
+    public String patch(@PathVariable() long id, @RequestBody String requestBody) {
+        return requestBody;
     }
 }
