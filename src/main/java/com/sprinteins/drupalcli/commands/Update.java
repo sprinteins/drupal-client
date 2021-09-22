@@ -222,7 +222,6 @@ public class Update implements Callable<Integer> {
             ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
             newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
             newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
-            newReleaseNoteElement.setTargetType(TargetType.PARAGRAPH);
             newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
 
             newReleaseNoteElementList.add(newReleaseNoteElement);

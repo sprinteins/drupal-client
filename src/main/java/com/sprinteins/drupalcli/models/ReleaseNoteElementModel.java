@@ -6,7 +6,7 @@ public class ReleaseNoteElementModel {
 
     private Long targetId;
     private Long targetRevisionId;
-    private TargetType targetType;
+    private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
 
     @JsonProperty("target_id")
