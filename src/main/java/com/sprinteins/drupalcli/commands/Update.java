@@ -3,6 +3,7 @@ package com.sprinteins.drupalcli.commands;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
+import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
@@ -83,6 +84,7 @@ public class Update implements Callable<Integer> {
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
+        Converter converter = applicationContext.converter();
 
         NodeModel nodeModel = nodeClient.getByUri(link);
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
@@ -94,40 +96,40 @@ public class Update implements Callable<Integer> {
                     "The page titles do not match. Are you updating the wrong API page?\n" + " Supplied title: " + title
                             + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         }
-
-        NodeModel getStartedParagraphPatchNodeModel = new NodeModel();
-
+        
         var getStartedDocsElements = new ArrayList<>(nodeModel.getGetStartedDocsElements());
-        for (int i = getStartedDocsElements.size(); i < menuItems.size(); i++) {
-            GetStartedParagraphModel paragraph = new GetStartedParagraphModel(menuItems.get(i), DescriptionModel.basicHtml("..."));
-            paragraph = getStartedParagraphClient.post(paragraph);
-            GetStartedDocsElementModel elementModel = new GetStartedDocsElementModel(paragraph);
-            getStartedDocsElements.add(elementModel);
-            getStartedParagraphPatchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
-        }
-        if (getStartedParagraphPatchNodeModel.getGetStartedDocsElements() != null) {
-            nodeClient.patch(nodeId, getStartedParagraphPatchNodeModel);
-        }
+        
+        for (int i = 0; i < menuItems.size(); i++) {
+            
+            String menuItem = menuItems.get(i);
+            System.out.println("Updating paragraph: " + menuItem + " ...");
+            
+            GetStartedParagraphModel getStartedParagraph = null;
+            if (i > getStartedDocsElements.size() - 1) {
+                getStartedParagraph = new GetStartedParagraphModel(menuItem, DescriptionModel.basicHtml("..."));
+                getStartedParagraph = getStartedParagraphClient.post(getStartedParagraph);
+                getStartedDocsElements.add(new GetStartedDocsElementModel(getStartedParagraph));
+            } else {
+                getStartedParagraph = getStartedParagraphClient
+                        .get(getStartedDocsElements.get(i).getTargetId());
+            }
 
-        for (GetStartedDocsElementModel getStartedDocsElement : getStartedDocsElements) {
-
-            System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
-
-            GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient
-                    .get(getStartedDocsElement.getTargetId());
+            System.out.println("Updating paragraph: " + getStartedParagraph.id() + " ...");
 
             Path docPath = workingDir.resolve(
-                    getStartedParagraph.getOrCreateFirstTitle().getValue().toLowerCase(Locale.ROOT).replace(" ", "-")
+                    menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
                             + ".markdown");
 
             if (!Files.exists(docPath)) {
                 throw new IllegalStateException("File " + docPath + " not found");
             }
+            
+            getStartedParagraph.getOrCreateFirstTitle().setValue(menuItem);
 
             Document currentParagraphDocument = Jsoup
                     .parse(getStartedParagraph.getOrCreateFirstDescription().getProcessed());
             Document newParagraphDocument = Jsoup
-                    .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(docPath)));
+                    .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
 
             for (Element imageElement : newParagraphDocument.select("img")) {
                 
@@ -168,13 +170,15 @@ public class Update implements Callable<Integer> {
             fieldDescription.setFormat(ValueFormat.BASIC_HTML);
             fieldDescription.setValue(newParagraphDocument.body().html());
 
-            getStartedParagraphClient.patch(getStartedDocsElement.getTargetId(), getStartedParagraph);
-            System.out.println("Finished processing paragraph: " + getStartedDocsElement.getTargetId());
+            getStartedParagraphClient.patch(getStartedParagraph);
+            System.out.println("Finished processing paragraph: " + getStartedParagraph.id());
         }
-
+        
+        NodeModel patchNodeModel = new NodeModel();
+        patchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
 
         Document newReleaseNoteDocument = Jsoup
-                .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
+                .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
 
         Element releaseNoteBody = newReleaseNoteDocument.body();
 
@@ -202,7 +206,6 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
         }
 
-        NodeModel patchNodeModel = new NodeModel();
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
 
         while(releaseNoteBody.childNodeSize() > 0) {
@@ -249,7 +252,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
 
         Document newMainDocument = Jsoup
-                .parse(applicationContext.converter().convertMarkdownToHtml(Files.readString(mainFilePath)));
+                .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
         patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
         patchNodeModel.getOrCreateFirstListDescription().setFormat(ValueFormat.BASIC_HTML);
 
