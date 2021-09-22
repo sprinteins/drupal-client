@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class FlexmarkJavaTest {
 
     @Test
     @Disabled
-    void testCompareHtml() throws IOException, InterruptedException {
+    void testCompareHtml() throws Exception {
         List<String> linkList = new ArrayList<>();
         linkList.add("http://dhl.docker.amazee.io/api-reference/deutsche-post-international-post-parcel-germany");
         linkList.add("http://dhl.docker.amazee.io/api-reference/clone-deutsche-post-international-post-parcel-germany");
