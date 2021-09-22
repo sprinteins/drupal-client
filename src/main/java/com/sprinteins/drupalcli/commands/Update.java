@@ -96,7 +96,7 @@ public class Update implements Callable<Integer> {
 
         NodeModel patchNodeModel = new NodeModel();
 
-        for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElement()) {
+        for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
 
             System.out.println("Updating paragraph: " + getStartedDocsElement.getTargetId() + " ...");
 

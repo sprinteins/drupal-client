@@ -26,7 +26,7 @@ public class NodeModelTest {
         String testFileAsString = TestFiles.readAllBytesToString("json/node-54-exported.json");
 
         var node = objectMapper.readValue(testFileAsString, NodeModel.class);
-        Assertions.assertEquals( 3,node.getGetStartedDocsElement().size());
+        Assertions.assertEquals( 3,node.getGetStartedDocsElements().size());
     }
 
 

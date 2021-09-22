@@ -13,7 +13,7 @@ public class NodeModel {
 
     private List<TypeModel> type = Collections
             .singletonList(new TypeModel(TargetId.API_REFERENCE));
-    private List<GetStartedDocsElementModel> getStartedDocsElement;
+    private List<GetStartedDocsElementModel> getStartedDocsElements;
     private List<ReleaseNoteElementModel> releaseNotesElement;
     private List<SourceFileModel> sourceFile;
     private List<LongValueModel> nid;
@@ -146,11 +146,11 @@ public class NodeModel {
     }
 
     @JsonProperty("field_get_started_docs_elements")
-    public List<GetStartedDocsElementModel> getGetStartedDocsElement() {
-        return Optional.ofNullable(getStartedDocsElement).map(List::copyOf).orElse(null);
+    public List<GetStartedDocsElementModel> getGetStartedDocsElements() {
+        return Optional.ofNullable(getStartedDocsElements).map(List::copyOf).orElse(null);
     }
-    public void setGetStartedDocsElement(List<GetStartedDocsElementModel> getStartedDocsElement) {
-        this.getStartedDocsElement = Optional.ofNullable(getStartedDocsElement).map(List::copyOf).orElse(null);
+    public void setGetStartedDocsElements(List<GetStartedDocsElementModel> getStartedDocsElements) {
+        this.getStartedDocsElements = Optional.ofNullable(getStartedDocsElements).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("field_list_description")

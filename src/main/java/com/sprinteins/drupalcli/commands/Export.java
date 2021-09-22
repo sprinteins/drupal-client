@@ -77,7 +77,7 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         mainMarkdown.add("menu:");
 
-        for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
+        for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElements()) {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 

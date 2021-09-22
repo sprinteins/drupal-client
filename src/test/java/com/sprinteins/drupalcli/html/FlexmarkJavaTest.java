@@ -62,7 +62,7 @@ public class FlexmarkJavaTest {
 
             String workingDir = "./target/test-compare-html";
             
-            for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElement()) {
+            for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElements()) {
                 GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
                 DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
                 Document doc = Jsoup.parse(descriptionModel.getProcessed());
