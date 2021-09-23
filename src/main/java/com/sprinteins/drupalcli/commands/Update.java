@@ -67,16 +67,13 @@ public class Update implements Callable<Integer> {
         if (!Files.exists(releaseNoteFilePath)) {
             throw new IllegalStateException("File " + releaseNoteFilePath + " not found");
         }
-
-        OpenAPI apiSpec = new OpenAPI(workingDir);
-        String openAPISpecFileName = apiSpec.getOpenAPISpecFileName();
+        
+        Path swaggerPath = OpenAPI.findYamlFile(workingDir);
 
         String mainFileContent = Files.readString(mainFilePath);
         Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
         String title = frontmatter.get("title").get(0);
         List<String> menuItems = frontmatter.get("menu");
-
-        Path swaggerPath = workingDir.resolve(openAPISpecFileName);
 
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();

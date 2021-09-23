@@ -1,32 +1,21 @@
 package com.sprinteins.drupalcli;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 
 public class OpenAPI {
 
-    private String openAPISpecFileName;
-    private Path directory;
-
-    public String getOpenAPISpecFileName() { return openAPISpecFileName; }
-    public void setOpenAPISpecFileName(String openAPISpecFile) { openAPISpecFileName = openAPISpecFile; }
-
-    public Path getDirectory() { return directory; }
-    public void setDirectory(Path directory) { this.directory = directory; }
-
-    public OpenAPI(Path path) throws Exception {
-        setDirectory(path);
-        setYamlFile();
+    public static Path findYamlFile(Path path) {
+        try (var stream = Files.newDirectoryStream(path, "*.{yaml,yml}")) {
+            for (Path file : stream) {
+                return file;
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        throw new IllegalStateException("No yaml file for OpenAPI spec in given directory (" + path + ")");
     }
 
-    private void setYamlFile() throws Exception {
-        String fileName = Files.list(directory)
-            .map(Path::getFileName)
-            .map(Path::toString)
-            .filter(name -> name.toLowerCase(Locale.ROOT).endsWith(".yaml") || name.toLowerCase(Locale.ROOT).endsWith(".yml"))
-            .findFirst()
-            .orElseThrow(() -> new Exception("No yaml file for OpenAPI spec in given directory (" + directory + ")"));
-        setOpenAPISpecFileName(fileName);
-    }
 }
