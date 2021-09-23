@@ -45,15 +45,15 @@ public class ApiReferenceFileClient {
         }
     }
 
-    public byte[] download(String link){
+    public String download(String link){
         try {
             HttpRequest request = HttpRequestBuilderFactory
                     .create(URI.create(link), apiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 
-            HttpResponse<byte[]> httpResponse = httpClient
-                    .send(request, HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<String> httpResponse = httpClient
+                    .send(request, HttpResponse.BodyHandlers.ofString());
             
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
 

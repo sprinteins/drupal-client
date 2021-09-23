@@ -132,9 +132,8 @@ public class Export implements Callable<Integer> {
                 .map(URI::getPath)
                 .map(FilenameUtils::getName)
                 .orElseThrow();
-        byte[] apiReferenceBytes = apiReferenceFileClient.download(sourceFileLink);
-        Files.write(apiPageDirectory.resolve(fileName), apiReferenceBytes);
-
+        String apiReference = apiReferenceFileClient.download(sourceFileLink);
+        Files.writeString(apiPageDirectory.resolve(fileName), apiReference);
 
         // finish up main markdown and add description list
         mainMarkdown.add("---");
