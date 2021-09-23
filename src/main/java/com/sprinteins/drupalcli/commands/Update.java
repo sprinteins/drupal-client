@@ -242,11 +242,13 @@ public class Update implements Callable<Integer> {
 
             patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
         }
-
-        FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
-
-
-        patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
+        
+        String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
+        String newApiReference = Files.readString(swaggerPath);
+        if (!currentApiReference.equals(newApiReference)) {
+            FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
+            patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue()); 
+        }
 
         Document newMainDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
