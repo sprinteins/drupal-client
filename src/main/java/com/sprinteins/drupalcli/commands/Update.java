@@ -103,7 +103,7 @@ public class Update implements Callable<Integer> {
             
             GetStartedParagraphModel getStartedParagraph = null;
             if (i > getStartedDocsElements.size() - 1) {
-                getStartedParagraph = new GetStartedParagraphModel(menuItem, DescriptionModel.basicHtml("..."));
+                getStartedParagraph = GetStartedParagraphModel.create(menuItem, DescriptionModel.basicHtml("..."));
                 getStartedParagraph = getStartedParagraphClient.post(getStartedParagraph);
                 getStartedDocsElements.add(new GetStartedDocsElementModel(getStartedParagraph));
             } else {

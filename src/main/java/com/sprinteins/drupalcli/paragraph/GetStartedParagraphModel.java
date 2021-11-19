@@ -10,17 +10,17 @@ import java.util.List;
 
 public class GetStartedParagraphModel extends ParagraphModel{
 
+    public static GetStartedParagraphModel create(String title, DescriptionModel description) {
+        GetStartedParagraphModel model = new GetStartedParagraphModel();
+        model.getOrCreateFirstTitle().setValue(title);
+        model.setDescription(List.of(description));
+        return model;
+    }
 
     public GetStartedParagraphModel(){
         super(new TypeModel(TargetId.GET_STARTED_ELEMENT));
     }
     
-    public GetStartedParagraphModel(String title, DescriptionModel description) {
-        this();
-        getOrCreateFirstTitle().setValue(title);
-        setDescription(List.of(description));
-    }
-
     @Override
     @JsonProperty("field_p_getstarted_title")
     public List<TitleModel> getTitle() {
