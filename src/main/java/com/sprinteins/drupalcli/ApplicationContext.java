@@ -8,6 +8,7 @@ import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
+import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
@@ -34,6 +35,7 @@ public class ApplicationContext {
     private final ObjectMapper objectMapper;
     private final NodeClient nodeClient;
     private final ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient;
+    private final ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient;
     private final ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient;
     private final ImageClient imageClient;
     private final ApiReferenceFileClient apiReferenceFileClient;
@@ -42,37 +44,43 @@ public class ApplicationContext {
     public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
         this(baseUri, readApiKey(globalOptions.tokenFile), buildHttpClient(globalOptions));
     }
-    
+
     public ApplicationContext(String baseUri, String apiKey) {
         this(baseUri, apiKey, buildHttpClient(new GlobalOptions()));
     }
-    
-    public ApplicationContext(String baseUri, String apiKey, HttpClient httpClient) {
-         objectMapper = new ObjectMapper();
-         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-         objectMapper.setSerializationInclusion(Include.NON_NULL);
 
-         nodeClient = new NodeClient(
-                 objectMapper,
-                 baseUri,
-                 apiKey,
-                 httpClient);
-         getStartedParagraphClient = new ParagraphClient<>(
-                 objectMapper,
-                 baseUri,
-                 apiKey,
-                 GetStartedParagraphModel.class,
-                 httpClient);
-         imageClient = new ImageClient(
-                 objectMapper,
-                 baseUri,
-                 apiKey,
-                 httpClient);
-         apiReferenceFileClient = new ApiReferenceFileClient(
-                 objectMapper,
-                 baseUri,
-                 apiKey,
-                 httpClient);
+    public ApplicationContext(String baseUri, String apiKey, HttpClient httpClient) {
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
+
+        nodeClient = new NodeClient(
+                objectMapper,
+                baseUri,
+                apiKey,
+                httpClient);
+        getStartedParagraphClient = new ParagraphClient<>(
+                objectMapper,
+                baseUri,
+                apiKey,
+                GetStartedParagraphModel.class,
+                httpClient);
+        imageClient = new ImageClient(
+                objectMapper,
+                baseUri,
+                apiKey,
+                httpClient);
+        apiReferenceFileClient = new ApiReferenceFileClient(
+                objectMapper,
+                baseUri,
+                apiKey,
+                httpClient);
+        additionalInformationParagraphClient = new ParagraphClient<>(
+                objectMapper,
+                baseUri,
+                apiKey,
+                AdditionalInformationParagraphModel.class,
+                httpClient);
         releaseNoteParagraphClient = new ParagraphClient<>(
                 objectMapper,
                 baseUri,
@@ -80,7 +88,7 @@ public class ApplicationContext {
                 ReleaseNoteParagraphModel.class,
                 httpClient);
     }
-    
+
     private static String readApiKey(Path path) {
         if (Files.notExists(path)) {
             throw new IllegalArgumentException("API key file not found: " + path + " does not exist");
@@ -91,7 +99,7 @@ public class ApplicationContext {
                 throw new IllegalArgumentException("API key invalid: " + path + " is empty");
             }
             String apiKey = apiKeyLines.get(0);
-            if (apiKey.isEmpty() ) {
+            if (apiKey.isEmpty()) {
                 throw new IllegalArgumentException("API key invalid : first line of " + path + " is empty");
             }
             return apiKey;
@@ -99,22 +107,24 @@ public class ApplicationContext {
             throw new IllegalArgumentException("API key file invalid. Could not read " + path, e);
         }
     }
-    
+
     private static TrustManager[] trustAllCerts = new TrustManager[]{
             new X509TrustManager() {
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
+
                 @Override
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
+
                 @Override
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }
-        };
-    
+    };
+
     private static HttpClient buildHttpClient(GlobalOptions globalOptions) {
         Builder httpClientBuilder = HttpClient.newBuilder()
                 .followRedirects(Redirect.NORMAL);
@@ -122,7 +132,7 @@ public class ApplicationContext {
                 new CustomProxySearchStrategy(globalOptions, System.getenv());
         ProxySelector proxySelector = searchStrategy.getProxySelector();
         if (proxySelector != null) {
-            httpClientBuilder.proxy(proxySelector); 
+            httpClientBuilder.proxy(proxySelector);
         }
         if (globalOptions.insecureHttps) {
             try {
@@ -135,7 +145,7 @@ public class ApplicationContext {
         }
         return httpClientBuilder.build();
     }
-    
+
     public ObjectMapper objectMapper() {
         return objectMapper;
     }
@@ -148,7 +158,13 @@ public class ApplicationContext {
         return getStartedParagraphClient;
     }
 
-    public ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient() { return releaseNoteParagraphClient;}
+    public ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient() {
+        return additionalInformationParagraphClient;
+    }
+
+    public ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient() {
+        return releaseNoteParagraphClient;
+    }
 
     public ImageClient imageClient() {
         return imageClient;
@@ -159,8 +175,8 @@ public class ApplicationContext {
     }
 
     public Converter converter() {
-        return converter;        
+        return converter;
     }
-    
-    
+
+
 }

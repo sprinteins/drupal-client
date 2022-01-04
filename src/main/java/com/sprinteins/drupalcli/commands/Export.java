@@ -7,6 +7,7 @@ import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
+import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import org.apache.commons.io.FilenameUtils;
@@ -60,6 +61,7 @@ public class Export implements Callable<Integer> {
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+        var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
@@ -83,6 +85,34 @@ public class Export implements Callable<Integer> {
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 
             String paragraphTitle = getStartedParagraph.title();
+            System.out.println("Download information from " + paragraphTitle + " ...");
+
+            mainMarkdown.add("  - " + paragraphTitle);
+
+            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+
+            System.out.println("Downloading images...");
+            downloadImages(imageClient, doc);
+
+            List<String> markdown = new ArrayList<>();
+            markdown.add("---");
+            markdown.add("title: " + paragraphTitle);
+            markdown.add("---");
+
+            markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
+
+            System.out.println("Create markdown file...");
+            Files.write(apiPageDirectory.resolve(paragraphTitle
+                    .toLowerCase(Locale.ROOT)
+                    .replace(" ", "-") + ".markdown"), markdown);
+
+        }
+
+        for (AdditionalInformationElementModel additionalInformationElement : nodeModel.getAdditionalInformationElements()) {
+            AdditionalInformationParagraphModel additionalInformationParagraph = additionalInformationParagraphClient.get(additionalInformationElement.getTargetId());
+            DescriptionModel descriptionModel = additionalInformationParagraph.getOrCreateFirstDescription();
+
+            String paragraphTitle = additionalInformationParagraph.title();
             System.out.println("Download information from " + paragraphTitle + " ...");
 
             mainMarkdown.add("  - " + paragraphTitle);
