@@ -77,9 +77,8 @@ public class Export implements Callable<Integer> {
         List<String> mainMarkdown = new ArrayList<>();
         mainMarkdown.add("---");
         mainMarkdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
-        mainMarkdown.add("menu:");
 
-
+        mainMarkdown.add("get-started-menu:");
         for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
@@ -97,6 +96,7 @@ public class Export implements Callable<Integer> {
             List<String> markdown = new ArrayList<>();
             markdown.add("---");
             markdown.add("title: " + paragraphTitle);
+            markdown.add("type: get-started-element");
             markdown.add("---");
 
             markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
@@ -108,6 +108,7 @@ public class Export implements Callable<Integer> {
 
         }
 
+        mainMarkdown.add("additional-information-menu:");
         for (AdditionalInformationElementModel additionalInformationElement : nodeModel.getAdditionalInformationElements()) {
             AdditionalInformationParagraphModel additionalInformationParagraph = additionalInformationParagraphClient.get(additionalInformationElement.getTargetId());
             DescriptionModel descriptionModel = additionalInformationParagraph.getOrCreateFirstDescription();
@@ -125,6 +126,7 @@ public class Export implements Callable<Integer> {
             List<String> markdown = new ArrayList<>();
             markdown.add("---");
             markdown.add("title: " + paragraphTitle);
+            markdown.add("type: additional-information-element");
             markdown.add("---");
 
             markdown.add(converter.convertHtmlToMarkdown(doc.html(), link));
