@@ -35,22 +35,22 @@ import static java.util.function.Predicate.not;
 @Command(
         name = "export",
         description = "Export page"
-        )
+)
 public class Export implements Callable<Integer> {
 
     public static final String API_DOCS_IMAGE_DIRECTORY = "images";
     public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
-    
+
     @Mixin
     private GlobalOptions globalOptions;
 
-     @Option(
-             names = { "--link" },
-             description = "Link to the api page that needs to be exported",
-             required = true
-             )
-     String link;
-     
+    @Option(
+            names = {"--link"},
+            description = "Link to the api page that needs to be exported",
+            required = true
+    )
+    String link;
+
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
@@ -77,7 +77,8 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add("title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         mainMarkdown.add("menu:");
 
-        for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElements()) {
+
+        for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
             DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
 
@@ -90,7 +91,7 @@ public class Export implements Callable<Integer> {
 
             System.out.println("Downloading images...");
             downloadImages(imageClient, doc);
-            
+
             List<String> markdown = new ArrayList<>();
             markdown.add("---");
             markdown.add("title: " + paragraphTitle);
@@ -107,7 +108,7 @@ public class Export implements Callable<Integer> {
 
         System.out.println("Download release notes ...");
         StringBuilder stringBuilder = new StringBuilder();
-        for(ReleaseNoteElementModel releaseNoteElementModel: nodeModel.getReleaseNotesElement()){
+        for (ReleaseNoteElementModel releaseNoteElementModel : nodeModel.getReleaseNotesElement()) {
             ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
             DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
             TitleModel titleModel = releaseNoteParagraphModel.getOrCreateFirstTitle();
@@ -149,7 +150,7 @@ public class Export implements Callable<Integer> {
 
     private void downloadImages(ImageClient imageClient, Document doc) throws IOException {
         Elements images = doc.select("img");
-        for(Element image: images){
+        for (Element image : images) {
             String srcAttribute = image.attr("src");
             String imageName = Optional.of(srcAttribute)
                     .filter(not(String::isBlank))
