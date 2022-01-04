@@ -6,7 +6,9 @@ import com.sprinteins.drupalcli.HttpResponseStatusHandler;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -70,10 +72,19 @@ public class ImageClient {
         }
     }
 
-    public byte[] download(String link){
+    public byte[] download(String link) throws MalformedURLException {
+
+        URL linkUrl = new URL(link);
+        URL baseUrl = new URL(baseUri);
+        String requestUri = baseUri + link;
+
+        if(!linkUrl.getHost().equals(baseUrl.getHost())){
+            requestUri = link;
+        }
+
         try {
             HttpRequest request = HttpRequestBuilderFactory
-                    .create(URI.create(baseUri + link), apiKey)
+                    .create(URI.create(requestUri), apiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 
