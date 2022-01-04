@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public enum ValueFormat {
 
-    GITHUB_FLAVORED_MARKDOWN, BASIC_HTML;
+    GITHUB_FLAVORED_MARKDOWN, BASIC_HTML, FULL_HTML;
 
     @JsonValue
     public String toLowerCase() {
