@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 
 public class AdditionalInformationElementModel {
@@ -13,7 +14,7 @@ public class AdditionalInformationElementModel {
     public AdditionalInformationElementModel() {
     }
 
-    public AdditionalInformationElementModel(GetStartedParagraphModel paragraph) {
+    public AdditionalInformationElementModel(AdditionalInformationParagraphModel paragraph) {
         setTargetId(paragraph.getOrCreateFirstId().getValue());
         setTargetRevisionId(paragraph.getOrCreateFirstRevisionId().getValue());
         setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
