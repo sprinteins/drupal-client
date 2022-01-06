@@ -67,19 +67,22 @@ public class Update implements Callable<Integer> {
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
 
         Yaml yaml = new Yaml();
-        File[] yamlFiles = new File(String.valueOf(workingDir)).listFiles((pathname) -> pathname.getName().endsWith(".yaml"));
-        for(int index = 0; index < Objects.requireNonNull(yamlFiles).length; index++){
-            System.out.println("Checking file: " + yamlFiles[index]);
-            InputStream stream = new FileInputStream(String.valueOf(yamlFiles[index]));
+        File[] yamlFiles = new File[0];
+        File folder = new File(String.valueOf(workingDir));
 
-            try {
+        if(folder.exists()) {
+            yamlFiles = folder.listFiles((pathname) -> pathname.getName().endsWith(".yaml"));
+        }
+
+        assert yamlFiles != null;
+        if(yamlFiles.length>0){
+            for(int index = 0; index < Objects.requireNonNull(yamlFiles).length; index++){
+                System.out.println("Checking file: " + yamlFiles[index]);
+                InputStream stream = new FileInputStream(String.valueOf(yamlFiles[index]));
                 Map<String, Object> obj = yaml.load(stream);
                 if (obj == null || obj.isEmpty()) {
                     throw new RuntimeException("Yaml file:" + yamlFiles[index] + " is not valid!");
                 }
-            } catch (Exception error) {
-                System.out.println("Yaml file: " + yamlFiles[index] + " is not valid!");
-                System.exit(1);
             }
         }
 
