@@ -1,5 +1,7 @@
 package com.sprinteins.drupalcli.commands;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.OpenAPI;
@@ -17,10 +19,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.yaml.snakeyaml.Yaml;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
+import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +40,7 @@ public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
+
 
     @Mixin
     private GlobalOptions globalOptions;
@@ -60,6 +65,23 @@ public class Update implements Callable<Integer> {
         Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
+
+        Yaml yaml = new Yaml();
+        File[] yamlFiles = new File(String.valueOf(workingDir)).listFiles((pathname) -> pathname.getName().endsWith(".yaml"));
+        for(int index = 0; index < Objects.requireNonNull(yamlFiles).length; index++){
+            System.out.println("Checking file: " + yamlFiles[index]);
+            InputStream stream = new FileInputStream(String.valueOf(yamlFiles[index]));
+
+            try {
+                Map<String, Object> obj = yaml.load(stream);
+                if (obj == null || obj.isEmpty()) {
+                    throw new RuntimeException("Yaml file:" + yamlFiles[index] + " is not valid!");
+                }
+            } catch (Exception error) {
+                System.out.println("Yaml file: " + yamlFiles[index] + " is not valid!");
+                System.exit(1);
+            }
+        }
 
         if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
