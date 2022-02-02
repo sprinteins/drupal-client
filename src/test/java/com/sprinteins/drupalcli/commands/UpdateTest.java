@@ -6,6 +6,9 @@ import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.URL;
+import java.util.Objects;
+
 
 public class UpdateTest {
 
@@ -35,5 +38,34 @@ public class UpdateTest {
         Assertions.assertEquals("Fourth Headline", fourthReleaseNote.select("h3").html());
     }
 
+    @Test
+    void testValidationV2() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL test = Objects.requireNonNull(classLoader.getResource("petstore-simple.yaml"));
+        Update update = new Update();
+
+        boolean valid = update.validate(test.toString());
+        Assertions.assertTrue(valid);
+    }
+
+    @Test
+    void testValidationV3() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL test = Objects.requireNonNull(classLoader.getResource("petstore.yaml"));
+        Update update = new Update();
+
+        boolean valid = update.validate(test.toString());
+        Assertions.assertTrue(valid);
+    }
+
+    @Test
+    void testValidationV3_invalid() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL test = Objects.requireNonNull(classLoader.getResource("petstore_invalid.yaml"));
+        Update update = new Update();
+
+        boolean valid = update.validate(test.toString());
+        Assertions.assertFalse(valid);
+    }
 
 }

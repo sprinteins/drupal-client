@@ -1,10 +1,8 @@
 package com.sprinteins.drupalcli.commands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
-import com.sprinteins.drupalcli.OpenAPI;
+import com.sprinteins.drupalcli.YamlFinder;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.FileUploadModel;
@@ -15,16 +13,17 @@ import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.yaml.snakeyaml.Yaml;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 
-import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,26 +65,6 @@ public class Update implements Callable<Integer> {
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
 
-        Yaml yaml = new Yaml();
-        File[] yamlFiles = new File[0];
-        File folder = new File(String.valueOf(workingDir));
-
-        if(folder.exists()) {
-            yamlFiles = folder.listFiles((pathname) -> pathname.getName().endsWith(".yaml"));
-        }
-
-        assert yamlFiles != null;
-        if(yamlFiles.length>0){
-            for(int index = 0; index < Objects.requireNonNull(yamlFiles).length; index++){
-                System.out.println("Checking file: " + yamlFiles[index]);
-                InputStream stream = new FileInputStream(String.valueOf(yamlFiles[index]));
-                Map<String, Object> obj = yaml.load(stream);
-                if (obj == null || obj.isEmpty()) {
-                    throw new RuntimeException("Yaml file:" + yamlFiles[index] + " is not valid!");
-                }
-            }
-        }
-
         if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
@@ -94,7 +73,12 @@ public class Update implements Callable<Integer> {
             throw new IllegalStateException("File " + releaseNoteFilePath + " not found");
         }
 
-        Path swaggerPath = OpenAPI.findYamlFile(workingDir);
+        Path swaggerPath = YamlFinder.findYamlFile(workingDir);
+
+        boolean valid = validate(String.valueOf(swaggerPath));
+        if(!valid) {
+            System.exit(1);
+        }
 
         String mainFileContent = Files.readString(mainFilePath);
         Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
@@ -398,5 +382,15 @@ public class Update implements Callable<Integer> {
         }
 
         return releaseNoteDocument.body();
+    }
+
+    boolean validate(String swaggerPath) {
+        SwaggerParseResult result = new OpenAPIParser().readLocation(swaggerPath, null, null);
+        if (result.getMessages().size()>0) {
+            result.getMessages().forEach(System.err::println);
+            return false;
+        } else {
+            return true;
+        }
     }
 }

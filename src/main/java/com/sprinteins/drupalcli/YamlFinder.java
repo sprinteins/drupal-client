@@ -7,7 +7,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class OpenAPI {
+public class YamlFinder {
 
     // See https://github.com/spotbugs/spotbugs/issues/1694
     @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")

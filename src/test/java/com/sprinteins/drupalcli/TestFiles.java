@@ -2,7 +2,9 @@ package com.sprinteins.drupalcli;
 
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public abstract class TestFiles {
 
@@ -16,5 +18,4 @@ public abstract class TestFiles {
     public static String readAllBytesToString(String path) throws Exception {
         return new String(readAllBytes(path), StandardCharsets.UTF_8);
     }
-
 }
