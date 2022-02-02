@@ -33,10 +33,6 @@
   "name":"com.fasterxml.jackson.databind.ser.Serializers[]"
 },
 {
-  "name":"com.intellij.rt.execution.application.AppMainV2$Agent",
-  "methods":[{"name":"premain","parameterTypes":["java.lang.String","java.lang.instrument.Instrumentation"] }]
-},
-{
   "name":"com.sprinteins.drupalcli.DrupalClientApplication",
   "allDeclaredFields":true,
   "allDeclaredMethods":true
