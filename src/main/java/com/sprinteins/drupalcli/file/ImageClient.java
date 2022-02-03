@@ -3,12 +3,13 @@ package com.sprinteins.drupalcli.file;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -72,19 +73,26 @@ public class ImageClient {
         }
     }
 
-    public byte[] download(String link) throws MalformedURLException {
+    public byte[] download(String link) throws MalformedURLException, URISyntaxException {
 
-        URL linkUrl = new URL(link);
-        URL baseUrl = new URL(baseUri);
-        String requestUri = baseUri + link;
+        URI linkUrl = URI.create(link);
+        URI baseUrl = URI.create(baseUri);
 
-        if(!linkUrl.getHost().equals(baseUrl.getHost())){
-            requestUri = link;
+        URI requestUri;
+
+        if(!linkUrl.isAbsolute()){
+            URIBuilder builder = new URIBuilder()
+                .setScheme(baseUrl.getScheme())
+                .setHost(baseUrl.getHost())
+                .setPath(linkUrl.getPath());
+            requestUri = builder.build();
+        } else {
+            requestUri = linkUrl;
         }
 
         try {
             HttpRequest request = HttpRequestBuilderFactory
-                    .create(URI.create(requestUri), apiKey)
+                    .create(requestUri, apiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 

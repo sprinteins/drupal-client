@@ -22,6 +22,7 @@ import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -180,7 +181,7 @@ public class Export implements Callable<Integer> {
         return 0;
     }
 
-    private void downloadImages(ImageClient imageClient, Document doc) throws IOException {
+    private void downloadImages(ImageClient imageClient, Document doc) throws IOException, URISyntaxException {
         Elements images = doc.select("img");
         for (Element image : images) {
             String srcAttribute = image.attr("src");
