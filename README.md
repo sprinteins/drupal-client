@@ -58,3 +58,44 @@ There is no support for multiple environments at the moment.
 7. Create a new file `token.txt` and paste the key into it
 8. Press `Win+R` and execute `rundll32 sysdm.cpl,EditEnvironmentVariables`
 9. Create the `DHL_API_DEVELOPER_PORTAL_TOKEN_FILE` variable and set it to `%USERPROFILE%\.config\drupal-client\token.txt`
+
+## Development
+
+### GraalVM resource and reflection configuration
+
+! Warning: This can be a bit tedious to figure out what is necessary ;) !
+
+GraalVM needs to know which resources are used and which
+classes are reflected at run/build-time. So it can be that
+the Java version of your code works just fine but the GitHub
+Actions build fails, or worse the client throws an error.
+
+This config lives in `src/main/resources/META-INF/native-image`.
+
+In case the build fails and you want to switch to your local
+environment.
+
+Install graalvm with e.g. `brew info graalvm-ce-java17`
+
+Set your JAVA_HOME accordingly and call `./mvnw verify` and
+reproduce the errors.
+
+Then call the Java code with the agent that can intercept
+the reflection and resource usage and automatically fill
+the settings. You can find the configuration for this in 
+the exec-maven-plugin configuration in the pom.xml.
+
+! Don't just add everything !
+
+It will add a lot of "local" files from e.g. IntelliJ.
+You'll have to trial and error your way to what is necessary.
+
+This has worked fine so far
+
+ * jni-config.json
+   * remove everything
+ * reflect-config.json
+   * remove `java.*`
+   * remove `picocli.*`
+
+Then try the build locally again and keep your fingers crossed.
