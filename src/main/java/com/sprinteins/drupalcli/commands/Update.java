@@ -77,7 +77,7 @@ public class Update implements Callable<Integer> {
 
         boolean valid = validate(String.valueOf(swaggerPath));
         if(!valid) {
-            System.exit(1);
+            throw new Exception("Swagger " + swaggerPath + " is invalid");
         }
 
         String mainFileContent = Files.readString(mainFilePath);
