@@ -1,9 +1,18 @@
 {
   "resources":{
   "includes":[
-    {"pattern":"\\QEmojiReference.txt\\E"}, 
-    {"pattern":"\\QMETA-INF/MANIFEST.MF\\E"}, 
-    {"pattern":"\\QMETA-INF/services/io.swagger.v3.parser.core.extensions.SwaggerParserExtension\\E"}
+    {
+      "pattern":"\\QEmojiReference.txt\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/MANIFEST.MF\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/io.swagger.v3.parser.core.extensions.SwaggerParserExtension\\E"
+    }, 
+    {
+      "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"
+    }
   ]},
   "bundles":[]
 }
