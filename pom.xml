@@ -183,6 +183,10 @@
             <artifactId>swagger-parser</artifactId>
             <version>1.0.56</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
