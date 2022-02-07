@@ -2,9 +2,7 @@ package com.sprinteins.drupalcli;
 
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 public abstract class TestFiles {
 
