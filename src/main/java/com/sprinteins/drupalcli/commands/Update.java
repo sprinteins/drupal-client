@@ -44,7 +44,6 @@ public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
-    private static Validator validator;
 
 
     @Mixin
@@ -103,7 +102,7 @@ public class Update implements Callable<Integer> {
         Converter converter = applicationContext.converter();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        Validator validator = factory.getValidator();
 
         NodeModel nodeModel = nodeClient.getByUri(link);
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
