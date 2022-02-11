@@ -42,7 +42,7 @@ public class DateValueModelTest {
 
         Assertions.assertEquals( 1, constraintViolations.size() );
         Assertions.assertEquals(
-                "Value for date is not valid, please use YYYY-MM-DD",
+                "Value for date is not valid, please use YYYY-MM-DD\n",
                 constraintViolations.iterator().next().getMessage()
         );
     }
