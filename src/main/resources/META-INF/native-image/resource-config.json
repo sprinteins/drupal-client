@@ -1,18 +1,14 @@
 {
   "resources":{
   "includes":[
-    {
-      "pattern":"\\QEmojiReference.txt\\E"
-    }, 
-    {
-      "pattern":"\\QMETA-INF/MANIFEST.MF\\E"
-    }, 
-    {
-      "pattern":"\\QMETA-INF/services/io.swagger.v3.parser.core.extensions.SwaggerParserExtension\\E"
-    }, 
-    {
-      "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"
-    }
+    {"pattern":"\\QEmojiReference.txt\\E"}, 
+    {"pattern":"\\QMETA-INF/MANIFEST.MF\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.swagger.v3.parser.core.extensions.SwaggerParserExtension\\E"}, 
+    {"pattern":"\\QMETA-INF/services/javax.el.ExpressionFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/javax.validation.spi.ValidationProvider\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.apache.logging.log4j.spi.Provider\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.apache.logging.log4j.util.PropertySource\\E"}, 
+    {"pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"}
   ]},
   "bundles":[]
 }
