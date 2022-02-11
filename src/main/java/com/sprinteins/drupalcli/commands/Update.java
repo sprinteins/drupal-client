@@ -24,6 +24,11 @@ import picocli.CommandLine.Option;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +44,7 @@ public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
+    private static Validator validator;
 
 
     @Mixin
@@ -80,7 +86,8 @@ public class Update implements Callable<Integer> {
             throw new Exception("Swagger " + swaggerPath + " is invalid");
         }
 
-        String mainFileContent = Files.readString(mainFilePath);
+        String mainFileContent = readFile(mainFilePath);
+
         Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
         String title = frontmatter.get("title").get(0);
         List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
@@ -94,6 +101,9 @@ public class Update implements Callable<Integer> {
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         Converter converter = applicationContext.converter();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
 
         NodeModel nodeModel = nodeClient.getByUri(link);
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
@@ -290,6 +300,16 @@ public class Update implements Callable<Integer> {
             fieldDescription.setFormat(ValueFormat.BASIC_HTML);
             fieldDescription.setValue(releaseNote.html());
 
+            Set<ConstraintViolation<DateValueModel>> constraintViolations =
+                    validator.validate( dateValueModel );
+
+            if (constraintViolations.size() > 0){
+                for(ConstraintViolation<DateValueModel> validation : constraintViolations ) {
+                    System.out.print("Release Note " + releaseNoteElement.getTargetId() + " has the following validation error: " + validation.getMessage());
+                }
+                throw new Exception("Aborting the update of: " + title + "\nSee error above for more details. ");
+            }
+
             releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
         }
@@ -330,7 +350,6 @@ public class Update implements Callable<Integer> {
             newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
 
             newReleaseNoteElementList.add(newReleaseNoteElement);
-
             patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
         }
 
@@ -392,5 +411,15 @@ public class Update implements Callable<Integer> {
         } else {
             return true;
         }
+    }
+
+    public String readFile(Path filePath) {
+        String result = "";
+        try {
+            result = Files.readString(filePath);
+        } catch (IOException error) {
+            throw new IllegalStateException("Wrong encoding for " + MAIN_MARKDOWN_FILE_NAME + ". Please make sure the file is UTF-8 encoded.");
+        }
+        return result;
     }
 }
