@@ -189,6 +189,12 @@
   "allPublicFields":true
 },
 {
+  "name":"java.lang.Object",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"javax.validation.constraints.Pattern",
   "allDeclaredMethods":true
 },
