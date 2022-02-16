@@ -39,17 +39,18 @@ public class ApplicationContext {
     private final ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient;
     private final ImageClient imageClient;
     private final ApiReferenceFileClient apiReferenceFileClient;
-    private final Converter converter = new Converter();
+    private final Converter converter;
 
     public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
-        this(baseUri, readApiKey(globalOptions.tokenFile), buildHttpClient(globalOptions));
+        this(baseUri, readApiKey(globalOptions.tokenFile), buildHttpClient(globalOptions), initialiseConverter(globalOptions));
     }
 
     public ApplicationContext(String baseUri, String apiKey) {
-        this(baseUri, apiKey, buildHttpClient(new GlobalOptions()));
+        this(baseUri, apiKey, buildHttpClient(new GlobalOptions()), initialiseConverter(new GlobalOptions()));
     }
 
-    public ApplicationContext(String baseUri, String apiKey, HttpClient httpClient) {
+    public ApplicationContext(String baseUri, String apiKey, HttpClient httpClient, Converter initialisedConverter) {
+        converter = initialisedConverter;
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -87,6 +88,10 @@ public class ApplicationContext {
                 apiKey,
                 ReleaseNoteParagraphModel.class,
                 httpClient);
+    }
+
+    public static Converter initialiseConverter(GlobalOptions globalOptions) {
+        return new Converter(globalOptions.customHtml);
     }
 
     private static String readApiKey(Path path) {

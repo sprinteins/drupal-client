@@ -1,27 +1,37 @@
 package com.sprinteins.drupalcli.converter;
 
 import com.sprinteins.drupalcli.extensions.CustomFlexmarkExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import com.vladsch.flexmark.util.sequence.LineAppendable;
+import com.vladsch.flexmark.util.sequence.SequenceUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
+import org.jsoup.nodes.*;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.regex.Pattern;
 
 public class Converter {
 
+    private static final Pattern REMOVE_TRAILING_PATTERN = Pattern.compile("\\p{Blank}+$", Pattern.MULTILINE);
+
+    private final boolean customHtml;
+
     public Converter() {
+        this(false);
+    }
+    public Converter(boolean customHtml) {
+        this.customHtml = customHtml;
     }
 
     public String convertHtmlToMarkdown(String input, String link){
@@ -144,12 +154,7 @@ public class Converter {
         document.select("h6").tagName("h4");
 
         // add options to the HtmlConverter
-        DataHolder options = new MutableDataSet()
-                .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
-                .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
-                .set(FlexmarkHtmlConverter.LISTS_END_ON_DOUBLE_BLANK, true)
-                .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()))
-                .toImmutable();
+        DataHolder options = generateConverterOptions();
 
         return FlexmarkHtmlConverter.builder(options).build().convert(document.body().html());
     }
@@ -157,13 +162,19 @@ public class Converter {
     public String convertMarkdownToHtml(String input){
         DataHolder options = new MutableDataSet()
                 .set(Parser.LISTS_END_ON_DOUBLE_BLANK, true)
-                .set(Parser.EXTENSIONS, Collections.singleton(YamlFrontMatterExtension.create()))
+                .set(TablesExtension.COLUMN_SPANS, false)
+                .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
+                .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+                .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, false)
+                .set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), YamlFrontMatterExtension.create()))
                 .toImmutable();
+
         String html = HtmlRenderer.builder(options)
             .build()
             .render(Parser.builder(options)
                     .build()
                     .parse(input));
+
         Document document = Jsoup.parse(html);
 
         document.select("h4").tagName("h6");
@@ -171,7 +182,31 @@ public class Converter {
         document.select("h2").tagName("h4");
         document.select("h1").tagName("h3");
 
-        return document.body().html();
+        String body = document.body().html();
+        String bodyWithRemovedWhitespaces = REMOVE_TRAILING_PATTERN.matcher(body).replaceAll("");;
+
+        return bodyWithRemovedWhitespaces;
     }
 
+    private DataHolder generateConverterOptions() {
+        if(customHtml) {
+            return new MutableDataSet()
+                .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
+                .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
+                .set(FlexmarkHtmlConverter.LISTS_END_ON_DOUBLE_BLANK, true)
+                .set(Parser.EXTENSIONS, Collections.singletonList(CustomFlexmarkExtension.IgnoreTagExtension.create()))
+                .toImmutable();
+        } else {
+            return new MutableDataSet()
+                .set(FlexmarkHtmlConverter.SETEXT_HEADINGS, false)
+                .set(FlexmarkHtmlConverter.OUTPUT_ATTRIBUTES_ID, false)
+                .set(FlexmarkHtmlConverter.LISTS_END_ON_DOUBLE_BLANK, true)
+                .set(TablesExtension.COLUMN_SPANS, false)
+                .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
+                .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+                .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, false)
+                .set(Parser.EXTENSIONS, Collections.singletonList(TablesExtension.create()))
+                .toImmutable();
+        }
+    };
 }

@@ -135,12 +135,21 @@ public class ConverterTest {
     }
 
     public static void assertHtmlToMarkdown(String html, String expected){
-        Converter converter = new Converter();
+        Converter converter = new Converter(true);
         String markdown = converter.convertHtmlToMarkdown(html, "https://example.com/api-reference/location-finder");
         Assertions.assertEquals(expected, markdown);
         String markdownToHtml = converter.convertMarkdownToHtml(markdown);
         String htmlToMarkdown = converter.convertHtmlToMarkdown(markdownToHtml, "https://example.com/api-reference/location-finder");
         Assertions.assertEquals(markdown, htmlToMarkdown);
+    }
+
+    public static void assertMarkdownToHtml(String markdown, String expectedHtml){
+        Converter converter = new Converter();
+        String html = converter.convertMarkdownToHtml(markdown);
+        Assertions.assertEquals(expectedHtml, html);
+        String htmlToMarkdown = converter.convertHtmlToMarkdown(html, "https://example.com/api-reference/location-finder");
+        String markdownToHtml = converter.convertMarkdownToHtml(htmlToMarkdown);
+        Assertions.assertEquals(html, markdownToHtml);
     }
 
     @Test
@@ -241,7 +250,24 @@ public class ConverterTest {
     }
     
     @Test
-    public void testTableWithStrong() throws Exception {
+    public void testMarkdownTableWithStrong() throws Exception {
+        String markdown = "|--------|\n"
+                + "| **Hi** |";
+
+        String html = "<table>\n"
+                + " <thead></thead>\n"
+                + " <tbody>\n"
+                + "  <tr>\n"
+                + "   <td><strong>Hi</strong></td>\n"
+                + "  </tr>\n"
+                + " </tbody>\n"
+                + "</table>";
+
+        ConverterTest.assertMarkdownToHtml(markdown, html);
+    }
+
+    @Test
+    public void testHTMLTableWithStrong() throws Exception {
         String html = "<table>\n"
                 + " <tbody>\n"
                 + "  <tr>\n"

@@ -48,4 +48,9 @@ public class GlobalOptions {
             )
     public Path tokenFile;
 
+    @Option(
+            names = {"--custom-html"},
+            description = "Flag to keep custom html elements within the documentation"
+    )
+    public boolean customHtml;
 }
