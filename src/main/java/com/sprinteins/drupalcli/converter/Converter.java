@@ -8,13 +8,14 @@ import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.sequence.LineAppendable;
-import com.vladsch.flexmark.util.sequence.SequenceUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Cleaner;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -39,18 +40,18 @@ public class Converter {
         input = input.replace("–","-");
         input = input.replace("&nbsp;", " ");
         Document document = Jsoup.parse(input, link);
-        Whitelist whitelist = Whitelist.relaxed();
-        whitelist.removeTags("u");
-        whitelist.addAttributes("table", "style", "class", "align", "border", "cellpadding", "cellspacing");
-        whitelist.addAttributes("tr", "style", "class", "height");
-        whitelist.addAttributes("td", "style", "class", "height");
-        whitelist.addAttributes("p", "style", "class");
-        whitelist.addAttributes("div", "id", "class");
-        whitelist.addAttributes("col", "style");
-        whitelist.addAttributes("a", "class", "data-parent", "data-toggle", "target");
-        whitelist.preserveRelativeLinks(true);
+        Safelist safelist = Safelist.relaxed();
+        safelist.removeTags("u");
+        safelist.addAttributes("table", "style", "class", "align", "border", "cellpadding", "cellspacing");
+        safelist.addAttributes("tr", "style", "class", "height");
+        safelist.addAttributes("td", "style", "class", "height");
+        safelist.addAttributes("p", "style", "class");
+        safelist.addAttributes("div", "id", "class");
+        safelist.addAttributes("col", "style");
+        safelist.addAttributes("a", "class", "data-parent", "data-toggle", "target");
+        safelist.preserveRelativeLinks(true);
 
-        Cleaner cleaner = new Cleaner(whitelist);
+        Cleaner cleaner = new Cleaner(safelist);
         document = cleaner.clean(document);
         
         for(Element br : document.select("br")){
