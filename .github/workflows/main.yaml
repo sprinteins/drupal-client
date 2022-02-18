@@ -6,7 +6,7 @@ on:
   - cron: 50 6 21 * *
 env:
   ARTIFACT: drupal-client
-  GRAALVM_VERSION: 21.2.0
+  GRAALVM_VERSION: 22.0.0.2
 
 jobs:
   debug:
