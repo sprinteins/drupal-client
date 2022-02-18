@@ -186,9 +186,20 @@ jobs:
         .\mvnw --batch-mode -Dsha1="$env:GITHUB_SHA" -Drevision="$env:REVISION" --settings .\.github\github-actions-windows-maven-settings.xml verify
     - name: Test and compress executable
       run: |
-        "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
+        $expectedOutput = "You are missing some arguments!`r`nType in --help or -h for help.`r`n"
+        $firstOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
         upx "target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
-        "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
+        $secondOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
+        if ($firstOutput -ne $expectedOutput) {
+          echo "The first output is wrong:"
+          echo $firstOutput
+          exit 1
+        }
+        if ($secondOutput -ne $expectedOutput) {
+          echo "The second output is wrong:"
+          echo $secondOutput
+          exit 1
+        }
     - name: Move artifacts
       run: |
         mkdir target/artifacts
