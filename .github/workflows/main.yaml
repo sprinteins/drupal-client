@@ -188,7 +188,7 @@ jobs:
       run: |
         $expectedOutput = "You are missing some arguments!`r`nType in --help or -h for help.`r`n"
         $firstOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
-        upx "target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
+        #upx "target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
         $secondOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
         if ($firstOutput -ne $expectedOutput) {
           echo "The first output is wrong:"
