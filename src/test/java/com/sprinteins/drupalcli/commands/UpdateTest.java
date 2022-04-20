@@ -68,4 +68,29 @@ public class UpdateTest {
         Assertions.assertFalse(valid);
     }
 
+    @Test
+    void testValidation_invalidPath() throws Exception {
+        Update update = new Update();
+
+        boolean valid = update.validate("laksjdlkajsdlkj");
+        Assertions.assertFalse(valid);
+    }
+
+    @Test
+    void testValidation_nullPath() throws Exception {
+        Update update = new Update();
+
+        boolean valid = update.validate(null);
+        Assertions.assertFalse(valid);
+    }
+
+    @Test
+    void testValidation_locationFinderNullPointer() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL test = Objects.requireNonNull(classLoader.getResource("petstore-simple-with-tabs.yaml"));
+        Update update = new Update();
+
+        boolean valid = update.validate(test.toString());
+        Assertions.assertFalse(valid);
+    }
 }

@@ -1,5 +1,7 @@
 package com.sprinteins.drupalcli.commands;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.YamlFinder;
@@ -14,6 +16,7 @@ import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,8 +24,6 @@ import org.jsoup.select.Elements;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
-import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.parser.core.models.SwaggerParseResult;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -402,14 +404,25 @@ public class Update implements Callable<Integer> {
         return releaseNoteDocument.body();
     }
 
+    String getSwaggerString(String swaggerPath) throws IOException {
+        final String adjustedLocation = swaggerPath.replaceAll("\\\\", "/");
+        final Path path = adjustedLocation.toLowerCase().startsWith("file:") ?
+                Paths.get(URI.create(adjustedLocation)) : Paths.get(adjustedLocation);
+
+        return FileUtils.readFileToString(path.toFile(), "UTF-8");
+    }
+
     boolean validate(String swaggerPath) {
-        SwaggerParseResult result = new OpenAPIParser().readLocation(swaggerPath, null, null);
-        if (result.getMessages().size()>0) {
-            result.getMessages().forEach(System.err::println);
-            return false;
-        } else {
-            return true;
+        boolean validationResult = true;
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        try {
+            mapper.readTree(getSwaggerString(swaggerPath));
+        } catch (Exception error) {
+            System.out.println("Validation of the OpenAPI Specification file(" + swaggerPath + ") failed! " + error);
+            validationResult = false;
         }
+
+        return validationResult;
     }
 
     public String readFile(Path filePath) {
