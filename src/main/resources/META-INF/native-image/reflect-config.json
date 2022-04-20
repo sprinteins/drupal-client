@@ -7,6 +7,14 @@
   "name":"boolean[]"
 },
 {
+  "name":"com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"com.sprinteins.drupalcli.DrupalClientApplication",
   "allDeclaredFields":true,
   "allDeclaredMethods":true
