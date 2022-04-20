@@ -406,7 +406,7 @@ public class Update implements Callable<Integer> {
 
     String getSwaggerString(String swaggerPath) throws IOException {
         final String adjustedLocation = swaggerPath.replaceAll("\\\\", "/");
-        final Path path = adjustedLocation.toLowerCase().startsWith("file:") ?
+        final Path path = adjustedLocation.toLowerCase(Locale.ROOT).startsWith("file:") ?
                 Paths.get(URI.create(adjustedLocation)) : Paths.get(adjustedLocation);
 
         return FileUtils.readFileToString(path.toFile(), "UTF-8");
