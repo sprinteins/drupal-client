@@ -74,7 +74,7 @@ jobs:
         graalvm: ${{ env.GRAALVM_VERSION }}
         java: 'java11'
     - name: Cache Maven packages
-      uses: actions/cache@v3.0.5
+      uses: actions/cache@v3.0.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -121,7 +121,7 @@ jobs:
         graalvm: ${{ env.GRAALVM_VERSION }}
         java: 'java11'
     - name: Cache Maven packages
-      uses: actions/cache@v3.0.5
+      uses: actions/cache@v3.0.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -176,7 +176,7 @@ jobs:
     - name: Set up Visual Studio shell
       uses: egor-tensin/vs-shell@v2
     - name: Cache Maven packages
-      uses: actions/cache@v3.0.5
+      uses: actions/cache@v3.0.6
       with:
         path: .m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -304,7 +304,7 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Cache Maven packages
-      uses: actions/cache@v3.0.5
+      uses: actions/cache@v3.0.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
