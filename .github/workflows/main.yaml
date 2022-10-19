@@ -56,7 +56,7 @@ jobs:
       env:
         NEW_VERSION: ${{ steps.tag.outputs.new_version}}
       run: |
-        echo "::set-output name=new_version::${NEW_VERSION:-$GITHUB_SHA}"
+        echo "new_version=${NEW_VERSION:-$GITHUB_SHA}" >> $GITHUB_OUTPUT
   macos:
     runs-on: macos-latest
     needs: version
