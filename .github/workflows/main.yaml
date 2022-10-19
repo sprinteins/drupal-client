@@ -183,7 +183,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: |
-        .\mvnw --batch-mode -Dsha1="$env:GITHUB_SHA" -Drevision="$env:REVISION" --settings .\.github\github-actions-windows-maven-settings.xml verify
+        .\mvnw --batch-mode -Dsha1="$env:GITHUB_SHA" -Drevision="$env:REVISION" verify
     - name: Test and compress executable
       run: |
         $expectedOutput = "You are missing some arguments!`r`nType in --help or -h for help.`r`n"
@@ -316,7 +316,6 @@ jobs:
       run: |
         ./mvnw \
           --batch-mode \
-          --settings ./.github/github-packages-maven-settings.xml \
           -Dsha1="${GITHUB_SHA}" \
           -Drevision="${REVISION}" \
           -DaltDeploymentRepository="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}" \
