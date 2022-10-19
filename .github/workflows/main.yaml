@@ -58,6 +58,8 @@ jobs:
         NEW_VERSION: ${{ steps.tag.outputs.new_version}}
       run: |
         echo "new_version=${NEW_VERSION:-$GITHUB_SHA}" >> $GITHUB_OUTPUT
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
   macos:
     runs-on: macos-latest
     needs: version
@@ -95,6 +97,8 @@ jobs:
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
   linux:
     runs-on: ubuntu-latest
     needs: version
@@ -134,6 +138,8 @@ jobs:
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
   windows:
     runs-on: windows-latest
     needs: version
@@ -179,6 +185,8 @@ jobs:
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
   release:
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -264,6 +272,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         release_id: ${{ steps.create_release.outputs.id }}
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
   deploy:
     needs: [version, macos, linux, windows]
     if: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/dependabot/') }}
@@ -286,3 +296,5 @@ jobs:
           -Drevision="${REVISION}" \
           -DaltDeploymentRepository="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}" \
           deploy
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
