@@ -180,7 +180,7 @@ jobs:
     - name: Move artifacts
       run: |
         mkdir target/artifacts
-        cp target/${{ env.ARTIFACT }}-* target/artifacts
+        copy target/${{ env.ARTIFACT }}-* target/artifacts
     - uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
