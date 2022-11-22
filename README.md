@@ -50,7 +50,7 @@ With a global API key you can skip the `--token-file` parameter for the client i
 There is no support for multiple environments at the moment.
 
 1. [Navigate to your profile in the API Developer Portal](https://developer.dhl.com/user/)
-2. Go to *Key authentication*
+2. Go to *Key authentication* (if this option is not available to you let the admins know and we can add you)
 3. And *Generate a new key* if necessary
 4. Open an Explorer window
 5. Navigate to your profile directory by entering `%USERPROFILE%` in the address bar
