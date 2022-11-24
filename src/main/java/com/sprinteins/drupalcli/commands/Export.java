@@ -9,6 +9,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +64,7 @@ public class Export implements Callable<Integer> {
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
+        var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
@@ -137,6 +139,13 @@ public class Export implements Callable<Integer> {
                     .toLowerCase(Locale.ROOT)
                     .replace(" ", "-") + ".markdown"), markdown);
 
+        }
+
+        mainMarkdown.add("faqs:");
+        for(FaqItemsModel faqItemsModel : nodeModel.getFaqItems()) {
+          FaqItemsParagraphModel faqItemsParagraph = faqItemsParagraphClient.get(faqItemsModel.getTargetId());
+
+          
         }
 
         System.out.println("Download release notes ...");

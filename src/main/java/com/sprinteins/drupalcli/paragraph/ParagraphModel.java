@@ -18,6 +18,8 @@ public abstract class ParagraphModel {
     private List<DescriptionModel> description;
     private List<TitleModel> title;
     private List<TypeModel> type;
+    private List<FaqQuestionModel> question;
+    private List<FaqAnswerModel> answer;
 
     public ParagraphModel(TypeModel type){
         this.type = Collections.singletonList(type);
@@ -128,6 +130,22 @@ public abstract class ParagraphModel {
 
     public void setTitle(List<TitleModel> title) {
         this.title = Optional.ofNullable(title).map(List::copyOf).orElse(null);
+    }
+
+    public List<FaqQuestionModel> getQuestion() {
+      return Optional.ofNullable(question).map(List::copyOf).orElse(null);
+    }
+
+    public void setQuestion(List<FaqQuestionModel> question) {
+        this.question = Optional.ofNullable(question).map(List::copyOf).orElse(null);
+    }
+
+    public List<FaqAnswerModel> getAnswer() {
+      return Optional.ofNullable(answer).map(List::copyOf).orElse(null);
+    }
+
+    public void setAnswer(List<FaqAnswerModel> answer) {
+        this.answer = Optional.ofNullable(answer).map(List::copyOf).orElse(null);
     }
 
     public List<TypeModel> getType() {
