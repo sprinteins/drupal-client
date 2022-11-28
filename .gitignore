@@ -40,3 +40,5 @@ credentials.txt
 
 ### export folder api docs ###
 /api-docs
+.vscode/launch.json
+.settings/org.eclipse.jdt.core.prefs

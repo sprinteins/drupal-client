@@ -1,0 +1,19 @@
+{
+    "type": [
+        {
+            "target_id": "faq_item"
+        } 
+    ],
+
+    "field_faq_item_answer": [
+        {
+            "value": "Test124",
+            "format": "basic_html"
+        }
+    ],
+    "field_faq_item_question": [
+        {
+            "value": "Is Pineapple a valid topping?"
+        }
+    ]
+}

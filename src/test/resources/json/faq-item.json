@@ -1,0 +1,22 @@
+{
+  "type": [
+    {
+      "target_id": "faq_items",
+    }
+  ],
+  "field_faq_item": [
+    {
+      "target_id": 1500,
+      "target_revision_id": 35223,
+    },
+    {
+      "target_id": 1501,
+      "target_revision_id": 35224,
+    }
+  ],
+  "field_faq_title": [
+    {
+      "value": "Questions about Pizza toppings"
+    }
+  ]
+}

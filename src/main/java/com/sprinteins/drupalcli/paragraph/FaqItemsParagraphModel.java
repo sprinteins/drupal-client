@@ -21,7 +21,7 @@ public class FaqItemsParagraphModel extends ParagraphModel {
   }
 
   public FaqItemsParagraphModel() {
-    super(new TypeModel(TargetId.FAQ));
+    super(new TypeModel(TargetId.FAQ_ITEM));
   }
 
   @JsonProperty("field_faq_item")
