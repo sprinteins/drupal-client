@@ -1,4 +1,4 @@
-package com.sprinteins.drupalcli.getstartedparagraph;
+package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
