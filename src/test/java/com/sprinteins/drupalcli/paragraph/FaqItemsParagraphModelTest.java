@@ -69,5 +69,5 @@ public class FaqItemsParagraphModelTest {
         JSONAssert.assertEquals(expectedTargetUuid, actualTargetUuid, true);
         JSONAssert.assertEquals(expectedTitle, actualTitle, true);
     }
-
+    
 }
