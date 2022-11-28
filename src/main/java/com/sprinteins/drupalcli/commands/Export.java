@@ -3,7 +3,10 @@ package com.sprinteins.drupalcli.commands;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.fields.AdditionalInformationElementModel;
+import com.sprinteins.drupalcli.fields.FaqAnswerModel;
+import com.sprinteins.drupalcli.fields.FaqItemModel;
 import com.sprinteins.drupalcli.fields.FaqItemsModel;
+import com.sprinteins.drupalcli.fields.FaqQuestionModel;
 import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
 import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
@@ -68,6 +71,7 @@ public class Export implements Callable<Integer> {
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
         var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
+        var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
@@ -148,7 +152,28 @@ public class Export implements Callable<Integer> {
         for(FaqItemsModel faqItemsModel : nodeModel.getFaqItems()) {
           FaqItemsParagraphModel faqItemsParagraph = faqItemsParagraphClient.get(faqItemsModel.getTargetId());
 
-          
+          String paragraphTitle = faqItemsParagraph.title();
+          System.out.println(("Download information from "+ paragraphTitle+"..."));
+
+          mainMarkdown.add(" -" + paragraphTitle);
+
+          List<String> markdown = new ArrayList<>();
+          markdown.add("---");
+          markdown.add("title: " + paragraphTitle);
+          markdown.add("type: faqs");
+          markdown.add("---");
+
+          System.out.println("Create markdown file...");
+          Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ","-")+".markdown"),markdown);
+
+          for(FaqItemModel faqItemModel : nodeModel.getFaqItem()){
+            FaqItemParagraphModel faqItemParagraph = faqItemParagraphClient.get(faqItemModel.getTargetId());
+
+            List<FaqQuestionModel> faqQuestion = faqItemParagraph.getQuestion();
+
+            List<FaqAnswerModel> faqAnswer = faqItemParagraph.getAnswer();
+
+          }
         }
 
         System.out.println("Download release notes ...");

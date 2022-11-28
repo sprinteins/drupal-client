@@ -18,6 +18,7 @@ public class NodeModel {
     private List<GetStartedDocsElementModel> getStartedDocsElements;
     private List<AdditionalInformationElementModel> additionalInformationElements;
     private List<FaqItemsModel> faqItems;
+    private List<FaqItemModel> faqItem;
     private List<ReleaseNoteElementModel> releaseNotesElement;
     private List<SourceFileModel> sourceFile;
     private List<LongValueModel> nid;
@@ -197,6 +198,14 @@ public class NodeModel {
     }
     public void setFaqItems(List<FaqItemsModel> faqItems) {
         this.faqItems = Optional.ofNullable(faqItems).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_faq_item")
+    public List<FaqItemModel> getFaqItem() {
+        return Optional.ofNullable(faqItem).map(List::copyOf).orElse(null);
+    }
+    public void setFaqItem(List<FaqItemModel> faqItem) {
+        this.faqItem = Optional.ofNullable(faqItem).map(List::copyOf).orElse(null);
     }
 
     @Override

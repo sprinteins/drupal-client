@@ -9,6 +9,7 @@ import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
+import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;
 import com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import com.sprinteins.drupalcli.paragraph.ParagraphClient;
@@ -38,6 +39,7 @@ public class ApplicationContext {
     private final ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient;
     private final ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient;
     private final ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient;
+    private final ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient;
     private final ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient;
     private final ImageClient imageClient;
     private final ApiReferenceFileClient apiReferenceFileClient;
@@ -89,6 +91,12 @@ public class ApplicationContext {
                 baseUri,
                 apiKey,
                 FaqItemsParagraphModel.class,
+                httpClient);
+        faqItemParagraphClient = new ParagraphClient<>(
+                objectMapper,
+                baseUri,
+                apiKey,
+                FaqItemParagraphModel.class,
                 httpClient);
         releaseNoteParagraphClient = new ParagraphClient<>(
                 objectMapper,
@@ -177,6 +185,10 @@ public class ApplicationContext {
 
     public ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient() {
       return faqItemsParagraphClient;
+  }
+  
+    public ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient() {
+      return faqItemParagraphClient;
   }
 
     public ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient() {
