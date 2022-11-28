@@ -1,15 +1,17 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
+
+import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 
 public class FaqAnswerModel {
 
     private String value;
-    private ValueFormat format;
+    private TextFormat format;
     private String processed;
     
     public static FaqAnswerModel basicHtml(String html) {
       FaqAnswerModel result = new FaqAnswerModel();
         result.value = html;
-        result.format = ValueFormat.BASIC_HTML;
+        result.format = TextFormat.BASIC_HTML;
         return result;
     }
       
@@ -21,11 +23,11 @@ public class FaqAnswerModel {
         this.value = value;
     }
 
-    public ValueFormat getFormat() {
+    public TextFormat getFormat() {
         return format;
     }
 
-    public void setFormat(ValueFormat format) {
+    public void setFormat(TextFormat format) {
         this.format = format;
     }
 

@@ -1,4 +1,4 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
 public class FaqQuestionModel {
 

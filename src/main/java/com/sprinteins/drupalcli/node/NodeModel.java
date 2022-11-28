@@ -2,7 +2,9 @@ package com.sprinteins.drupalcli.node;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.*;
+import com.sprinteins.drupalcli.fields.*;
+import com.sprinteins.drupalcli.fieldtypes.*;
+import com.sprinteins.drupalcli.fields.FaqItemsModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,9 +25,9 @@ public class NodeModel {
     private List<LongValueModel> vid;
     private List<StringValueModel> langcode;
     private List<DateValueModel> revisionTimestamp;
-    private List<UidValueModel> revisionUid;
-    private List<DescriptionModel> listDescription;
-    private List<TitleModel> displayTitle;
+    private List<UidTargetModel> revisionUid;
+    private List<FormattedTextModel> listDescription;
+    private List<StringValueModel> displayTitle;
 
 
     @JsonIgnore
@@ -40,23 +42,23 @@ public class NodeModel {
     }
 
     @JsonIgnore
-    public DescriptionModel getOrCreateFirstListDescription() {
+    public FormattedTextModel getOrCreateFirstListDescription() {
         if (listDescription == null) {
             listDescription = new ArrayList<>();
         }
         if (listDescription.isEmpty()) {
-            listDescription.add(new DescriptionModel());
+            listDescription.add(new FormattedTextModel());
         }
         return listDescription.get(0);
     }
 
     @JsonIgnore
-    public TitleModel getOrCreateFirstDisplayTitle() {
+    public StringValueModel getOrCreateFirstDisplayTitle() {
         if (displayTitle == null) {
             displayTitle = new ArrayList<>();
         }
         if (displayTitle.isEmpty()) {
-            displayTitle.add(new TitleModel());
+            displayTitle.add(new StringValueModel());
         }
         return displayTitle.get(0);
     }
@@ -140,10 +142,10 @@ public class NodeModel {
     }
 
     @JsonProperty("revision_uid")
-    public List<UidValueModel> getRevisionUid() {
+    public List<UidTargetModel> getRevisionUid() {
         return Optional.ofNullable(revisionUid).map(List::copyOf).orElse(null);
     }
-    public void setRevisionUid(List<UidValueModel> revisionUid) {
+    public void setRevisionUid(List<UidTargetModel> revisionUid) {
         this.revisionUid = Optional.ofNullable(revisionUid).map(List::copyOf).orElse(null);
     }
 
@@ -164,20 +166,20 @@ public class NodeModel {
     }
 
     @JsonProperty("field_list_description")
-    public List<DescriptionModel> getListDescription() {
+    public List<FormattedTextModel> getListDescription() {
         return Optional.ofNullable(listDescription).map(List::copyOf).orElse(null);
     }
 
-    public void setListDescription(List<DescriptionModel> description) {
+    public void setListDescription(List<FormattedTextModel> description) {
         this.listDescription = Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("field_display_title")
-    public List<TitleModel> getDisplayTitle() {
+    public List<StringValueModel> getDisplayTitle() {
         return Optional.ofNullable(displayTitle).map(List::copyOf).orElse(null);
     }
 
-    public void setDisplayTitle(List<TitleModel> title) {
+    public void setDisplayTitle(List<StringValueModel> title) {
         this.displayTitle = Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 

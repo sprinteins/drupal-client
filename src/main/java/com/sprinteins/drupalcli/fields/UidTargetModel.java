@@ -1,6 +1,8 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
-public class UidValueModel extends TargetModel {
+import com.sprinteins.drupalcli.fields.TargetModel;
+
+public class UidTargetModel extends TargetModel {
 
     private String url;
 

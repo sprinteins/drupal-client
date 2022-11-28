@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.FaqAnswerModel;
-import com.sprinteins.drupalcli.models.FaqQuestionModel;
-import com.sprinteins.drupalcli.models.TargetId;
-import com.sprinteins.drupalcli.models.TypeModel;
+import com.sprinteins.drupalcli.fields.FaqAnswerModel;
+import com.sprinteins.drupalcli.fields.FaqQuestionModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
+import com.sprinteins.drupalcli.fields.TypeModel;
 
 public class FaqItemParagraphModel extends ParagraphModel{
   private List<FaqQuestionModel> question;

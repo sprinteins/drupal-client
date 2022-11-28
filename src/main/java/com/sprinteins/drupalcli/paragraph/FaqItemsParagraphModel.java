@@ -1,14 +1,13 @@
 package com.sprinteins.drupalcli.paragraph;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.FaqItemModel;
-import com.sprinteins.drupalcli.models.TargetId;
-import com.sprinteins.drupalcli.models.TitleModel;
-import com.sprinteins.drupalcli.models.TypeModel;
+import com.sprinteins.drupalcli.fields.FaqItemModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
+import com.sprinteins.drupalcli.fields.TypeModel;
 
 public class FaqItemsParagraphModel extends ParagraphModel {
 
@@ -34,7 +33,7 @@ public class FaqItemsParagraphModel extends ParagraphModel {
 
   @Override
   @JsonProperty("field_faq_title")
-  public List<TitleModel>getTitle() {
+  public List<StringValueModel>getTitle() {
     return super.getTitle();
   }
 

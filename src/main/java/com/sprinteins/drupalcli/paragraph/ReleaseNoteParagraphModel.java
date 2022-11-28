@@ -2,7 +2,11 @@ package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.*;
+import com.sprinteins.drupalcli.fields.TypeModel;
+import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +33,13 @@ public class ReleaseNoteParagraphModel extends ParagraphModel{
 
     @Override
     @JsonProperty("field_p_release_note_title")
-    public List<TitleModel> getTitle() {
+    public List<StringValueModel> getTitle() {
         return super.getTitle();
     }
 
     @Override
     @JsonProperty("field_p_release_note_description")
-    public List<DescriptionModel> getDescription() {
+    public List<FormattedTextModel> getDescription() {
         return super.getDescription();
     }
 

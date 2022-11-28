@@ -1,10 +1,10 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fieldtypes;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Locale;
 
-public enum ValueFormat {
+public enum TextFormat {
 
     GITHUB_FLAVORED_MARKDOWN, BASIC_HTML, FULL_HTML;
 

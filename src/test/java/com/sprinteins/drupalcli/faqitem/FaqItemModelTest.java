@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.TestFiles;
-import com.sprinteins.drupalcli.models.FaqAnswerModel;
-import com.sprinteins.drupalcli.models.FaqQuestionModel;
-import com.sprinteins.drupalcli.models.ValueFormat;
+import com.sprinteins.drupalcli.fields.FaqAnswerModel;
+import com.sprinteins.drupalcli.fields.FaqQuestionModel;
+import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -24,7 +24,7 @@ public class FaqItemModelTest {
         List<FaqAnswerModel> answerArray = new ArrayList<FaqAnswerModel>();
         answerArray.add(answer);
         answer.setValue("Test124");
-        answer.setFormat(ValueFormat.BASIC_HTML);
+        answer.setFormat(TextFormat.BASIC_HTML);
 
         var question = new FaqQuestionModel();
         List<FaqQuestionModel> questionArray = new ArrayList<FaqQuestionModel>();

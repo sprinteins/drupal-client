@@ -3,7 +3,12 @@ package com.sprinteins.drupalcli.paragraph;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.*;
+import com.sprinteins.drupalcli.fields.FaqAnswerModel;
+import com.sprinteins.drupalcli.fields.FaqQuestionModel;
+import com.sprinteins.drupalcli.fields.TypeModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +20,8 @@ public abstract class ParagraphModel {
     private List<LongValueModel> id;
     private List<LongValueModel> revisionId;
     private List<StringValueModel> uuid;
-    private List<DescriptionModel> description;
-    private List<TitleModel> title;
+    private List<FormattedTextModel> description;
+    private List<StringValueModel> title;
     private List<TypeModel> type;
 
     public ParagraphModel(TypeModel type){
@@ -67,23 +72,23 @@ public abstract class ParagraphModel {
     }
 
     @JsonIgnore
-    public DescriptionModel getOrCreateFirstDescription() {
+    public FormattedTextModel getOrCreateFirstDescription() {
         if (description == null) {
             description = new ArrayList<>();
         }
         if (description.isEmpty()) {
-            description.add(new DescriptionModel());
+            description.add(new FormattedTextModel());
         }
         return description.get(0);
     }
 
     @JsonIgnore
-    public TitleModel getOrCreateFirstTitle() {
+    public StringValueModel getOrCreateFirstTitle() {
         if (title == null) {
             title = new ArrayList<>();
         }
         if (title.isEmpty()) {
-            title.add(new TitleModel());
+            title.add(new StringValueModel());
         }
         return title.get(0);
     }
@@ -114,19 +119,19 @@ public abstract class ParagraphModel {
     }
 
 
-    public List<DescriptionModel> getDescription() {
+    public List<FormattedTextModel> getDescription() {
         return Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
-    public void setDescription(List<DescriptionModel> description) {
+    public void setDescription(List<FormattedTextModel> description) {
         this.description = Optional.ofNullable(description).map(List::copyOf).orElse(null);
     }
 
-    public List<TitleModel> getTitle() {
+    public List<StringValueModel> getTitle() {
         return Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 
-    public void setTitle(List<TitleModel> title) {
+    public void setTitle(List<StringValueModel> title) {
         this.title = Optional.ofNullable(title).map(List::copyOf).orElse(null);
     }
 

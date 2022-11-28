@@ -1,20 +1,14 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetType;
 
-public class FaqItemsModel {
+public class ReleaseNoteElementModel {
 
     private Long targetId;
     private Long targetRevisionId;
     private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
-    
-    public FaqItemsModel(FaqItemsParagraphModel paragraph) {
-        setTargetId(paragraph.getOrCreateFirstId().getValue());
-        setTargetRevisionId(paragraph.getOrCreateFirstRevisionId().getValue());
-        setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
-    }
 
     @JsonProperty("target_id")
     public Long getTargetId() {
@@ -44,4 +38,3 @@ public class FaqItemsModel {
     public String getTargetUuid() { return targetUuid; }
     public void setTargetUuid(String targetUuid) { this.targetUuid = targetUuid; }
 }
-

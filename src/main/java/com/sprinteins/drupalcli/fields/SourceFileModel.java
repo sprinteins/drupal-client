@@ -1,6 +1,4 @@
-package com.sprinteins.drupalcli.node;
-
-import com.sprinteins.drupalcli.models.TargetModel;
+package com.sprinteins.drupalcli.fields;
 
 public class SourceFileModel extends TargetModel {
 

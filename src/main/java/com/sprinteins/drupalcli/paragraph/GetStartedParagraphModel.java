@@ -1,16 +1,16 @@
 package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.TargetId;
-import com.sprinteins.drupalcli.models.TitleModel;
-import com.sprinteins.drupalcli.models.TypeModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
+import com.sprinteins.drupalcli.fields.TypeModel;
 
 import java.util.List;
 
 public class GetStartedParagraphModel extends ParagraphModel{
 
-    public static GetStartedParagraphModel create(String title, DescriptionModel description) {
+    public static GetStartedParagraphModel create(String title, FormattedTextModel description) {
         GetStartedParagraphModel model = new GetStartedParagraphModel();
         model.getOrCreateFirstTitle().setValue(title);
         model.setDescription(List.of(description));
@@ -23,13 +23,13 @@ public class GetStartedParagraphModel extends ParagraphModel{
     
     @Override
     @JsonProperty("field_p_getstarted_title")
-    public List<TitleModel> getTitle() {
+    public List<StringValueModel> getTitle() {
         return super.getTitle();
     }
 
     @Override
     @JsonProperty("field_p_getstarted_description")
-    public List<DescriptionModel> getDescription() {
+    public List<FormattedTextModel> getDescription() {
         return super.getDescription();
     }
 }

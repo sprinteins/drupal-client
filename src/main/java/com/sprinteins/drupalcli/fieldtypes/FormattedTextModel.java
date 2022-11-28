@@ -1,19 +1,19 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fieldtypes;
 
-public class DescriptionModel {
+public class FormattedTextModel {
 
     private String value;
-    private ValueFormat format;
+    private TextFormat format;
     private String processed;
     
-    public static DescriptionModel basicHtml(String html) {
-        DescriptionModel result = new DescriptionModel();
+    public static FormattedTextModel basicHtml(String html) {
+        FormattedTextModel result = new FormattedTextModel();
         result.value = html;
-        result.format = ValueFormat.BASIC_HTML;
+        result.format = TextFormat.BASIC_HTML;
         return result;
     }
     
-    public DescriptionModel() {
+    public FormattedTextModel() {
     }
     
     public String getValue() {
@@ -24,11 +24,11 @@ public class DescriptionModel {
         this.value = value;
     }
 
-    public ValueFormat getFormat() {
+    public TextFormat getFormat() {
         return format;
     }
 
-    public void setFormat(ValueFormat format) {
+    public void setFormat(TextFormat format) {
         this.format = format;
     }
 

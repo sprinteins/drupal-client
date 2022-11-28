@@ -1,16 +1,17 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetType;
+import com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel;
 
-public class FaqItemModel {
+public class FaqItemsModel {
 
     private Long targetId;
     private Long targetRevisionId;
     private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
     
-    public FaqItemModel(FaqItemParagraphModel paragraph) {
+    public FaqItemsModel(FaqItemsParagraphModel paragraph) {
         setTargetId(paragraph.getOrCreateFirstId().getValue());
         setTargetRevisionId(paragraph.getOrCreateFirstRevisionId().getValue());
         setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
