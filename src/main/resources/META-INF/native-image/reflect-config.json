@@ -142,12 +142,6 @@
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.node.SourceFileModel",
-  "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allDeclaredConstructors":true
-},
-{
   "name":"com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
