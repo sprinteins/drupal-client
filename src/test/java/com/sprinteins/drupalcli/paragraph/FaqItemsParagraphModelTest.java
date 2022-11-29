@@ -17,8 +17,6 @@ public class FaqItemsParagraphModelTest {
     @Test
     void testJsonSerializationDescription() throws Exception {
         FaqItemsParagraphModel faqItemsParagraphModel = new FaqItemsParagraphModel();
-        faqItemsParagraphModel.create("Questions about Pizza toppings");
-
 
         FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
 
@@ -47,6 +45,7 @@ public class FaqItemsParagraphModelTest {
         JsonNode actualJson = objectMapper.readTree(objectMapper.writeValueAsString(value));
 
         var expectedType = expectedJson.get("type").findValue("target_id").asText();
+        var actualType = expectedJson.get("type").findValue("target_id").asText();
 
         var expectedTargetid = expectedJson.get("field_faq_item").findValue("target_id").asText();
         var actualTargetid = expectedJson.get("field_faq_item").findValue("target_id").asText();
@@ -63,11 +62,12 @@ public class FaqItemsParagraphModelTest {
         var expectedTitle = expectedJson.get("field_faq_title").findValue("value").asText();
         var actualTitle = expectedJson.get("field_faq_title").findValue("value").asText();
 
+        JSONAssert.assertEquals(expectedType, actualType, true);
         JSONAssert.assertEquals(expectedTargetid, actualTargetid, true);
         JSONAssert.assertEquals(expectedTargetRevisionId, actualTargetRevisionId, true);
         JSONAssert.assertEquals(expectedTargetType, actualTargetType, true);
         JSONAssert.assertEquals(expectedTargetUuid, actualTargetUuid, true);
         JSONAssert.assertEquals(expectedTitle, actualTitle, true);
     }
-    
+
 }
