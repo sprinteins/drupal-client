@@ -10,6 +10,10 @@ public class FaqItemsModel {
     private Long targetRevisionId;
     private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
+
+    public FaqItemsModel(){
+
+    }
     
     public FaqItemsModel(FaqItemsParagraphModel paragraph) {
         setTargetId(paragraph.getOrCreateFirstId().getValue());
