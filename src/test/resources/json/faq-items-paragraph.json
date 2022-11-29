@@ -1,0 +1,27 @@
+{
+    "type": [
+        {
+            "target_id": "faq_items"
+        } 
+    ],
+
+    "field_faq_item": [
+        {
+            "target_id": 1500,
+            "target_revision_id": 35223,
+            "target_type": "paragraph",
+            "target_uuid": "9543d057-4493-473a-ae58-6a495f06e02d"
+        },
+        {
+            "target_id": 1501,
+            "target_revision_id": 35224,
+            "target_type": "paragraph",
+            "target_uuid": "228e52fe-ed47-467b-a1e9-3b5dc9c6b2dd"
+        }
+    ],
+    "field_faq_title": [
+        {
+            "value": "Questions about Pizza toppings"
+        }
+    ]
+}

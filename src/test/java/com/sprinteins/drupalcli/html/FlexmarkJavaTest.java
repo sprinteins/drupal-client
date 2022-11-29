@@ -3,9 +3,9 @@ package com.sprinteins.drupalcli.html;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.TestFiles;
 import com.sprinteins.drupalcli.converter.Converter;
-import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.GetStartedDocsElementModel;
-import com.sprinteins.drupalcli.models.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
+import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
@@ -63,8 +63,8 @@ public class FlexmarkJavaTest {
             
             for(GetStartedDocsElementModel getStartedDocsElement: nodeModel.getGetStartedDocsElements()) {
                 GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
-                DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
-                Document doc = Jsoup.parse(descriptionModel.getProcessed());
+                FormattedTextModel formattedTextModel = getStartedParagraph.getOrCreateFirstDescription();
+                Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
                 //get html
                 String html = doc.body().html();
@@ -107,8 +107,8 @@ public class FlexmarkJavaTest {
 
             for(ReleaseNoteElementModel releaseNoteElementModel: nodeModel.getReleaseNotesElement()) {
                 ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphModelParagraphClient.get(releaseNoteElementModel.getTargetId());
-                DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
-                Document doc = Jsoup.parse(descriptionModel.getProcessed());
+                FormattedTextModel formattedTextModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
+                Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
                 //convert to md
                 String html = doc.body().html();

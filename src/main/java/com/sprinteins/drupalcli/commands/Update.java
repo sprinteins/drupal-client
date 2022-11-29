@@ -6,10 +6,16 @@ import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.YamlFinder;
 import com.sprinteins.drupalcli.converter.Converter;
+import com.sprinteins.drupalcli.fields.AdditionalInformationElementModel;
+import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
+import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
+import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
@@ -126,7 +132,7 @@ public class Update implements Callable<Integer> {
 
             GetStartedParagraphModel getStartedParagraph;
             if (i > getStartedDocsElements.size() - 1) {
-                getStartedParagraph = GetStartedParagraphModel.create(menuItem, DescriptionModel.basicHtml("..."));
+                getStartedParagraph = GetStartedParagraphModel.create(menuItem, FormattedTextModel.basicHtml("..."));
                 getStartedParagraph = getStartedParagraphClient.post(getStartedParagraph);
                 getStartedDocsElements.add(new GetStartedDocsElementModel(getStartedParagraph));
             } else {
@@ -186,8 +192,8 @@ public class Update implements Callable<Integer> {
                 }
             }
 
-            DescriptionModel fieldDescription = getStartedParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            FormattedTextModel fieldDescription = getStartedParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
             fieldDescription.setValue(newParagraphDocument.body().html());
 
             getStartedParagraphClient.patch(getStartedParagraph);
@@ -206,7 +212,7 @@ public class Update implements Callable<Integer> {
 
             AdditionalInformationParagraphModel additionalInformationParagraph;
             if (i > additionalInformationElements.size() - 1) {
-                additionalInformationParagraph = AdditionalInformationParagraphModel.create(menuItem, DescriptionModel.basicHtml("..."));
+                additionalInformationParagraph = AdditionalInformationParagraphModel.create(menuItem, FormattedTextModel.basicHtml("..."));
                 additionalInformationParagraph = additionalInformationParagraphClient.post(additionalInformationParagraph);
                 additionalInformationElements.add(new AdditionalInformationElementModel(additionalInformationParagraph));
             } else {
@@ -266,8 +272,8 @@ public class Update implements Callable<Integer> {
                 }
             }
 
-            DescriptionModel fieldDescription = additionalInformationParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            FormattedTextModel fieldDescription = additionalInformationParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
             fieldDescription.setValue(newParagraphDocument.body().html());
 
             additionalInformationParagraphClient.patch(additionalInformationParagraph);
@@ -289,16 +295,16 @@ public class Update implements Callable<Integer> {
             ReleaseNoteParagraphModel releaseNoteParagraph = releaseNoteParagraphClient
                     .get(releaseNoteElement.getTargetId());
 
-            TitleModel titleModel = releaseNoteParagraph.getOrCreateFirstTitle();
+            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
             DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
 
-            titleModel.setValue(releaseNote.select("h3").html());
+            releaseNoteTitle.setValue(releaseNote.select("h3").html());
             dateValueModel.setValue(releaseNote.select("h4").html());
             releaseNote.select("h3").remove();
             releaseNote.select("h4").remove();
 
-            DescriptionModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
             fieldDescription.setValue(releaseNote.html());
 
             Set<ConstraintViolation<DateValueModel>> constraintViolations =
@@ -332,16 +338,16 @@ public class Update implements Callable<Integer> {
 
             ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
 
-            TitleModel titleModel = releaseNoteParagraph.getOrCreateFirstTitle();
+            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
             DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
 
-            titleModel.setValue(releaseNote.select("h3").html());
+            releaseNoteTitle.setValue(releaseNote.select("h3").html());
             dateValueModel.setValue(releaseNote.select("h4").html());
             releaseNote.select("h3").remove();
             releaseNote.select("h4").remove();
 
-            DescriptionModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(ValueFormat.BASIC_HTML);
+            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
             fieldDescription.setValue(releaseNote.html());
             ReleaseNoteParagraphModel newReleaseNoteParagraph = releaseNoteParagraphClient.post(releaseNoteParagraph);
 
@@ -364,7 +370,7 @@ public class Update implements Callable<Integer> {
         Document newMainDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
         patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
-        patchNodeModel.getOrCreateFirstListDescription().setFormat(ValueFormat.BASIC_HTML);
+        patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
 
         nodeClient.patch(nodeId, patchNodeModel);
 

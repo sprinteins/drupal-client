@@ -1,6 +1,6 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fieldtypes;
 
-public class TitleModel {
+public class StringValueModel {
 
     private String value;
 
@@ -14,7 +14,7 @@ public class TitleModel {
 
     @Override
     public String toString() {
-        return "TitleModel {value=" + value + "}";
+        return "StringValueModel {value=" + value + "}";
     }
 
 }

@@ -1,23 +1,14 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetType;
 
-public class GetStartedDocsElementModel {
+public class ReleaseNoteElementModel {
 
     private Long targetId;
     private Long targetRevisionId;
     private TargetType targetType = TargetType.PARAGRAPH;
     private String targetUuid;
-    
-    public GetStartedDocsElementModel() {
-    }
-    
-    public GetStartedDocsElementModel(GetStartedParagraphModel paragraph) {
-        setTargetId(paragraph.getOrCreateFirstId().getValue());
-        setTargetRevisionId(paragraph.getOrCreateFirstRevisionId().getValue());
-        setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
-    }
 
     @JsonProperty("target_id")
     public Long getTargetId() {

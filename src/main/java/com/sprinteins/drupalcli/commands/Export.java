@@ -2,14 +2,21 @@ package com.sprinteins.drupalcli.commands;
 
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.converter.Converter;
+import com.sprinteins.drupalcli.fields.AdditionalInformationElementModel;
+import com.sprinteins.drupalcli.fields.FaqAnswerModel;
+import com.sprinteins.drupalcli.fields.FaqItemModel;
+import com.sprinteins.drupalcli.fields.FaqItemsModel;
+import com.sprinteins.drupalcli.fields.FaqQuestionModel;
+import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
+import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
-import com.sprinteins.drupalcli.models.*;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
-import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
-import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
-import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+import com.sprinteins.drupalcli.paragraph.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -63,6 +70,8 @@ public class Export implements Callable<Integer> {
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
+        var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
+        var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
@@ -82,14 +91,14 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add("get-started-menu:");
         for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
             GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient.get(getStartedDocsElement.getTargetId());
-            DescriptionModel descriptionModel = getStartedParagraph.getOrCreateFirstDescription();
+            FormattedTextModel formattedTextModel = getStartedParagraph.getOrCreateFirstDescription();
 
             String paragraphTitle = getStartedParagraph.title();
             System.out.println("Download information from " + paragraphTitle + " ...");
 
             mainMarkdown.add("  - " + paragraphTitle);
 
-            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+            Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
             System.out.println("Downloading images...");
             downloadImages(imageClient, doc);
@@ -112,14 +121,14 @@ public class Export implements Callable<Integer> {
         mainMarkdown.add("additional-information-menu:");
         for (AdditionalInformationElementModel additionalInformationElement : nodeModel.getAdditionalInformationElements()) {
             AdditionalInformationParagraphModel additionalInformationParagraph = additionalInformationParagraphClient.get(additionalInformationElement.getTargetId());
-            DescriptionModel descriptionModel = additionalInformationParagraph.getOrCreateFirstDescription();
+            FormattedTextModel formattedTextModel = additionalInformationParagraph.getOrCreateFirstDescription();
 
             String paragraphTitle = additionalInformationParagraph.title();
             System.out.println("Download information from " + paragraphTitle + " ...");
 
             mainMarkdown.add("  - " + paragraphTitle);
 
-            Document doc = Jsoup.parse(descriptionModel.getProcessed());
+            Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
             System.out.println("Downloading images...");
             downloadImages(imageClient, doc);
@@ -139,18 +148,53 @@ public class Export implements Callable<Integer> {
 
         }
 
+        mainMarkdown.add("faqs:");
+        for(FaqItemsModel faqItemsModel : nodeModel.getFaqItems()) {
+          FaqItemsParagraphModel faqItemsParagraph = faqItemsParagraphClient.get(faqItemsModel.getTargetId());
+
+          String paragraphTitle = faqItemsParagraph.title();
+          System.out.println(("Download information from "+ paragraphTitle+"..."));
+
+          mainMarkdown.add("  - " + paragraphTitle);
+
+          List<String> markdown = new ArrayList<>();
+          markdown.add("---");
+          markdown.add("title: " + paragraphTitle);
+          markdown.add("type: faqs");
+          markdown.add("---");
+
+         
+          for(FaqItemModel faqItemModel : faqItemsParagraph.getFaqItem()){
+            FaqItemParagraphModel faqItemParagraph = faqItemParagraphClient.get(faqItemModel.getTargetId());
+
+            FaqQuestionModel faqQuestion = faqItemParagraph.getOrCreateFirstQuestion();
+            FaqAnswerModel faqAnswer = faqItemParagraph.getOrCreateFirstAnswer();
+
+            String faqQuestionValue = faqQuestion.getValue();
+            Document faqAnswerValue = Jsoup.parse(faqAnswer.getProcessed());
+
+            markdown.add("QUESTION:");
+            markdown.add(faqQuestionValue);
+            markdown.add("ANSWER:");
+            markdown.add(converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
+          }
+
+          System.out.println("Create markdown file...");
+          Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ","-")+".markdown"),markdown);
+        }
+
         System.out.println("Download release notes ...");
         StringBuilder stringBuilder = new StringBuilder();
         for (ReleaseNoteElementModel releaseNoteElementModel : nodeModel.getReleaseNotesElement()) {
             ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient.get(releaseNoteElementModel.getTargetId());
-            DescriptionModel descriptionModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
-            TitleModel titleModel = releaseNoteParagraphModel.getOrCreateFirstTitle();
+            FormattedTextModel formattedTextModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
+            StringValueModel releaseNoteTitle = releaseNoteParagraphModel.getOrCreateFirstTitle();
             DateValueModel dateValueModel = releaseNoteParagraphModel.getOrCreateFirstDate();
 
             Document releaseNote = new Document("");
-            releaseNote.append("<h3>" + titleModel.getValue() + "</h3>");
+            releaseNote.append("<h3>" + releaseNoteTitle.getValue() + "</h3>");
             releaseNote.append("<h4>" + dateValueModel.getValue() + "</h4>");
-            releaseNote.append(descriptionModel.getProcessed());
+            releaseNote.append(formattedTextModel.getProcessed());
 
             stringBuilder.append(converter.convertHtmlToMarkdown(releaseNote.html(), link));
         }

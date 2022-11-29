@@ -1,10 +1,10 @@
-package com.sprinteins.drupalcli.getstartedparagraph;
+package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.TestFiles;
-import com.sprinteins.drupalcli.models.DescriptionModel;
-import com.sprinteins.drupalcli.models.ValueFormat;
+import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
+import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -14,9 +14,9 @@ public class GetStartedParagraphModelTest {
     @Test
     void testJsonSerializationDescription() throws Exception {
         GetStartedParagraphModel getStartedParagraph = new GetStartedParagraphModel();
-        DescriptionModel fieldDescription = getStartedParagraph
+        FormattedTextModel fieldDescription = getStartedParagraph
                 .getOrCreateFirstDescription();
-        fieldDescription.setFormat(ValueFormat.GITHUB_FLAVORED_MARKDOWN);
+        fieldDescription.setFormat(TextFormat.GITHUB_FLAVORED_MARKDOWN);
         fieldDescription.setValue("# Title");
 
         testSerialization("paragraph-serialize-description",

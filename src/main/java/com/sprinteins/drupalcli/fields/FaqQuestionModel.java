@@ -1,9 +1,9 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
-public class StringValueModel {
+public class FaqQuestionModel {
 
     private String value;
-
+      
     public String getValue() {
         return value;
     }
@@ -14,7 +14,7 @@ public class StringValueModel {
 
     @Override
     public String toString() {
-        return "StringValueModel {value=" + value + "}";
+        return "FaqQuestionModel {value=" + value + "}";
     }
 
 }

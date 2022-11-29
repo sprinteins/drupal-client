@@ -1,12 +1,12 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fieldtypes;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Locale;
 
-public enum TargetId {
+public enum TextFormat {
 
-    GET_STARTED_ELEMENT, API_REFERENCE, IMAGE, RELEASE_NOTE, ADDITIONAL_INFO_ELEMENT;
+    GITHUB_FLAVORED_MARKDOWN, BASIC_HTML, FULL_HTML;
 
     @JsonValue
     public String toLowerCase() {

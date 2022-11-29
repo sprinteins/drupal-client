@@ -1,6 +1,8 @@
-package com.sprinteins.drupalcli.models;
+package com.sprinteins.drupalcli.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
+import com.sprinteins.drupalcli.fieldtypes.TargetType;
 
 public class TypeModel {
 
