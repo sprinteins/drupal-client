@@ -39,14 +39,6 @@ public class FaqItemParagraphModelTest {
                 faqItemParagraphModel);
     }
 
-    // @Test
-    // void testJsonSerializationTitle() throws Exception {
-    //     FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
-    //     faqItemParagraphModel.getOrCreateFirstTitle().setValue("Legal Terms");
-
-    //     testSerialization("paragraph-serialize-title", faqItemParagraphModel);
-    // }
-
     private void testSerialization(String path, Object value) throws Exception {
         String expected = TestFiles
                 .readAllBytesToString("json/" + path + ".json");
