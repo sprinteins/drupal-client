@@ -17,8 +17,6 @@ public class FaqItemsParagraphModelTest {
     @Test
     void testJsonSerializationDescription() throws Exception {
         FaqItemsParagraphModel faqItemsParagraphModel = new FaqItemsParagraphModel();
-        faqItemsParagraphModel.create("Questions about Pizza toppings");
-
 
         FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
 
@@ -69,5 +67,5 @@ public class FaqItemsParagraphModelTest {
         JSONAssert.assertEquals(expectedTargetUuid, actualTargetUuid, true);
         JSONAssert.assertEquals(expectedTitle, actualTitle, true);
     }
-    
+
 }
