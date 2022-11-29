@@ -17,6 +17,10 @@ public class FaqItemModel {
         setTargetUuid(paragraph.getOrCreateFirstUuid().getValue());
     }
 
+    public FaqItemModel() {
+      
+    }
+
     @JsonProperty("target_id")
     public Long getTargetId() {
         return targetId;

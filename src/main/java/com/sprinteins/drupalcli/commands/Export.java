@@ -155,7 +155,7 @@ public class Export implements Callable<Integer> {
           String paragraphTitle = faqItemsParagraph.title();
           System.out.println(("Download information from "+ paragraphTitle+"..."));
 
-          mainMarkdown.add(" -" + paragraphTitle);
+          mainMarkdown.add("  - " + paragraphTitle);
 
           List<String> markdown = new ArrayList<>();
           markdown.add("---");
@@ -163,17 +163,24 @@ public class Export implements Callable<Integer> {
           markdown.add("type: faqs");
           markdown.add("---");
 
-          System.out.println("Create markdown file...");
-          Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ","-")+".markdown"),markdown);
-
-          for(FaqItemModel faqItemModel : nodeModel.getFaqItem()){
+         
+          for(FaqItemModel faqItemModel : faqItemsParagraph.getFaqItem()){
             FaqItemParagraphModel faqItemParagraph = faqItemParagraphClient.get(faqItemModel.getTargetId());
 
-            List<FaqQuestionModel> faqQuestion = faqItemParagraph.getQuestion();
+            FaqQuestionModel faqQuestion = faqItemParagraph.getOrCreateFirstQuestion();
+            FaqAnswerModel faqAnswer = faqItemParagraph.getOrCreateFirstAnswer();
 
-            List<FaqAnswerModel> faqAnswer = faqItemParagraph.getAnswer();
+            String faqQuestionValue = faqQuestion.getValue();
+            Document faqAnswerValue = Jsoup.parse(faqAnswer.getProcessed());
 
+            markdown.add("QUESTION:");
+            markdown.add(faqQuestionValue);
+            markdown.add("ANSWER:");
+            markdown.add(converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
           }
+
+          System.out.println("Create markdown file...");
+          Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ","-")+".markdown"),markdown);
         }
 
         System.out.println("Download release notes ...");
