@@ -162,6 +162,7 @@ public class Update implements Callable<Integer> {
             Document newParagraphDocument = Jsoup
                     .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
 
+
             for (Element imageElement : newParagraphDocument.select("img")) {
 
                 if (imageElement.hasAttr("data-entity-type")) {

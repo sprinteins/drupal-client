@@ -49,10 +49,10 @@ public class FaqItemParagraphModelTest {
         JsonNode expectedJson = objectMapper.readTree(expected);
         JsonNode actualJson = objectMapper.readTree(objectMapper.writeValueAsString(value));
 
-        var expectedAnswerValue = expectedJson.get("field_faq_item_question").findValue("value").asText();
-        var actualAnswerValue = expectedJson.get("field_faq_item_question").findValue("value").asText();
+        var expectedQuestionValue = expectedJson.get("field_faq_item_question").findValue("value").toString();
+        var actualQuestionValue = actualJson.get("field_faq_item_question").findValue("value").toString();
 
 
-        JSONAssert.assertEquals(expectedAnswerValue, actualAnswerValue, true);
+        JSONAssert.assertEquals(expectedQuestionValue, actualQuestionValue, true);
     }
 }
