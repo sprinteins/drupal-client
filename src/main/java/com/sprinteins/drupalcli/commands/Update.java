@@ -56,6 +56,7 @@ public class Update implements Callable<Integer> {
     public static final String IMAGE_FOLDER_NAME = "images";
 
 
+
     @Mixin
     private GlobalOptions globalOptions;
 
