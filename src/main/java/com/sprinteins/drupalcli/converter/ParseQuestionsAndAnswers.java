@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.converter;
 
+import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.fields.FaqAnswerModel;
 import com.sprinteins.drupalcli.fields.FaqQuestionModel;
 import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;
@@ -11,17 +12,19 @@ import org.jsoup.nodes.Node;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ParseQuestionsAndAnswers {
 
 
-    public List<FaqItemParagraphModel> parseQuestionsAndAnswersFromMarkdown(String markdown) {
+    public List<FaqItemParagraphModel> parseQuestionsAndAnswersFromMarkdown(String markdown) throws Exception {
 
         Converter  converter = new Converter();
 
+        Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(markdown);
+
         Document newParagraphDocument = Jsoup.parse(converter.convertMarkdownToHtml(markdown));
         List<Node> pTagList = newParagraphDocument.childNodes().get(0).childNodes().get(1).childNodes();
-
 
 
         /* String FAQ_MARKDOWN_FILE_NAME = "questions-about-pizza-sauces.markdown";
@@ -37,9 +40,9 @@ public class ParseQuestionsAndAnswers {
 
         List<FaqItemParagraphModel> faqItemParagraphList = new ArrayList<FaqItemParagraphModel>();
 
-        FaqItemParagraphModel faqItemParagraph = new FaqItemParagraphModel();
-/*        List<FaqQuestionModel> faqQuestionModelList = new ArrayList<FaqQuestionModel>();
-        List<FaqAnswerModel> faqAnswerModelList = new ArrayList<FaqAnswerModel>();*/
+    /*    FaqItemParagraphModel faqItemParagraph = new FaqItemParagraphModel();
+*//*        List<FaqQuestionModel> faqQuestionModelList = new ArrayList<FaqQuestionModel>();
+        List<FaqAnswerModel> faqAnswerModelList = new ArrayList<FaqAnswerModel>();*//*
 
         Type test1 = pTagList.get(0).getClass();
         Boolean test2 = pTagList.get(1).hasAttr("value");
@@ -76,7 +79,7 @@ public class ParseQuestionsAndAnswers {
                 }
             }
         }
-
+*/
         return faqItemParagraphList;
     }
 

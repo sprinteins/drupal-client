@@ -294,7 +294,15 @@ public class Update implements Callable<Integer> {
 
         for (int i = 0; i < faqItemsSection.size(); i++) {
 
-            String menuItem = faqItemsSection.get(i);
+            String menuItem = faqItemsSection.get(i);/*
+            menuItem.get("question");
+
+            for (int j = 0; j < menuItem.size(); j++){
+                menuItem.get("question");
+
+            }*/
+
+
             System.out.println("Updating paragraph: " + menuItem + " ...");
 
             FaqItemsParagraphModel faqItemsParagraph;

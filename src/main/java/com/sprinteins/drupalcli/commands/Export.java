@@ -159,11 +159,10 @@ public class Export implements Callable<Integer> {
 
           List<String> markdown = new ArrayList<>();
           markdown.add("---");
-          markdown.add("title: " + paragraphTitle);
+          markdown.add("subsection-title: " + paragraphTitle);
           markdown.add("type: faqs");
-          markdown.add("---");
+          markdown.add("q-and-a:");
 
-         
           for(FaqItemModel faqItemModel : faqItemsParagraph.getFaqItem()){
             FaqItemParagraphModel faqItemParagraph = faqItemParagraphClient.get(faqItemModel.getTargetId());
 
@@ -173,11 +172,13 @@ public class Export implements Callable<Integer> {
             String faqQuestionValue = faqQuestion.getValue();
             Document faqAnswerValue = Jsoup.parse(faqAnswer.getProcessed());
 
-            markdown.add("QUESTION:");
-            markdown.add(faqQuestionValue);
-            markdown.add("ANSWER:");
-            markdown.add(converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
+
+            markdown.add("- question: " + faqQuestionValue);
+            markdown.add("  answer: |");
+            markdown.add("    " + converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
           }
+
+          markdown.add("---");
 
           System.out.println("Create markdown file...");
           Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ","-")+".markdown"),markdown);
