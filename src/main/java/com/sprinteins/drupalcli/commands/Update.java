@@ -6,10 +6,7 @@ import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
 import com.sprinteins.drupalcli.YamlFinder;
 import com.sprinteins.drupalcli.converter.Converter;
-import com.sprinteins.drupalcli.fields.AdditionalInformationElementModel;
-import com.sprinteins.drupalcli.fields.FaqItemsModel;
-import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
-import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.fields.*;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
@@ -19,10 +16,7 @@ import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
-import com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel;
-import com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel;
-import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
-import com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel;
+import com.sprinteins.drupalcli.paragraph.*;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -317,9 +311,48 @@ public class Update implements Callable<Integer> {
 
             System.out.println("Updating paragraph: " + faqItemsParagraph.id() + " ...");
 
-            Path docPath = workingDir.resolve(
-                    menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
-                            + ".markdown");
+            Path docPath = workingDir.resolve(menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
+                    + ".markdown");
+            String faqSectionContent = readFile(docPath);
+            Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
+
+            FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
+            List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
+            List<FaqAnswerModel> faqAnswerModelList = new ArrayList<>();
+            List<String> qAndA = frontmatterFaq.get("q-and-a");
+
+            /*System.out.println(qAndA);*/
+
+
+            for (var k = 0; k < qAndA.size(); k++) {
+                if(qAndA.get(k).contains("question:")) {
+                    String questionString = qAndA.get(k);
+                    var question = questionString.split("question: ");
+                    FaqQuestionModel questionModel = new FaqQuestionModel();
+                    questionModel.setValue(question[1]);
+                    faqQuestionModelList.add(questionModel);
+                }
+
+                if(qAndA.get(k).contains("answer:")) {
+                    String answerString = qAndA.get(k);
+                    var answer = answerString.split("answer: ");
+                    FaqAnswerModel answerModel = new FaqAnswerModel();
+                    answerModel.setValue(answer[1]);
+                    faqAnswerModelList.add(answerModel);                }
+            }
+
+            faqItemParagraphModel.setQuestion(faqQuestionModelList);
+            faqItemParagraphModel.setAnswer(faqAnswerModelList);
+            faqItemParagraphModel.getOrCreateFirstId();
+            faqItemParagraphModel.getOrCreateFirstRevisionId();
+            faqItemParagraphModel.getOrCreateFirstUuid();
+            faqItemParagraphModel.getOrCreateFirstTitle();
+            faqItemParagraphModel.getOrCreateFirstDescription();
+
+            System.out.println(faqItemParagraphModel.id());
+
+
+            faqItemParagraphClient.patch(faqItemParagraphModel);
 
             if (!Files.exists(docPath)) {
                 throw new IllegalStateException("File " + docPath + " not found");

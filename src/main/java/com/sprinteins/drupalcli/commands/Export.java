@@ -173,9 +173,8 @@ public class Export implements Callable<Integer> {
             Document faqAnswerValue = Jsoup.parse(faqAnswer.getProcessed());
 
 
-            markdown.add("- question: " + faqQuestionValue);
-            markdown.add("  answer: |");
-            markdown.add("    " + converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
+            markdown.add("  - question: " + faqQuestionValue);
+            markdown.add("  - answer: " + converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
           }
 
           markdown.add("---");
