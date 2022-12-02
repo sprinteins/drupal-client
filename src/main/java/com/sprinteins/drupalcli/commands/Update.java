@@ -288,14 +288,7 @@ public class Update implements Callable<Integer> {
 
         for (int i = 0; i < faqItemsSection.size(); i++) {
 
-            String menuItem = faqItemsSection.get(i);/*
-            menuItem.get("question");
-
-            for (int j = 0; j < menuItem.size(); j++){
-                menuItem.get("question");
-
-            }*/
-
+            String menuItem = faqItemsSection.get(i);
 
             System.out.println("Updating paragraph: " + menuItem + " ...");
 
@@ -304,44 +297,42 @@ public class Update implements Callable<Integer> {
                 faqItemsParagraph = FaqItemsParagraphModel.create(menuItem);
                 faqItemsParagraph = faqItemsParagraphClient.post(faqItemsParagraph);
                 faqSectionElements.add(new FaqItemsModel(faqItemsParagraph));
-            } else {
-                faqItemsParagraph = faqItemsParagraphClient
-                        .get(faqSectionElements.get(i).getTargetId());
-            }
 
-            System.out.println("Updating paragraph: " + faqItemsParagraph.id() + " ...");
-
-            Path docPath = workingDir.resolve(menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
-                    + ".markdown");
-            String faqSectionContent = readFile(docPath);
-            Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
-
-            FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
-            List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
-            List<FaqAnswerModel> faqAnswerModelList = new ArrayList<>();
-            List<String> qAndA = frontmatterFaq.get("q-and-a");
-
-            /*System.out.println(qAndA);*/
+                var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
 
 
-            for (var k = 0; k < qAndA.size(); k++) {
-                if(qAndA.get(k).contains("question:")) {
-                    String questionString = qAndA.get(k);
-                    var question = questionString.split("question: ");
-                    FaqQuestionModel questionModel = new FaqQuestionModel();
-                    questionModel.setValue(question[1]);
-                    faqQuestionModelList.add(questionModel);
+
+                Path docPath = workingDir.resolve(menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
+                        + ".markdown");
+                String faqSectionContent = readFile(docPath);
+                Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
+
+                FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
+                List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
+                List<FaqAnswerModel> faqAnswerModelList = new ArrayList<>();
+                List<String> qAndA = frontmatterFaq.get("q-and-a");
+
+                /*System.out.println(qAndA);*/
+
+
+                for (var k = 0; k < qAndA.size(); k++) {
+                    if(qAndA.get(k).contains("question:")) {
+                        String questionString = qAndA.get(k);
+                        var question = questionString.split("question: ");
+                        FaqQuestionModel questionModel = new FaqQuestionModel();
+                        questionModel.setValue(question[1]);
+                        faqQuestionModelList.add(questionModel);
+                    }
+
+                    if(qAndA.get(k).contains("answer:")) {
+                        String answerString = qAndA.get(k);
+                        var answer = answerString.split("answer: ");
+                        FaqAnswerModel answerModel = new FaqAnswerModel();
+                        answerModel.setValue(answer[1]);
+                        faqAnswerModelList.add(answerModel);                }
                 }
 
-                if(qAndA.get(k).contains("answer:")) {
-                    String answerString = qAndA.get(k);
-                    var answer = answerString.split("answer: ");
-                    FaqAnswerModel answerModel = new FaqAnswerModel();
-                    answerModel.setValue(answer[1]);
-                    faqAnswerModelList.add(answerModel);                }
-            }
-
-            faqItemParagraphModel.setQuestion(faqQuestionModelList);
+/*            faqItemParagraphModel.setQuestion(faqQuestionModelList);
             faqItemParagraphModel.setAnswer(faqAnswerModelList);
             faqItemParagraphModel.getOrCreateFirstId();
             faqItemParagraphModel.getOrCreateFirstRevisionId();
@@ -349,21 +340,27 @@ public class Update implements Callable<Integer> {
             faqItemParagraphModel.getOrCreateFirstTitle();
             faqItemParagraphModel.getOrCreateFirstDescription();
 
-            System.out.println(faqItemParagraphModel.id());
+            System.out.println(faqItemParagraphModel.id());*/
 
 
-            faqItemParagraphClient.patch(faqItemParagraphModel);
 
-            if (!Files.exists(docPath)) {
-                throw new IllegalStateException("File " + docPath + " not found");
-            }
+                faqItemParagraphClient.patch(faqItemParagraphModel);
 
-            faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
+                FaqItemModel faqItemModel = new FaqItemModel(faqItemParagraphModel);
+                List<FaqItemModel> itemModelList = new ArrayList<FaqItemModel>();
+                itemModelList.add(faqItemModel);
+                faqItemsParagraph.setFaqItem(itemModelList);
+
+                if (!Files.exists(docPath)) {
+                    throw new IllegalStateException("File " + docPath + " not found");
+                }
+
+                faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
 
 /*            Document currentParagraphDocument = Jsoup
                     .parse(faqItemsParagraph.getOrCreateFirstDescription().getProcessed()); */
-            Document newParagraphDocument = Jsoup
-                    .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
+                Document newParagraphDocument = Jsoup
+                        .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
 
 /*            for (Element imageElement : newParagraphDocument.select("img")) {
 
@@ -399,6 +396,13 @@ public class Update implements Callable<Integer> {
                     images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
             } */
+
+            } else {
+                faqItemsParagraph = faqItemsParagraphClient
+                        .get(faqSectionElements.get(i).getTargetId());
+            }
+
+            System.out.println("Updating paragraph: " + faqItemsParagraph.id() + " ...");
 
             faqItemsParagraphClient.patch(faqItemsParagraph);
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
