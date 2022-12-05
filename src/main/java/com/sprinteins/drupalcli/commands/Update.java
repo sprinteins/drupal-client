@@ -288,15 +288,7 @@ public class Update implements Callable<Integer> {
 
         for (int i = 0; i < faqItemsSection.size(); i++) {
 
-            String menuItem = faqItemsSection.get(i);/*
-            menuItem.get("question");
-
-            for (int j = 0; j < menuItem.size(); j++){
-                menuItem.get("question");
-
-            }*/
-
-
+            String menuItem = faqItemsSection.get(i);
             System.out.println("Updating paragraph: " + menuItem + " ...");
 
             FaqItemsParagraphModel faqItemsParagraph;
@@ -316,13 +308,23 @@ public class Update implements Callable<Integer> {
             String faqSectionContent = readFile(docPath);
             Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
 
-            FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
+            var faqItem = new ArrayList<>(faqItemsParagraph.getFaqItem());
+
+            for (int j = 0; j < faqItem.size(); j++) {
+              FaqItemParagraphModel faqItemParagraphModel;
+              if (j > faqItem.size()) {
+                faqItemParagraphModel = FaqItemParagraphModel.create(nodeId);
+                faqItemParagraphModel = faqItemParagraphClient.post(faqItemParagraphModel);
+                faqItem.add(new FaqItemModel(faqItemParagraphModel));
+            } else {
+              faqItemParagraphModel = faqItemParagraphClient.get(faqItem.get(i).getTargetId());
+              System.out.println(faqItemParagraphModel);
+            }
+
+
             List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
             List<FaqAnswerModel> faqAnswerModelList = new ArrayList<>();
             List<String> qAndA = frontmatterFaq.get("q-and-a");
-
-            /*System.out.println(qAndA);*/
-
 
             for (var k = 0; k < qAndA.size(); k++) {
                 if(qAndA.get(k).contains("question:")) {
@@ -338,21 +340,15 @@ public class Update implements Callable<Integer> {
                     var answer = answerString.split("answer: ");
                     FaqAnswerModel answerModel = new FaqAnswerModel();
                     answerModel.setValue(answer[1]);
-                    faqAnswerModelList.add(answerModel);                }
+                    faqAnswerModelList.add(answerModel);                
+                  }
             }
-
             faqItemParagraphModel.setQuestion(faqQuestionModelList);
             faqItemParagraphModel.setAnswer(faqAnswerModelList);
-            faqItemParagraphModel.getOrCreateFirstId();
-            faqItemParagraphModel.getOrCreateFirstRevisionId();
-            faqItemParagraphModel.getOrCreateFirstUuid();
-            faqItemParagraphModel.getOrCreateFirstTitle();
-            faqItemParagraphModel.getOrCreateFirstDescription();
 
             System.out.println(faqItemParagraphModel.id());
-
-
-            faqItemParagraphClient.patch(faqItemParagraphModel);
+            faqItemParagraphClient.patch(faqItemParagraphModel); 
+          }
 
             if (!Files.exists(docPath)) {
                 throw new IllegalStateException("File " + docPath + " not found");

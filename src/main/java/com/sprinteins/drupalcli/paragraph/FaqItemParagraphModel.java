@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.FaqAnswerModel;
 import com.sprinteins.drupalcli.fields.FaqQuestionModel;
+import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TargetId;
 import com.sprinteins.drupalcli.fields.TypeModel;
 
@@ -17,6 +18,12 @@ public class FaqItemParagraphModel extends ParagraphModel{
 
   public FaqItemParagraphModel() {
     super(new TypeModel(TargetId.FAQ_ITEM));
+  }
+
+  public static FaqItemParagraphModel create(Long id) {
+    FaqItemParagraphModel model = new FaqItemParagraphModel();
+    model.getOrCreateFirstId().setValue(id);
+    return model;
   }
 
   @JsonProperty("field_faq_item_question")
