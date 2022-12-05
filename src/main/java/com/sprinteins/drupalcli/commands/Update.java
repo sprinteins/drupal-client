@@ -317,32 +317,25 @@ public class Update implements Callable<Integer> {
                 faqItemParagraphModel = faqItemParagraphClient.post(faqItemParagraphModel);
                 faqItem.add(new FaqItemModel(faqItemParagraphModel));
             } else {
-              faqItemParagraphModel = faqItemParagraphClient.get(faqItem.get(i).getTargetId());
+              faqItemParagraphModel = faqItemParagraphClient.get(faqItem.get(j).getTargetId());
               System.out.println(faqItemParagraphModel);
             }
 
 
             List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
             List<FaqAnswerModel> faqAnswerModelList = new ArrayList<>();
-            List<String> qAndA = frontmatterFaq.get("q-and-a");
+            var questionString = frontmatterFaq.get("question-"+j);
+            
+            FaqQuestionModel questionModel = new FaqQuestionModel();
+            questionModel.setValue(questionString.get(0));
+            faqQuestionModelList.add(questionModel);
+            
 
-            for (var k = 0; k < qAndA.size(); k++) {
-                if(qAndA.get(k).contains("question:")) {
-                    String questionString = qAndA.get(k);
-                    var question = questionString.split("question: ");
-                    FaqQuestionModel questionModel = new FaqQuestionModel();
-                    questionModel.setValue(question[1]);
-                    faqQuestionModelList.add(questionModel);
-                }
-
-                if(qAndA.get(k).contains("answer:")) {
-                    String answerString = qAndA.get(k);
-                    var answer = answerString.split("answer: ");
-                    FaqAnswerModel answerModel = new FaqAnswerModel();
-                    answerModel.setValue(answer[1]);
-                    faqAnswerModelList.add(answerModel);                
-                  }
-            }
+            var answerString = frontmatterFaq.get("answer-"+j);
+            FaqAnswerModel answerModel = new FaqAnswerModel();
+            answerModel.setValue(answerString.get(0));
+            faqAnswerModelList.add(answerModel);                
+                      
             faqItemParagraphModel.setQuestion(faqQuestionModelList);
             faqItemParagraphModel.setAnswer(faqAnswerModelList);
 
