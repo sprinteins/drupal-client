@@ -45,8 +45,9 @@ public class FaqItemParagraphModel extends ParagraphModel{
   }
 
   @JsonIgnore
-  public String question() {
-      return getOrCreateFirstQuestion().getValue();
+  public static FaqItemParagraphModel question(String question) {
+      FaqItemParagraphModel model = new FaqItemParagraphModel();
+      return model.getOrCreateFirstQuestion().setValue(question);
   }
 
   @JsonIgnore
