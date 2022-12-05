@@ -161,7 +161,8 @@ public class Export implements Callable<Integer> {
           markdown.add("---");
           markdown.add("subsection-title: " + paragraphTitle);
           markdown.add("type: faqs");
-          markdown.add("q-and-a:");
+
+          var counter = 0;
 
           for(FaqItemModel faqItemModel : faqItemsParagraph.getFaqItem()){
             FaqItemParagraphModel faqItemParagraph = faqItemParagraphClient.get(faqItemModel.getTargetId());
@@ -173,8 +174,10 @@ public class Export implements Callable<Integer> {
             Document faqAnswerValue = Jsoup.parse(faqAnswer.getProcessed());
 
 
-            markdown.add("  - question: " + faqQuestionValue);
-            markdown.add("  - answer: " + converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
+            markdown.add("question-" + counter + ": " + faqQuestionValue);
+            markdown.add("answer-" + counter + ": |");
+            markdown.add(converter.convertHtmlToMarkdown(faqAnswerValue.html(), link));
+            counter ++;
           }
 
           markdown.add("---");
