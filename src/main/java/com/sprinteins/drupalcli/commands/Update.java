@@ -249,7 +249,9 @@ public class Update implements Callable<Integer> {
 
                 if (j > faqItem.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
-                    faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(j));
+                    var answerString = frontmatterFaq.get("answer-"+j);
+                    faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(0));
+                    faqItemParagraphModel = FaqItemParagraphModel.answer(answerString.get(0), faqItemParagraphModel);
                     faqItemParagraphModel = faqItemParagraphClient.post(faqItemParagraphModel);
                     faqItem.add(new FaqItemModel(faqItemParagraphModel));
                 } else {
@@ -269,54 +271,37 @@ public class Update implements Callable<Integer> {
                 FaqAnswerModel answerModel = new FaqAnswerModel();
                 answerModel.setValue(answerString.get(0));
                 faqAnswerModelList.add(answerModel);
+
                 faqItemParagraphModel.setQuestion(faqQuestionModelList);
                 faqItemParagraphModel.setAnswer(faqAnswerModelList);
+
                 System.out.println(faqItemParagraphModel.id());
                 faqItemParagraphClient.patch(faqItemParagraphModel);
             }
             if (!Files.exists(docPath)) {
                 throw new IllegalStateException("File " + docPath + " not found");
             }
+
             faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
-/*            Document currentParagraphDocument = Jsoup
-                    .parse(faqItemsParagraph.getOrCreateFirstDescription().getProcessed()); */
+
             Document newParagraphDocument = Jsoup
                     .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
-/*            for (Element imageElement : newParagraphDocument.select("img")) {
-                if (imageElement.hasAttr("data-entity-type")) {
-                    continue;
-                }
-                String imageSrc = imageElement.attr("src");
-                Path imagePath = workingDir.resolve(imageSrc);
-                if (!Files.exists(imagePath)) {
-                    throw new IllegalStateException("File " + imagePath + " not found");
-                }
-                String filename = Optional.of(imagePath)
-                        .map(Path::getFileName)
-                        .map(Path::toString)
-                        .orElseThrow();
-                System.out.println("Uploading " + filename + "...");
-                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
-                images.attr("data-entity-type", "file");
-                String md5 = imageClient.generateMd5Hash(imagePath);
-                Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
-                if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                    images.attr("src", currentImage.attr("src"));
-                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
-                } else {
-                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
-                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
-                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
-                }
-            } */
+
+            faqItemsParagraph.setFaqItem(faqItem);
             faqItemsParagraphClient.patch(faqItemsParagraph);
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
         }
+
         NodeModel faqNodeModel = new NodeModel();
         faqNodeModel.setFaqItems(faqSectionElements);
+
+
+
+
         Document newReleaseNoteDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
         Element releaseNoteBody = newReleaseNoteDocument.body();
+
         for (ReleaseNoteElementModel releaseNoteElement : nodeModel.getReleaseNotesElement()) {
             System.out.println("Updating release note: " + releaseNoteElement.getTargetId() + " ...");
             Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
@@ -343,6 +328,7 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
         }
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
+
         while (releaseNoteBody.childNodeSize() > 0) {
             System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
             var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
@@ -371,16 +357,20 @@ public class Update implements Callable<Integer> {
         }
         String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
         String newApiReference = Files.readString(swaggerPath);
+
         if (!currentApiReference.equals(newApiReference)) {
             FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
             patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
         }
+
         Document newMainDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
         patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
         patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
         nodeClient.patch(nodeId, patchNodeModel);
+
         System.out.println("Finished processing node: " + nodeId);
+
         return 0;
     }
     public Element extractFirstReleaseNote(Element releaseNoteBody) {

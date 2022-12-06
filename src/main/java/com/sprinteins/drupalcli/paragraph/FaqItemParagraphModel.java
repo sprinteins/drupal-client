@@ -47,7 +47,8 @@ public class FaqItemParagraphModel extends ParagraphModel{
   @JsonIgnore
   public static FaqItemParagraphModel question(String question) {
       FaqItemParagraphModel model = new FaqItemParagraphModel();
-      return model.getOrCreateFirstQuestion().setValue(question);
+      model.getOrCreateFirstQuestion().setValue(question);
+      return model;
   }
 
   @JsonIgnore
@@ -62,8 +63,13 @@ public class FaqItemParagraphModel extends ParagraphModel{
   }
 
   @JsonIgnore
-  public String answer() {
-      return getOrCreateFirstAnswer().getValue();
+  public static FaqItemParagraphModel answer(String answer, FaqItemParagraphModel... paragraphModel) {
+      FaqItemParagraphModel model = new FaqItemParagraphModel();
+      if (paragraphModel.length != 0 && paragraphModel[0] != null){
+          model = paragraphModel[0];
+      }
+      model.getOrCreateFirstAnswer().setValue(answer);
+      return model;
   }
 
   @JsonIgnore
