@@ -79,7 +79,7 @@ public class Update implements Callable<Integer> {
         String title = frontmatter.get("title").get(0);
         List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
         List<String> additionalInformationMenuItems = frontmatter.get("additional-information-menu");
-        List<String> faqItemsSection = frontmatter.get("faqs");
+        List<String> faqSectionItems = frontmatter.get("faqs");
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
@@ -222,8 +222,8 @@ public class Update implements Callable<Integer> {
 
         var faqSectionElements = new ArrayList<>(nodeModel.getFaqItems());
 
-        for (int i = 0; i < faqItemsSection.size(); i++) {
-            String menuItem = faqItemsSection.get(i);
+        for (int i = 0; i < faqSectionItems.size(); i++) {
+            String menuItem = faqSectionItems.get(i);
             System.out.println("Updating paragraph: " + menuItem + " ...");
             FaqItemsParagraphModel faqItemsParagraph;
             if (i > faqSectionElements.size() - 1) {
@@ -240,22 +240,22 @@ public class Update implements Callable<Integer> {
             String faqSectionContent = readFile(docPath);
             Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
 
-            var faqItem = new ArrayList<>(faqItemsParagraph.getFaqItem());
+            var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
             var iterations = (frontmatterFaq.size() - 2) / 2;
 
 
             for (int j = 0; j < iterations; j++) {
                 FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
 
-                if (j > faqItem.size() - 1) {
+                if (j > faqItems.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
                     var answerString = frontmatterFaq.get("answer-"+j);
                     faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(0));
                     faqItemParagraphModel = FaqItemParagraphModel.answer(answerString.get(0), faqItemParagraphModel);
                     faqItemParagraphModel = faqItemParagraphClient.post(faqItemParagraphModel);
-                    faqItem.add(new FaqItemModel(faqItemParagraphModel));
+                    faqItems.add(new FaqItemModel(faqItemParagraphModel));
                 } else {
-                    faqItemParagraphModel = faqItemParagraphClient.get(faqItem.get(j).getTargetId());
+                    faqItemParagraphModel = faqItemParagraphClient.get(faqItems.get(j).getTargetId());
                     System.out.println(faqItemParagraphModel);
                 }
 
@@ -282,12 +282,13 @@ public class Update implements Callable<Integer> {
                 throw new IllegalStateException("File " + docPath + " not found");
             }
 
+            faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
 
             Document newParagraphDocument = Jsoup
                     .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
 
-            faqItemsParagraph.setFaqItem(faqItem);
+            faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraphClient.patch(faqItemsParagraph);
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
         }
