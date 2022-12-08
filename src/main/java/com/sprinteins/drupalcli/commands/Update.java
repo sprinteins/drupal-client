@@ -247,7 +247,7 @@ public class Update implements Callable<Integer> {
 
 
             for (int j = 0; j < iterations; j++) {
-                FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
+                FaqItemParagraphModel faqItemParagraphModel;
 
                  if (j > faqItems.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
