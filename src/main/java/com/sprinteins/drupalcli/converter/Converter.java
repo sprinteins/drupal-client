@@ -39,9 +39,6 @@ public class Converter {
         // microsoft word aka long dash is replaced with regular minus
         input = input.replace("–","-");
         input = input.replace("&nbsp;", " ");
-        input = input.replaceAll("\r", " ");
-        input = input.replaceAll("\n", " ");
-
 
         Document document = Jsoup.parse(input, link);
         Safelist safelist = Safelist.relaxed();
