@@ -247,7 +247,7 @@ public class Update implements Callable<Integer> {
             for (int j = 0; j < iterations; j++) {
                 FaqItemParagraphModel faqItemParagraphModel = new FaqItemParagraphModel();
 
-                if (j > faqItems.size() - 1) {
+                 if (j > faqItems.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
                     var answerString = frontmatterFaq.get("answer-"+j);
                     faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(0));
@@ -256,7 +256,6 @@ public class Update implements Callable<Integer> {
                     faqItems.add(new FaqItemModel(faqItemParagraphModel));
                 } else {
                     faqItemParagraphModel = faqItemParagraphClient.get(faqItems.get(j).getTargetId());
-                    System.out.println(faqItemParagraphModel);
                 }
 
                 List<FaqQuestionModel> faqQuestionModelList = new ArrayList<>();
@@ -275,7 +274,7 @@ public class Update implements Callable<Integer> {
                 faqItemParagraphModel.setQuestion(faqQuestionModelList);
                 faqItemParagraphModel.setAnswer(faqAnswerModelList);
 
-                System.out.println(faqItemParagraphModel.id());
+                System.out.println("Updating paragraph: " + faqItemParagraphModel.id());
                 faqItemParagraphClient.patch(faqItemParagraphModel);
             }
             if (!Files.exists(docPath)) {
@@ -293,10 +292,7 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
         }
 
-        NodeModel faqNodeModel = new NodeModel();
-        faqNodeModel.setFaqItems(faqSectionElements);
-
-
+        patchNodeModel.setFaqItems(faqSectionElements);
 
 
         Document newReleaseNoteDocument = Jsoup
