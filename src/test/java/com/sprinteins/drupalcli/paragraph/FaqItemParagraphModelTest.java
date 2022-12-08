@@ -7,7 +7,6 @@ import com.sprinteins.drupalcli.TestFiles;
 import com.sprinteins.drupalcli.fields.FaqAnswerModel;
 import com.sprinteins.drupalcli.fields.FaqQuestionModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
-import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;    
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 

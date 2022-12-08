@@ -1,11 +1,9 @@
 package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprinteins.drupalcli.mock.DrupalMockApplication;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
-import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
-import com.sprinteins.drupalcli.paragraph.ParagraphClient;
+import com.sprinteins.drupalcli.mock.DrupalMockApplication;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

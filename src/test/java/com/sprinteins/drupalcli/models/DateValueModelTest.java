@@ -1,15 +1,14 @@
 package com.sprinteins.drupalcli.models;
 
+import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
-import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-
 import java.util.Set;
 
 public class DateValueModelTest {

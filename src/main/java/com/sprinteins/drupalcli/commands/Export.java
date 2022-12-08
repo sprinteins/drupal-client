@@ -2,13 +2,7 @@ package com.sprinteins.drupalcli.commands;
 
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.converter.Converter;
-import com.sprinteins.drupalcli.fields.AdditionalInformationElementModel;
-import com.sprinteins.drupalcli.fields.FaqAnswerModel;
-import com.sprinteins.drupalcli.fields.FaqItemModel;
-import com.sprinteins.drupalcli.fields.FaqItemsModel;
-import com.sprinteins.drupalcli.fields.FaqQuestionModel;
-import com.sprinteins.drupalcli.fields.GetStartedDocsElementModel;
-import com.sprinteins.drupalcli.fields.ReleaseNoteElementModel;
+import com.sprinteins.drupalcli.fields.*;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;

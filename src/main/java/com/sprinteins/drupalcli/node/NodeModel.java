@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.*;
 import com.sprinteins.drupalcli.fieldtypes.*;
-import com.sprinteins.drupalcli.fields.FaqItemsModel;
 
 import java.util.ArrayList;
 import java.util.Collections;

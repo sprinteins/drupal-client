@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.TestFiles;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
-import com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 

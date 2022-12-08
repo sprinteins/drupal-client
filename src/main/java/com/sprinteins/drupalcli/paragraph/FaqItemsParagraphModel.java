@@ -1,13 +1,13 @@
 package com.sprinteins.drupalcli.paragraph;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.FaqItemModel;
+import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TargetId;
-import com.sprinteins.drupalcli.fields.TypeModel;
+
+import java.util.List;
+import java.util.Optional;
 
 public class FaqItemsParagraphModel extends ParagraphModel {
 
@@ -20,7 +20,7 @@ public class FaqItemsParagraphModel extends ParagraphModel {
   }
 
   public FaqItemsParagraphModel() {
-    super(new TypeModel(TargetId.FAQ_ITEM));
+    super(new TypeModel(TargetId.FAQ_ITEMS));
   }
 
   @JsonProperty("field_faq_item")

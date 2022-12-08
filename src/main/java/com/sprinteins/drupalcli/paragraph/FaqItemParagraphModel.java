@@ -1,16 +1,15 @@
 package com.sprinteins.drupalcli.paragraph;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.FaqAnswerModel;
 import com.sprinteins.drupalcli.fields.FaqQuestionModel;
-import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
-import com.sprinteins.drupalcli.fieldtypes.TargetId;
 import com.sprinteins.drupalcli.fields.TypeModel;
+import com.sprinteins.drupalcli.fieldtypes.TargetId;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class FaqItemParagraphModel extends ParagraphModel{
   private List<FaqQuestionModel> question;

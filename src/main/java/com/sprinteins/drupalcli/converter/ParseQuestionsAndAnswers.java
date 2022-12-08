@@ -1,15 +1,11 @@
 package com.sprinteins.drupalcli.converter;
 
 import com.sprinteins.drupalcli.FrontMatterReader;
-import com.sprinteins.drupalcli.fields.FaqAnswerModel;
-import com.sprinteins.drupalcli.fields.FaqQuestionModel;
 import com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

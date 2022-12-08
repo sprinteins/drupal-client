@@ -1,10 +1,10 @@
 package com.sprinteins.drupalcli.file;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sprinteins.drupalcli.fields.UriValueModel;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
 import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
-import com.sprinteins.drupalcli.fields.UriValueModel;
 
 import java.util.ArrayList;
 import java.util.List;

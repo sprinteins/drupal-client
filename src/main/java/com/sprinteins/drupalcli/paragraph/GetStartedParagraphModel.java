@@ -1,10 +1,10 @@
 package com.sprinteins.drupalcli.paragraph;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TargetId;
-import com.sprinteins.drupalcli.fields.TypeModel;
 
 import java.util.List;
 

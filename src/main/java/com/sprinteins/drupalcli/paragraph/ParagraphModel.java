@@ -3,8 +3,6 @@ package com.sprinteins.drupalcli.paragraph;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.fields.FaqAnswerModel;
-import com.sprinteins.drupalcli.fields.FaqQuestionModel;
 import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
