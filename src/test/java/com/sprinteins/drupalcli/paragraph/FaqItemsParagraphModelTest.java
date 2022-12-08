@@ -4,14 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.TestFiles;
-import com.sprinteins.drupalcli.fields.FaqItemModel;
-import com.sprinteins.drupalcli.fields.FaqTitleModel;
-import com.sprinteins.drupalcli.fieldtypes.TargetType;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FaqItemsParagraphModelTest {
     @Test
@@ -33,10 +28,15 @@ public class FaqItemsParagraphModelTest {
         JsonNode expectedJson = objectMapper.readTree(expected);
         JsonNode actualJson = objectMapper.readTree(objectMapper.writeValueAsString(value));
 
+
         var expectedTitle = expectedJson.get("field_faq_title").findValue("value").toString();
         var actualTitle = actualJson.get("field_faq_title").findValue("value").toString();
 
-        JSONAssert.assertEquals(expectedTitle, actualTitle, true);
+        var expectedTargetType = expectedJson.get("type").findValue("target_id").toString();
+        var actualTargetType = actualJson.get("type").findValue("target_id").toString();
+
+        assertEquals(expectedTitle, actualTitle);
+        assertEquals(expectedTargetType, actualTargetType);
     }
 
 }
