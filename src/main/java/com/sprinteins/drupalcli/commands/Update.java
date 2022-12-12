@@ -35,6 +35,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Callable;
 @Command(
@@ -102,6 +103,9 @@ public class Update implements Callable<Integer> {
                     "The page titles do not match. Are you updating the wrong API page?\n" + " Supplied title: " + title
                             + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
         }
+
+
+        NodeModel patchNodeModel = new NodeModel();
         var getStartedDocsElements = new ArrayList<>(nodeModel.getGetStartedDocsElements());
         for (int i = 0; i < getStartedMenuItems.size(); i++) {
             String menuItem = getStartedMenuItems.get(i);
@@ -160,8 +164,94 @@ public class Update implements Callable<Integer> {
             getStartedParagraphClient.patch(getStartedParagraph);
             System.out.println("Finished processing paragraph: " + getStartedParagraph.id());
         }
-        NodeModel patchNodeModel = new NodeModel();
+
         patchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
+
+
+        updateAdditionalInfoSection(workingDir, additionalInformationMenuItems, additionalInformationParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
+
+
+        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
+
+
+        Document newReleaseNoteDocument = Jsoup
+                .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
+        Element releaseNoteBody = newReleaseNoteDocument.body();
+
+        for (ReleaseNoteElementModel releaseNoteElement : nodeModel.getReleaseNotesElement()) {
+            System.out.println("Updating release note: " + releaseNoteElement.getTargetId() + " ...");
+            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
+            ReleaseNoteParagraphModel releaseNoteParagraph = releaseNoteParagraphClient
+                    .get(releaseNoteElement.getTargetId());
+            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
+            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
+            releaseNoteTitle.setValue(releaseNote.select("h3").html());
+            dateValueModel.setValue(releaseNote.select("h4").html());
+            releaseNote.select("h3").remove();
+            releaseNote.select("h4").remove();
+            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
+            fieldDescription.setValue(releaseNote.html());
+            Set<ConstraintViolation<DateValueModel>> constraintViolations =
+                    validator.validate( dateValueModel );
+            if (constraintViolations.size() > 0){
+                for(ConstraintViolation<DateValueModel> validation : constraintViolations ) {
+                    System.out.print("Release Note " + releaseNoteElement.getTargetId() + " has the following validation error: " + validation.getMessage());
+                }
+                throw new Exception("Aborting the update of: " + title + "\nSee error above for more details. ");
+            }
+            releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
+            System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
+        }
+        patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
+
+
+        while (releaseNoteBody.childNodeSize() > 0) {
+            System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
+            var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
+            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
+            for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
+                newReleaseNoteElementList.add(releaseNoteElementModel);
+            }
+            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
+            ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
+            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
+            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
+            releaseNoteTitle.setValue(releaseNote.select("h3").html());
+            dateValueModel.setValue(releaseNote.select("h4").html());
+            releaseNote.select("h3").remove();
+            releaseNote.select("h4").remove();
+            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+            fieldDescription.setFormat(TextFormat.BASIC_HTML);
+            fieldDescription.setValue(releaseNote.html());
+            ReleaseNoteParagraphModel newReleaseNoteParagraph = releaseNoteParagraphClient.post(releaseNoteParagraph);
+            ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
+            newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
+            newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
+            newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
+            newReleaseNoteElementList.add(newReleaseNoteElement);
+            patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
+        }
+        String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
+        String newApiReference = Files.readString(swaggerPath);
+
+        if (!currentApiReference.equals(newApiReference)) {
+            FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
+            patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
+        }
+
+        Document newMainDocument = Jsoup
+                .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
+        patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
+        patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
+        nodeClient.patch(nodeId, patchNodeModel);
+
+        System.out.println("Finished processing node: " + nodeId);
+
+        return 0;
+    }
+
+    private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
         var additionalInformationElements = new ArrayList<>(nodeModel.getAdditionalInformationElements());
         for (int i = 0; i < additionalInformationMenuItems.size(); i++) {
             String menuItem = additionalInformationMenuItems.get(i);
@@ -221,13 +311,17 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing paragraph: " + additionalInformationParagraph.id());
         }
         patchNodeModel.setAdditionalInformationElementsElements(additionalInformationElements);
+    }
 
+    private void updateFaqSection(Path workingDir, List<String> faqSectionItems, ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient, ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws Exception {
         var faqSectionElements = new ArrayList<>(nodeModel.getFaqItems());
 
         for (int i = 0; i < faqSectionItems.size(); i++) {
             String menuItem = faqSectionItems.get(i);
             System.out.println("Updating paragraph: " + menuItem + " ...");
+
             FaqItemsParagraphModel faqItemsParagraph;
+
             if (i > faqSectionElements.size() - 1) {
                 faqItemsParagraph = FaqItemsParagraphModel.create(menuItem);
                 faqItemsParagraph = faqItemsParagraphClient.post(faqItemsParagraph);
@@ -295,83 +389,8 @@ public class Update implements Callable<Integer> {
         }
 
         patchNodeModel.setFaqItems(faqSectionElements);
-
-
-        Document newReleaseNoteDocument = Jsoup
-                .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
-        Element releaseNoteBody = newReleaseNoteDocument.body();
-
-        for (ReleaseNoteElementModel releaseNoteElement : nodeModel.getReleaseNotesElement()) {
-            System.out.println("Updating release note: " + releaseNoteElement.getTargetId() + " ...");
-            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
-            ReleaseNoteParagraphModel releaseNoteParagraph = releaseNoteParagraphClient
-                    .get(releaseNoteElement.getTargetId());
-            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
-            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
-            releaseNoteTitle.setValue(releaseNote.select("h3").html());
-            dateValueModel.setValue(releaseNote.select("h4").html());
-            releaseNote.select("h3").remove();
-            releaseNote.select("h4").remove();
-            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(TextFormat.BASIC_HTML);
-            fieldDescription.setValue(releaseNote.html());
-            Set<ConstraintViolation<DateValueModel>> constraintViolations =
-                    validator.validate( dateValueModel );
-            if (constraintViolations.size() > 0){
-                for(ConstraintViolation<DateValueModel> validation : constraintViolations ) {
-                    System.out.print("Release Note " + releaseNoteElement.getTargetId() + " has the following validation error: " + validation.getMessage());
-                }
-                throw new Exception("Aborting the update of: " + title + "\nSee error above for more details. ");
-            }
-            releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
-            System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
-        }
-        patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
-
-        while (releaseNoteBody.childNodeSize() > 0) {
-            System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
-            var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
-            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
-            for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
-                newReleaseNoteElementList.add(releaseNoteElementModel);
-            }
-            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
-            ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
-            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
-            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
-            releaseNoteTitle.setValue(releaseNote.select("h3").html());
-            dateValueModel.setValue(releaseNote.select("h4").html());
-            releaseNote.select("h3").remove();
-            releaseNote.select("h4").remove();
-            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(TextFormat.BASIC_HTML);
-            fieldDescription.setValue(releaseNote.html());
-            ReleaseNoteParagraphModel newReleaseNoteParagraph = releaseNoteParagraphClient.post(releaseNoteParagraph);
-            ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
-            newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
-            newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
-            newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
-            newReleaseNoteElementList.add(newReleaseNoteElement);
-            patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
-        }
-        String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
-        String newApiReference = Files.readString(swaggerPath);
-
-        if (!currentApiReference.equals(newApiReference)) {
-            FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
-            patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
-        }
-
-        Document newMainDocument = Jsoup
-                .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
-        patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
-        patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
-        nodeClient.patch(nodeId, patchNodeModel);
-
-        System.out.println("Finished processing node: " + nodeId);
-
-        return 0;
     }
+
     public Element extractFirstReleaseNote(Element releaseNoteBody) {
         Elements headlines = releaseNoteBody.select("h3");
         List<Integer> titleIds = new ArrayList<>();
