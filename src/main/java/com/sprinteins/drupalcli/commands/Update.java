@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
-import com.sprinteins.drupalcli.file.FileFinder;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.fields.*;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
@@ -13,6 +12,7 @@ import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.FileFinder;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
@@ -31,14 +31,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.Callable;
 @Command(
@@ -171,6 +169,23 @@ public class Update implements Callable<Integer> {
             FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
             patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
         }
+
+        ObjectMapper mapper;
+        if(this.useJson) {
+            mapper = new ObjectMapper(new JsonFactory());
+        } else{
+            mapper = new ObjectMapper(new YAMLFactory());
+        }
+        var mapperNode = mapper.readTree(getSwaggerString(String.valueOf(swaggerPath)));
+        var versionNode = mapperNode.findValue("version");
+        if(versionNode != null){
+            StringValueModel version = new StringValueModel();
+            version.setValue(versionNode.toString());
+            List<StringValueModel> versionList = new ArrayList<>();
+            versionList.add(version);
+            patchNodeModel.setVersion(versionList);
+        }
+
 
         Document newMainDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));

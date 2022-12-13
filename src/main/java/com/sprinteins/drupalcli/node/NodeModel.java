@@ -27,6 +27,7 @@ public class NodeModel {
     private List<UidTargetModel> revisionUid;
     private List<FormattedTextModel> listDescription;
     private List<StringValueModel> displayTitle;
+    private List<StringValueModel> version;
 
 
     @JsonIgnore
@@ -196,6 +197,15 @@ public class NodeModel {
     }
     public void setFaqItems(List<FaqItemsModel> faqItems) {
         this.faqItems = Optional.ofNullable(faqItems).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_version")
+    public List<StringValueModel> getVersion() {
+        return Optional.ofNullable(version).map(List::copyOf).orElse(null);
+    }
+
+    public void setVersion(List<StringValueModel> version) {
+        this.version = Optional.ofNullable(version).map(List::copyOf).orElse(null);
     }
 
     @Override
