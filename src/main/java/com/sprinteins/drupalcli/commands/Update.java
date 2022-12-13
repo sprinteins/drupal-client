@@ -420,9 +420,6 @@ public class Update implements Callable<Integer> {
             faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
 
-            Document newParagraphDocument = Jsoup
-                    .parse(converter.convertMarkdownToHtml(Files.readString(docPath)));
-
             faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraphClient.patch(faqItemsParagraph);
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
