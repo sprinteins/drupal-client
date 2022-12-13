@@ -1,10 +1,11 @@
 package com.sprinteins.drupalcli.commands;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.sprinteins.drupalcli.ApplicationContext;
 import com.sprinteins.drupalcli.FrontMatterReader;
-import com.sprinteins.drupalcli.YamlFinder;
+import com.sprinteins.drupalcli.file.FileFinder;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.fields.*;
 import com.sprinteins.drupalcli.fieldtypes.DateValueModel;
@@ -30,12 +31,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.Callable;
 @Command(
@@ -59,6 +62,11 @@ public class Update implements Callable<Integer> {
             description = "Explicitly disabled checks"
     )
     ArrayList<String> disabledChecks;
+    @Option(
+            names = {"--use-json"},
+            description = "Use JSON file to update api page"
+    )
+    boolean useJson;
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
@@ -73,10 +81,14 @@ public class Update implements Callable<Integer> {
             throw new IllegalStateException("File " + releaseNoteFilePath + " not found");
         }
 
-        Path swaggerPath = YamlFinder.findYamlFile(workingDir);
-        boolean valid = validate(String.valueOf(swaggerPath));
+        Path swaggerPath;
+        if(useJson){
+            swaggerPath = FileFinder.findJsonFile(workingDir);
+        }else {
+            swaggerPath = FileFinder.findYamlFile(workingDir);
+        }
 
-        if(!valid) {
+        if(!validate(String.valueOf(swaggerPath))) {
             throw new Exception("Swagger " + swaggerPath + " is invalid");
         }
 
@@ -434,9 +446,17 @@ public class Update implements Callable<Integer> {
                 Paths.get(URI.create(adjustedLocation)) : Paths.get(adjustedLocation);
         return FileUtils.readFileToString(path.toFile(), "UTF-8");
     }
-    boolean validate(String swaggerPath) {
+    public boolean validate(String swaggerPath) {
         boolean validationResult = true;
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ObjectMapper mapper;
+
+        if(this.useJson) {
+            mapper = new ObjectMapper(new JsonFactory());
+
+        } else{
+            mapper = new ObjectMapper(new YAMLFactory());
+        }
+
         try {
             mapper.readTree(getSwaggerString(swaggerPath));
         } catch (Exception error) {
