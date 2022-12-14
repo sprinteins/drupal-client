@@ -289,11 +289,18 @@ public class Update implements Callable<Integer> {
             System.out.println("Finished processing paragraph: " + getStartedParagraph.id());
         }
 
+        if(getStartedMenuItems.size() < getStartedDocsElements.size()){
+            for(var d = getStartedDocsElements.size(); d > getStartedMenuItems.size(); d--){
+                getStartedDocsElements.remove(d - 1);
+            }
+        }
+
         patchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
     }
 
     private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
         var additionalInformationElements = new ArrayList<>(nodeModel.getAdditionalInformationElements());
+
         for (int i = 0; i < additionalInformationMenuItems.size(); i++) {
             String menuItem = additionalInformationMenuItems.get(i);
             System.out.println("Updating paragraph: " + menuItem + " ...");
@@ -351,6 +358,13 @@ public class Update implements Callable<Integer> {
             additionalInformationParagraphClient.patch(additionalInformationParagraph);
             System.out.println("Finished processing paragraph: " + additionalInformationParagraph.id());
         }
+
+        if(additionalInformationMenuItems.size() < additionalInformationElements.size()){
+            for(var d = additionalInformationElements.size(); d > additionalInformationMenuItems.size(); d--){
+                additionalInformationElements.remove(d - 1);
+            }
+        }
+
         patchNodeModel.setAdditionalInformationElementsElements(additionalInformationElements);
     }
 
