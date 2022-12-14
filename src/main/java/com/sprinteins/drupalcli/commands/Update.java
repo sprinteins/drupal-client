@@ -224,6 +224,7 @@ public class Update implements Callable<Integer> {
             releaseNoteParagraphClient.patch(releaseNoteElement.getTargetId(), releaseNoteParagraph);
             System.out.println("Finished processing release notes: " + releaseNoteElement.getTargetId());
         }
+
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
     }
 
@@ -379,7 +380,6 @@ public class Update implements Callable<Integer> {
             var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
             var iterations = (frontmatterFaq.size() - 2) / 2;
 
-
             for (int j = 0; j < iterations; j++) {
                 FaqItemParagraphModel faqItemParagraphModel;
 
@@ -417,12 +417,24 @@ public class Update implements Callable<Integer> {
                 throw new IllegalStateException("File " + docPath + " not found");
             }
 
+            if((frontmatterFaq.size() - 2) / 2 < faqItems.size()){
+                for(var d = faqItems.size(); d > (frontmatterFaq.size() - 2) / 2; d--){
+                    faqItems.remove(d - 1);
+                }
+            }
+
             faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraph.getOrCreateFirstTitle().setValue(menuItem);
 
             faqItemsParagraph.setFaqItem(faqItems);
             faqItemsParagraphClient.patch(faqItemsParagraph);
             System.out.println("Finished processing paragraph: " + faqItemsParagraph.id());
+        }
+
+        if(faqSectionItems.size() < faqSectionElements.size()){
+            for(var d = faqSectionElements.size(); d > faqSectionItems.size(); d--){
+                faqSectionElements.remove(d - 1);
+            }
         }
 
         patchNodeModel.setFaqItems(faqSectionElements);
