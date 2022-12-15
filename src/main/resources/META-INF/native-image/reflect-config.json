@@ -50,11 +50,17 @@
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.fields.FaqItemsModel",
+  "name":"com.sprinteins.drupalcli.fields.FaqItemModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
 },
+  {
+    "name":"com.sprinteins.drupalcli.fields.FaqItemsModel",
+    "allDeclaredFields":true,
+    "allDeclaredMethods":true,
+    "allDeclaredConstructors":true
+  },
 {
   "name":"com.sprinteins.drupalcli.fields.GetStartedDocsElementModel",
   "allDeclaredFields":true,
