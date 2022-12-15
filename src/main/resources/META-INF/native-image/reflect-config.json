@@ -148,6 +148,18 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+  {
+    "name":"com.sprinteins.drupalcli.paragraph.FaqItemsParagraphModel",
+    "allDeclaredFields":true,
+    "allDeclaredMethods":true,
+    "allDeclaredConstructors":true
+  },
+{
   "name":"com.sprinteins.drupalcli.paragraph.GetStartedParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
