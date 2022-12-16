@@ -177,13 +177,15 @@ public class Update implements Callable<Integer> {
             mapper = new ObjectMapper(new YAMLFactory());
         }
         var mapperNode = mapper.readTree(getSwaggerString(String.valueOf(swaggerPath)));
-        var versionNode = mapperNode.findValue("version").toString();
-        if(versionNode != null){
+        try {
+            var versionNode = mapperNode.findValue("version").toString();
             StringValueModel version = new StringValueModel();
-            version.setValue(versionNode.toString().replace("\"", ""));
+            version.setValue(versionNode.replace("\"", ""));
             List<StringValueModel> versionList = new ArrayList<>();
             versionList.add(version);
             patchNodeModel.setVersion(versionList);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
 
