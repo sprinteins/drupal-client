@@ -75,9 +75,7 @@ public class Update implements Callable<Integer> {
         if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
-        if (!Files.exists(releaseNoteFilePath)) {
-            throw new IllegalStateException("File " + releaseNoteFilePath + " not found");
-        }
+        checkIfFileExists(releaseNoteFilePath);
 
         Path swaggerPath;
         if(useJson){
@@ -249,9 +247,7 @@ public class Update implements Callable<Integer> {
             Path docPath = workingDir.resolve(
                     menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
                             + ".markdown");
-            if (!Files.exists(docPath)) {
-                throw new IllegalStateException("File " + docPath + " not found");
-            }
+            checkIfFileExists(docPath);
             getStartedParagraph.getOrCreateFirstTitle().setValue(menuItem);
             Document currentParagraphDocument = Jsoup
                     .parse(getStartedParagraph.getOrCreateFirstDescription().getProcessed());
@@ -263,9 +259,7 @@ public class Update implements Callable<Integer> {
                 }
                 String imageSrc = imageElement.attr("src");
                 Path imagePath = workingDir.resolve(imageSrc);
-                if (!Files.exists(imagePath)) {
-                    throw new IllegalStateException("File " + imagePath + " not found");
-                }
+                checkIfFileExists(imagePath);
                 String filename = Optional.of(imagePath)
                         .map(Path::getFileName)
                         .map(Path::toString)
@@ -319,9 +313,7 @@ public class Update implements Callable<Integer> {
             Path docPath = workingDir.resolve(
                     menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
                             + ".markdown");
-            if (!Files.exists(docPath)) {
-                throw new IllegalStateException("File " + docPath + " not found");
-            }
+            checkIfFileExists(docPath);
             additionalInformationParagraph.getOrCreateFirstTitle().setValue(menuItem);
             Document currentParagraphDocument = Jsoup
                     .parse(additionalInformationParagraph.getOrCreateFirstDescription().getProcessed());
@@ -333,9 +325,7 @@ public class Update implements Callable<Integer> {
                 }
                 String imageSrc = imageElement.attr("src");
                 Path imagePath = workingDir.resolve(imageSrc);
-                if (!Files.exists(imagePath)) {
-                    throw new IllegalStateException("File " + imagePath + " not found");
-                }
+                checkIfFileExists(imagePath);
                 String filename = Optional.of(imagePath)
                         .map(Path::getFileName)
                         .map(Path::toString)
@@ -390,7 +380,9 @@ public class Update implements Callable<Integer> {
             System.out.println("Updating paragraph: " + faqItemsParagraph.id() + " ...");
             Path docPath = workingDir.resolve(menuItem.toLowerCase(Locale.ROOT).replace(" ", "-")
                     + ".markdown");
-            String faqSectionContent = readFile(docPath);
+            checkIfFileExists(docPath);
+            String faqSectionContent = Files.readString(docPath);
+            
             Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
 
             var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
@@ -429,9 +421,7 @@ public class Update implements Callable<Integer> {
                 System.out.println("Updating paragraph: " + faqItemParagraphModel.id());
                 faqItemParagraphClient.patch(faqItemParagraphModel);
             }
-            if (!Files.exists(docPath)) {
-                throw new IllegalStateException("File " + docPath + " not found");
-            }
+            checkIfFileExists(docPath);
 
             if((frontmatterFaq.size() - 2) / 2 < faqItems.size()){
                 for(var d = faqItems.size(); d > (frontmatterFaq.size() - 2) / 2; d--){
@@ -513,5 +503,11 @@ public class Update implements Callable<Integer> {
             throw new IllegalStateException("Wrong encoding for " + MAIN_MARKDOWN_FILE_NAME + ". Please make sure the file is UTF-8 encoded.");
         }
         return result;
+    }
+
+    public static void checkIfFileExists(Path filePath) {
+      if (!Files.exists(filePath)) {
+        throw new IllegalStateException("File " + filePath + " not found");
+      } 
     }
 }
