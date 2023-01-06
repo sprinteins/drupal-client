@@ -12,6 +12,13 @@ public class DownloadsElementParagraphModel extends ParagraphModel {
 
   private List<SourceFileModel> downloadableFiles;
 
+/*   public static DownloadsElementParagraphModel create(String file) {
+    DownloadsElementParagraphModel model = new DownloadsElementParagraphModel();
+    model.getOrCreateFirstDownloadElement().setValue(file);
+
+    return model;
+} */
+
   public DownloadsElementParagraphModel() {
     super(new TypeModel(TargetId.DOWNLOAD_ELEMENT));
   }

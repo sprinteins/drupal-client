@@ -215,7 +215,12 @@ public class Export implements Callable<Integer> {
 
 
         System.out.println("********TEST***********");
-     
+
+        for (DownloadsModel downloadsModel : nodeModel.getDownloadElements()) {
+          DownloadsElementParagraphModel downloadsParagraph = downloadsElementParagraphClient.get(downloadsModel.getTargetId());
+          List downloadFileLink = downloadsParagraph.getDownloadFiles();
+        }
+
         //Elements hrefs = doc.select("a[href$]");
         String example = "https://dhlapi-dev.metadeploy.com/sites/default/files/2023-01/example_0.json";
         String downloads = downloadsElementParagraphClient.download(example);
