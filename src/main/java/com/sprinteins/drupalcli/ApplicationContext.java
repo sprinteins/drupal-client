@@ -196,6 +196,10 @@ public class ApplicationContext {
     return releaseNoteParagraphClient;
   }
 
+  public ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient() {
+    return downloadsElementParagraphClient;
+  }
+
   public ImageClient imageClient() {
     return imageClient;
   }
