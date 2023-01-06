@@ -43,17 +43,6 @@ public class NodeModel {
     }
 
     @JsonIgnore
-    public DownloadsModel getOrCreateFirstDownloadElement() {
-        if (downloadElements == null) {
-            downloadElements = new ArrayList<>();
-        }
-        if (downloadElements.isEmpty()) {
-            downloadElements.add(new DownloadsModel());
-        }
-        return downloadElements.get(0);
-    }
-
-    @JsonIgnore
     public FormattedTextModel getOrCreateFirstListDescription() {
         if (listDescription == null) {
             listDescription = new ArrayList<>();
