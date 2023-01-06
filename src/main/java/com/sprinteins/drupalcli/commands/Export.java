@@ -43,6 +43,7 @@ public class Export implements Callable<Integer> {
 
     public static final String API_DOCS_IMAGE_DIRECTORY = "images";
     public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
+    public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
 
     @Mixin
     private GlobalOptions globalOptions;
@@ -67,12 +68,14 @@ public class Export implements Callable<Integer> {
         var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
         var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+        var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         Converter converter = applicationContext.converter();
 
         System.out.println("Creating directories...");
         Files.createDirectories(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY));
+        Files.createDirectories(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY));
 
         System.out.println("Download node information...");
         NodeModel nodeModel = nodeClient.getByUri(link);
@@ -209,6 +212,20 @@ public class Export implements Callable<Integer> {
                 .orElseThrow();
         String apiReference = apiReferenceFileClient.download(sourceFileLink);
         Files.writeString(apiPageDirectory.resolve(fileName), apiReference);
+
+
+        System.out.println("********TEST***********");
+     
+        //Elements hrefs = doc.select("a[href$]");
+        String example = "https://dhlapi-dev.metadeploy.com/sites/default/files/2023-01/example_0.json";
+        String downloads = downloadsElementParagraphClient.download(example);
+        String downloadableFileName = Optional.of(example)
+                                  .map(URI::create)
+                                  .map(URI::getPath)
+                                  .map(FilenameUtils::getName)
+                                  .orElseThrow();
+        Files.writeString(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY).resolve(downloadableFileName), downloadsElementParagraphClient.download(example)); 
+
 
         // finish up main markdown and add description list
         mainMarkdown.add("---");
