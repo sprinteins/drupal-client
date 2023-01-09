@@ -1,8 +1,10 @@
 package com.sprinteins.drupalcli.paragraph;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.SourceFileModel;
 import com.sprinteins.drupalcli.fields.TypeModel;
@@ -12,19 +14,28 @@ public class DownloadsElementParagraphModel extends ParagraphModel {
 
   private List<SourceFileModel> downloadableFiles;
 
-/*   public static DownloadsElementParagraphModel create(String file) {
-    DownloadsElementParagraphModel model = new DownloadsElementParagraphModel();
-    model.getOrCreateFirstDownloadElement().setValue(file);
-
-    return model;
-} */
 
   public DownloadsElementParagraphModel() {
-    super(new TypeModel(TargetId.DOWNLOAD_ELEMENT));
+    super(new TypeModel(TargetId.DOWNLOADS));
+  }
+
+  @JsonIgnore
+  public SourceFileModel getOrCreateFirstDownloadFile() {
+      if (downloadableFiles == null) {
+          downloadableFiles = new ArrayList<>();
+      }
+      if (downloadableFiles.isEmpty()) {
+          downloadableFiles.add(new SourceFileModel());
+      }
+      return downloadableFiles.get(0);
   }
 
   @JsonProperty("field_file_to_upload")
   public List<SourceFileModel> getDownloadFiles() {
     return Optional.ofNullable(downloadableFiles).map(List::copyOf).orElse(null);
+  }
+
+  public void setDownloadFiles(List<SourceFileModel>downloadableFiles) {
+    this.downloadableFiles = Optional.ofNullable(downloadableFiles).map(List::copyOf).orElse(null);
   }
 }
