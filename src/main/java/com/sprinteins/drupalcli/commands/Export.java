@@ -226,11 +226,11 @@ public class Export implements Callable<Integer> {
           String downloadFileURL = downloadFile.getUrl();
           var downloadFileDescription = downloadFile.getDescription();
 
-          if (downloadFileDescription != "") {
-            mainMarkdown.add("  - "+ downloadFileDescription);
+          if (downloadFileDescription.isEmpty()) {
+            mainMarkdown.add("  - <No description>");
           }
           else {
-            mainMarkdown.add("  - <No description>");
+            mainMarkdown.add("  - "+ downloadFileDescription);
           }
 
           String downloadableFileName = Optional.of(downloadFileURL)
