@@ -50,6 +50,12 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.fields.DownloadsModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.fields.FaqAnswerModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
@@ -197,6 +203,12 @@
 },
 {
   "name":"com.sprinteins.drupalcli.paragraph.AdditionalInformationParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.paragraph.DownloadsElementParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
