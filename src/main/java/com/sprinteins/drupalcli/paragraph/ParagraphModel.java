@@ -3,7 +3,6 @@ package com.sprinteins.drupalcli.paragraph;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprinteins.drupalcli.fields.DownloadsModel;
 import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.LongValueModel;
@@ -22,7 +21,7 @@ public abstract class ParagraphModel {
     private List<FormattedTextModel> description;
     private List<StringValueModel> title;
     private List<TypeModel> type;
-    private List<DownloadsModel> downloadElements;
+
 
     public ParagraphModel(TypeModel type){
         this.type = Collections.singletonList(type);
@@ -92,17 +91,6 @@ public abstract class ParagraphModel {
             title.add(new StringValueModel());
         }
         return title.get(0);
-    }
-
-    @JsonIgnore
-    public DownloadsModel getOrCreateFirstDownloadElement() {
-        if (downloadElements == null) {
-            downloadElements = new ArrayList<>();
-        }
-        if (downloadElements.isEmpty()) {
-            downloadElements.add(new DownloadsModel());
-        }
-        return downloadElements.get(0);
     }
 
     public List<LongValueModel> getId() {
