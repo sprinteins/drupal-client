@@ -27,7 +27,13 @@ public class FileClient {
     }
 
 		protected FileUploadModel upload(Path path, String uploadBaseUri) throws NoSuchAlgorithmException {
-			return upload(path, uploadBaseUri, path.getFileName().toString());
+      FileUploadModel uploadModel = upload(path, uploadBaseUri, path.getFileName().toString());
+      if(uploadModel == null){
+        throw new IllegalStateException("Test does not exist");
+      }
+      else {
+        return uploadModel;
+      }
 		}
 
     protected FileUploadModel upload(Path path, String uploadBaseUri, String fileName) throws NoSuchAlgorithmException {
