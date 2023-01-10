@@ -172,6 +172,18 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.file.DownloadFileClient",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.file.FileClient",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.file.FileFinder",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
