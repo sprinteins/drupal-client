@@ -273,7 +273,7 @@ public class Update implements Callable<Integer> {
                     images.attr("src", currentImage.attr("src"));
                     images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
                 } else {
-                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
+                    FileUploadModel imageModel = imageClient.upload(imagePath);
                     images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
                     images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
@@ -339,7 +339,7 @@ public class Update implements Callable<Integer> {
                     images.attr("src", currentImage.attr("src"));
                     images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
                 } else {
-                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
+                    FileUploadModel imageModel = imageClient.upload(imagePath);
                     images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
                     images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
