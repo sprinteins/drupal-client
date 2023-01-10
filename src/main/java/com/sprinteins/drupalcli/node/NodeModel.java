@@ -106,8 +106,9 @@ public class NodeModel {
     public List<DownloadsModel> getDownloadElements() {
         return Optional.ofNullable(downloadElements).map(List::copyOf).orElse(null);
     }
-    public void setDownloadFile(List<SourceFileModel> downloadFile) {
-        this.downloadElements = Optional.ofNullable(downloadElements).map(List::copyOf).orElse(null);
+
+    public void setDownloadElements(List<DownloadsModel> downloadElements) {
+      this.downloadElements = Optional.ofNullable(downloadElements).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("nid")
