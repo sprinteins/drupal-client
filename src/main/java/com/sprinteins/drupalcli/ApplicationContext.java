@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.commands.GlobalOptions;
 import com.sprinteins.drupalcli.converter.Converter;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.DownloadFileClient;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.*;
@@ -38,6 +39,7 @@ public class ApplicationContext {
   private final ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient;
   private final ImageClient imageClient;
   private final ApiReferenceFileClient apiReferenceFileClient;
+  private final DownloadFileClient downloadFileClient;
   private final Converter converter;
 
   public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
@@ -76,6 +78,11 @@ public class ApplicationContext {
         baseUri,
         apiKey,
         httpClient);
+    downloadFileClient = new DownloadFileClient(
+      objectMapper,
+      baseUri,
+      apiKey,
+      httpClient);
     additionalInformationParagraphClient = new ParagraphClient<>(
         objectMapper,
         baseUri,
@@ -206,6 +213,10 @@ public class ApplicationContext {
 
   public ApiReferenceFileClient apiReferenceFileClient() {
     return apiReferenceFileClient;
+  }
+
+  public DownloadFileClient downloadFileClient() {
+    return downloadFileClient;
   }
 
   public Converter converter() {
