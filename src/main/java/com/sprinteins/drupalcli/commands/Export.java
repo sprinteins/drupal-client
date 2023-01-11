@@ -215,8 +215,9 @@ public class Export implements Callable<Integer> {
 
 
         System.out.println("Download additional files");
-        mainMarkdown.add("downloads:");
-
+        System.out.println("Create markdown file...");
+        List <String> downloadsMarkdown = new ArrayList<>();
+        downloadsMarkdown.add("---");
         for (DownloadsModel downloadsModel : nodeModel.getDownloadElements()) {
           var targetID = downloadsModel.getTargetId();
 
@@ -226,21 +227,22 @@ public class Export implements Callable<Integer> {
           String downloadFileURL = downloadFile.getUrl();
           var downloadFileDescription = downloadFile.getDescription();
 
-          if (downloadFileDescription.isEmpty()) {
-            mainMarkdown.add("  - <No description>");
-          }
-          else {
-            mainMarkdown.add("  - "+ downloadFileDescription);
-          }
-
           String downloadableFileName = Optional.of(downloadFileURL)
                                     .map(URI::create)
                                     .map(URI::getPath)
                                     .map(FilenameUtils::getName)
                                     .orElseThrow();
           Files.writeString(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY).resolve(downloadableFileName), downloadsElementParagraphClient.download(downloadFileURL)); 
+
+          if (downloadFileDescription.isEmpty()) {
+            downloadsMarkdown.add(downloadableFileName +": " + "<No description>");
+          }
+          else {
+            downloadsMarkdown.add(downloadableFileName +": " + downloadFileDescription);
+          }         
         }
-       
+        downloadsMarkdown.add("---");
+        Files.write(apiPageDirectory.resolve("downloads.markdown"), downloadsMarkdown);
 
 
         // finish up main markdown and add description list
