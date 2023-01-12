@@ -2,6 +2,7 @@ package com.sprinteins.drupalcli.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fieldtypes.TargetType;
+import com.sprinteins.drupalcli.paragraph.DownloadsElementParagraphModel;
 
 public class DownloadsModel {
   
@@ -12,6 +13,12 @@ public class DownloadsModel {
   
   public DownloadsModel() {
 
+  }
+
+  public DownloadsModel(DownloadsElementParagraphModel downloadsParagraph) {
+    setTargetId(downloadsParagraph.getOrCreateFirstId().getValue());
+    setTargetRevisionId(downloadsParagraph.getOrCreateFirstRevisionId().getValue());
+    setTargetUuid(downloadsParagraph.getOrCreateFirstUuid().getValue());
   }
 
   @JsonProperty("target_id")
