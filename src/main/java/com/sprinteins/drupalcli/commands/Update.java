@@ -488,12 +488,13 @@ public class Update implements Callable<Integer> {
          if (i > downloadElements.size() - 1) {
           downloadsParagraph = DownloadsElementParagraphModel.create(downloadModel);
           downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
-          downloadsParagraph.getOrCreateFirstDownloadFile().getDescription();
+          downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
           downloadsParagraph = downloadsElementParagraphClient.post(downloadsParagraph);
           downloadElements.add(new DownloadsModel(downloadsParagraph));             
         } else {
           downloadsParagraph = downloadsElementParagraphClient
                   .get(downloadElements.get(i).getTargetId());
+          downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
           downloadsElementParagraphClient.patch(downloadsParagraph);
         }  
         System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
