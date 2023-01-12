@@ -12,6 +12,7 @@ import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.DownloadFileClient;
 import com.sprinteins.drupalcli.file.FileFinder;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
@@ -31,6 +32,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -47,6 +50,8 @@ public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
     public static final String IMAGE_FOLDER_NAME = "images";
+    public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
+
     @Mixin
     private GlobalOptions globalOptions;
     @Option(
@@ -72,6 +77,7 @@ public class Update implements Callable<Integer> {
         Path workingDir = globalOptions.apiPageDirectory;
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
+        
         if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
@@ -94,6 +100,16 @@ public class Update implements Callable<Integer> {
         List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
         List<String> additionalInformationMenuItems = frontmatter.get("additional-information-menu");
         List<String> faqSectionItems = frontmatter.get("faqs");
+
+        Path docPath = workingDir.resolve("downloads.markdown");
+        checkIfFileExists(docPath);
+        String downloadsSection = Files.readString(docPath);
+            
+        Map<String, List<String>> frontmatterDownloads = new FrontMatterReader().readFromString(downloadsSection);
+
+        
+
+
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
 
@@ -102,9 +118,11 @@ public class Update implements Callable<Integer> {
         var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
         var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+        var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
 
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
+        DownloadFileClient downloadFileClient = applicationContext.downloadFileClient();
         Converter converter = applicationContext.converter();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -126,6 +144,7 @@ public class Update implements Callable<Integer> {
 
         updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
 
+        updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, converter, nodeModel, patchNodeModel);
 
         Document newReleaseNoteDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
@@ -445,6 +464,44 @@ public class Update implements Callable<Integer> {
 
         patchNodeModel.setFaqItems(faqSectionElements);
     }
+
+
+    private void updateDownloadsSection (Path workingDir, Map<String, List<String>> frontmatterDownloads, ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient, DownloadFileClient downloadFileClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+      var downloadElements = new ArrayList<>(nodeModel.getDownloadElements());
+      var keys = frontmatterDownloads.keySet();
+      var values = frontmatterDownloads.values().iterator();
+      String downloadsDirPath = workingDir.resolve(API_DOCS_DOWNLOADS_DIRECTORY).toString(); // api-docs/downloads
+      var keySetArray = keys.toArray();
+
+
+      for (var i = 0; i < keys.size(); i++) {
+        var downloadItemFile = keySetArray[i];
+        var downloadItemDescription = values.next().get(0);
+                
+        System.out.println("Updating paragraph: " + downloadItemDescription + " ...");
+        DownloadsElementParagraphModel downloadsParagraph;
+
+        Path downloadFilesPath = Paths.get(downloadsDirPath +"/" + downloadItemFile); //api-docs/downloads/example.json
+        FileUploadModel downloadModel = downloadFileClient.upload(downloadFilesPath); 
+
+        
+         if (i > downloadElements.size() - 1) {
+          downloadsParagraph = DownloadsElementParagraphModel.create(downloadModel);
+          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
+          downloadsParagraph.getOrCreateFirstDownloadFile().getDescription();
+          downloadsParagraph = downloadsElementParagraphClient.post(downloadsParagraph);
+          downloadElements.add(new DownloadsModel(downloadsParagraph));             
+        } else {
+          downloadsParagraph = downloadsElementParagraphClient
+                  .get(downloadElements.get(i).getTargetId());
+          downloadsElementParagraphClient.patch(downloadsParagraph);
+        }  
+        System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
+        System.out.println("Finished processing paragraph: " + downloadsParagraph.id());
+      }   
+      patchNodeModel.setDownloadElements(downloadElements);   
+    }
+
 
     public Element extractFirstReleaseNote(Element releaseNoteBody) {
         Elements headlines = releaseNoteBody.select("h3");

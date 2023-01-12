@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprinteins.drupalcli.fields.SourceFileModel;
 import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.TargetId;
+import com.sprinteins.drupalcli.file.FileUploadModel;
 
 public class DownloadsElementParagraphModel extends ParagraphModel {
 
@@ -17,6 +18,12 @@ public class DownloadsElementParagraphModel extends ParagraphModel {
 
   public DownloadsElementParagraphModel() {
     super(new TypeModel(TargetId.DOWNLOADS));
+  }
+
+  public static DownloadsElementParagraphModel create(FileUploadModel downloadFile) {
+    DownloadsElementParagraphModel model = new DownloadsElementParagraphModel();
+    model.getOrCreateFirstDownloadFile();
+    return model;
   }
 
   @JsonIgnore
