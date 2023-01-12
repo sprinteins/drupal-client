@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -21,7 +22,7 @@ public class ApiReferenceFileClient extends FileClient {
         this.uploadBaseUri = baseUri + "/file/upload/node/api_reference/field_source_file";
     }
 
-    public FileUploadModel upload(Path path) throws NoSuchAlgorithmException {
+    public FileUploadModel upload(Path path) throws IOException {
         return super.upload(path, this.uploadBaseUri);
     }
 

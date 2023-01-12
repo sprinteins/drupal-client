@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -26,20 +27,26 @@ public class FileClient {
         this.httpClient = httpClient;
     }
 
-		protected FileUploadModel upload(Path path, String uploadBaseUri) throws NoSuchAlgorithmException {
-      FileUploadModel uploadModel = upload(path, uploadBaseUri, path.getFileName().toString());
-      if(uploadModel == null){
-        throw new IllegalStateException("Test does not exist");
-      }
-      else {
-        return uploadModel;
-      }
-		}
+    protected FileUploadModel upload(Path path, String uploadBaseUri) throws IOException {
+        try {
+            var fileName = "" + path.getFileName();
+            var response = post(path, uploadBaseUri, fileName);
+            return objectMapper.readValue(response.body(), FileUploadModel.class);
+        } catch (IOException e) {
+            throw new IOException("File is not available", e);
+        }
 
-    protected FileUploadModel upload(Path path, String uploadBaseUri, String fileName) throws NoSuchAlgorithmException {
+    }
+
+    protected FileUploadModel upload(Path path, String uploadBaseUri, String fileName) throws IOException {
+        var response = post(path, uploadBaseUri, fileName);
+        return objectMapper.readValue(response.body(), FileUploadModel.class);
+    }
+
+    private HttpResponse<String> post(Path path, String uri, String fileName) {
         try {
             HttpRequest request = HttpRequestBuilderFactory
-                    .create(URI.create(uploadBaseUri + "?_format=json"), apiKey)
+                    .create(URI.create(uri + "?_format=json"), apiKey)
                     .POST(HttpRequest.BodyPublishers.ofFile(path))
                     .header("Content-Type", "application/octet-stream")
                     .header("Content-Disposition", "file; filename=\"" + fileName + "\"")
@@ -47,10 +54,10 @@ public class FileClient {
 
             HttpResponse<String> httpResponse = httpClient
                     .send(request, HttpResponse.BodyHandlers.ofString());
-            
+
             HttpResponseStatusHandler.checkStatusCode(httpResponse);
 
-            return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
+            return httpResponse;
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Upload failed", e);
         }

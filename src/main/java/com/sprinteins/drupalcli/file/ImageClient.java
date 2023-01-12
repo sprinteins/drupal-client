@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -31,7 +32,7 @@ public class ImageClient extends FileClient{
         this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
     }
 
-    public FileUploadModel upload(Path path) throws NoSuchAlgorithmException {
+    public FileUploadModel upload(Path path) throws IOException {
         String md5 = generateMd5Hash(path);
         return super.upload(path, this.uploadBaseUri, md5 + path.getFileName());
     }
