@@ -494,12 +494,20 @@ public class Update implements Callable<Integer> {
         } else {
           downloadsParagraph = downloadsElementParagraphClient
                   .get(downloadElements.get(i).getTargetId());
+          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
           downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
+          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetUuid(downloadModel.getUuid().get(0).getValue());
+          downloadsParagraph.getOrCreateFirstDownloadFile().setUrl(downloadModel.getUri().get(0).getValue());
           downloadsElementParagraphClient.patch(downloadsParagraph);
         }  
         System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
         System.out.println("Finished processing paragraph: " + downloadsParagraph.id());
       }   
+      if(keys.size() < downloadElements.size()){
+        for(var d = downloadElements.size(); d > keys.size(); d--){
+          downloadElements.remove(d - 1);
+        }
+      }
       patchNodeModel.setDownloadElements(downloadElements);   
     }
 
