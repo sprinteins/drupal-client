@@ -284,17 +284,19 @@ public class Update implements Callable<Integer> {
                         .map(Path::toString)
                         .orElseThrow();
                 System.out.println("Uploading " + filename + "...");
-                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
-                images.attr("data-entity-type", "file");
+                Elements image = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
+                image.attr("data-entity-type", "file");
                 String md5 = imageClient.generateMd5Hash(imagePath);
                 Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                    images.attr("src", currentImage.attr("src"));
-                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("src", currentImage.attr("src"));
+                    image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("width", currentImage.attr("width"));
+                    image.attr("height", currentImage.attr("height"));
                 } else {
                     FileUploadModel imageModel = imageClient.upload(imagePath);
-                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
-                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
+                    image.attr("src", imageModel.getOrCreateFirstUri().getUrl());
+                    image.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
             }
             FormattedTextModel fieldDescription = getStartedParagraph.getOrCreateFirstDescription();
@@ -350,17 +352,19 @@ public class Update implements Callable<Integer> {
                         .map(Path::toString)
                         .orElseThrow();
                 System.out.println("Uploading " + filename + "...");
-                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
-                images.attr("data-entity-type", "file");
+                Elements image = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
+                image.attr("data-entity-type", "file");
                 String md5 = imageClient.generateMd5Hash(imagePath);
                 Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                    images.attr("src", currentImage.attr("src"));
-                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                  image.attr("src", currentImage.attr("src"));
+                  image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                  image.attr("width", currentImage.attr("width"));
+                  image.attr("height", currentImage.attr("height"));
                 } else {
                     FileUploadModel imageModel = imageClient.upload(imagePath);
-                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
-                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
+                    image.attr("src", imageModel.getOrCreateFirstUri().getUrl());
+                    image.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
             }
             FormattedTextModel fieldDescription = additionalInformationParagraph.getOrCreateFirstDescription();
