@@ -91,4 +91,22 @@ public class ParagraphClient<R extends ParagraphModel> {
             throw new IllegalStateException("Get Paragraph failed", e);
         }
     }
+
+    public String download(String link){
+      try {
+          HttpRequest request = HttpRequestBuilderFactory
+                  .create(URI.create(link), apiKey)
+                  .method("GET", HttpRequest.BodyPublishers.noBody())
+                  .build();
+  
+          HttpResponse<String> httpResponse = httpClient
+                  .send(request, HttpResponse.BodyHandlers.ofString());
+          
+          HttpResponseStatusHandler.checkStatusCode(httpResponse);
+  
+          return httpResponse.body();
+      } catch (IOException | InterruptedException e) {
+          throw new IllegalStateException("Download failed", e);
+      }
+  }
 }

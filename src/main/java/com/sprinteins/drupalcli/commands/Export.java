@@ -43,6 +43,7 @@ public class Export implements Callable<Integer> {
 
     public static final String API_DOCS_IMAGE_DIRECTORY = "images";
     public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
+    public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
 
     @Mixin
     private GlobalOptions globalOptions;
@@ -67,12 +68,14 @@ public class Export implements Callable<Integer> {
         var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
         var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+        var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         Converter converter = applicationContext.converter();
 
         System.out.println("Creating directories...");
         Files.createDirectories(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY));
+        Files.createDirectories(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY));
 
         System.out.println("Download node information...");
         NodeModel nodeModel = nodeClient.getByUri(link);
@@ -209,6 +212,38 @@ public class Export implements Callable<Integer> {
                 .orElseThrow();
         String apiReference = apiReferenceFileClient.download(sourceFileLink);
         Files.writeString(apiPageDirectory.resolve(fileName), apiReference);
+
+
+        System.out.println("Download additional files");
+        System.out.println("Create markdown file...");
+        List <String> downloadsMarkdown = new ArrayList<>();
+        downloadsMarkdown.add("---");
+        for (DownloadsModel downloadsModel : nodeModel.getDownloadElements()) {
+          var targetID = downloadsModel.getTargetId();
+
+          DownloadsElementParagraphModel downloadsParagraph = downloadsElementParagraphClient.get(targetID);
+          SourceFileModel downloadFile = downloadsParagraph.getOrCreateFirstDownloadFile();
+
+          String downloadFileURL = downloadFile.getUrl();
+          var downloadFileDescription = downloadFile.getDescription();
+
+          String downloadableFileName = Optional.of(downloadFileURL)
+                                    .map(URI::create)
+                                    .map(URI::getPath)
+                                    .map(FilenameUtils::getName)
+                                    .orElseThrow();
+          Files.writeString(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY).resolve(downloadableFileName), downloadsElementParagraphClient.download(downloadFileURL)); 
+
+          if (downloadFileDescription.isEmpty()) {
+            downloadsMarkdown.add(downloadableFileName +": " + "<No description>");
+          }
+          else {
+            downloadsMarkdown.add(downloadableFileName +": " + downloadFileDescription);
+          }         
+        }
+        downloadsMarkdown.add("---");
+        Files.write(apiPageDirectory.resolve("downloads.markdown"), downloadsMarkdown);
+
 
         // finish up main markdown and add description list
         mainMarkdown.add("---");

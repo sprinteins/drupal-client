@@ -22,6 +22,7 @@ public abstract class ParagraphModel {
     private List<StringValueModel> title;
     private List<TypeModel> type;
 
+
     public ParagraphModel(TypeModel type){
         this.type = Collections.singletonList(type);
     }

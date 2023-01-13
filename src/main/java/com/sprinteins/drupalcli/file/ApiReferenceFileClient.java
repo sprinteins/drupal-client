@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -10,39 +11,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 
-public class ApiReferenceFileClient {
+public class ApiReferenceFileClient extends FileClient {
 
-    private final ObjectMapper objectMapper;
-    private final String apiKey;
     private final String uploadBaseUri;
-    private final HttpClient httpClient;
 
     public ApiReferenceFileClient(ObjectMapper objectMapper, String baseUri, String apiKey, HttpClient httpClient) {
-        this.objectMapper = objectMapper;
+        super(objectMapper, baseUri, apiKey, httpClient);
         this.uploadBaseUri = baseUri + "/file/upload/node/api_reference/field_source_file";
-        this.apiKey = apiKey;
-        this.httpClient = httpClient;
     }
 
-    public FileUploadModel upload(Path path) {
-        try {
-            HttpRequest request = HttpRequestBuilderFactory
-                    .create(URI.create(uploadBaseUri + "?_format=json"), apiKey)
-                    .POST(HttpRequest.BodyPublishers.ofFile(path))
-                    .header("Content-Type", "application/octet-stream")
-                    .header("Content-Disposition", "file; filename=\"" + path.getFileName() + "\"")
-                    .build();
-
-            HttpResponse<String> httpResponse = httpClient
-                    .send(request, HttpResponse.BodyHandlers.ofString());
-            
-            HttpResponseStatusHandler.checkStatusCode(httpResponse);
-
-            return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Upload failed", e);
-        }
+    public FileUploadModel upload(Path path) throws IOException {
+        return super.upload(path, this.uploadBaseUri);
     }
 
     public String download(String link){

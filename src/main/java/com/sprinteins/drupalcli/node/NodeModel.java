@@ -19,6 +19,7 @@ public class NodeModel {
     private List<FaqItemsModel> faqItems;
     private List<ReleaseNoteElementModel> releaseNotesElement;
     private List<SourceFileModel> sourceFile;
+    private List<DownloadsModel> downloadElements;
     private List<LongValueModel> nid;
     private List<StringValueModel> uuid;
     private List<LongValueModel> vid;
@@ -99,6 +100,15 @@ public class NodeModel {
     }
     public void setSourceFile(List<SourceFileModel> sourceFile) {
         this.sourceFile = Optional.ofNullable(sourceFile).map(List::copyOf).orElse(null);
+    }
+
+    @JsonProperty("field_downloads")
+    public List<DownloadsModel> getDownloadElements() {
+        return Optional.ofNullable(downloadElements).map(List::copyOf).orElse(null);
+    }
+
+    public void setDownloadElements(List<DownloadsModel> downloadElements) {
+      this.downloadElements = Optional.ofNullable(downloadElements).map(List::copyOf).orElse(null);
     }
 
     @JsonProperty("nid")
