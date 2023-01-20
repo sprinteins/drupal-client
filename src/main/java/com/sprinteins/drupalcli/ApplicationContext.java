@@ -11,6 +11,7 @@ import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.paragraph.*;
 import com.sprinteins.drupalcli.proxy.CustomProxySearchStrategy;
+import com.sprinteins.drupalcli.translations.TranslationClient;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -41,6 +42,7 @@ public class ApplicationContext {
   private final ApiReferenceFileClient apiReferenceFileClient;
   private final DownloadFileClient downloadFileClient;
   private final Converter converter;
+  private final TranslationClient translationClient;
 
   public ApplicationContext(String baseUri, GlobalOptions globalOptions) {
     this(baseUri, readApiKey(globalOptions.tokenFile), buildHttpClient(globalOptions),
@@ -113,6 +115,11 @@ public class ApplicationContext {
         apiKey, 
         DownloadsElementParagraphModel.class, 
         httpClient);
+    translationClient = new TranslationClient(
+    objectMapper,
+    baseUri,
+    apiKey,
+    httpClient);
   }
 
   public static Converter initialiseConverter(GlobalOptions globalOptions) {
@@ -221,6 +228,10 @@ public class ApplicationContext {
 
   public Converter converter() {
     return converter;
+  }
+
+  public TranslationClient translationClient() {
+    return translationClient;
   }
 
 }
