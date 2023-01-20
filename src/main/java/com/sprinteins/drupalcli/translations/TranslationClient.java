@@ -41,4 +41,23 @@ public class TranslationClient {
       throw new IllegalStateException("Get translations failed", e);
     }
   }
+
+  public TranslationModel getTranslatedNode(long nid, String langcode) {
+    try {
+      HttpRequest request = HttpRequestBuilderFactory
+              .create(URI.create(baseUri + nid + "?_format=json" + "&lang=" + langcode), apiKey)
+              .GET()
+              .header("Content-Type", "application/json")
+              .build();
+
+      HttpResponse<String> httpResponse = httpClient
+              .send(request, HttpResponse.BodyHandlers.ofString());
+
+      HttpResponseStatusHandler.checkStatusCode(httpResponse);
+
+      return objectMapper.readValue(httpResponse.body(), TranslationModel.class);
+    } catch (IOException | InterruptedException e) {
+      throw new IllegalStateException("Get translated node failed", e);
+    }
+  }
 }
