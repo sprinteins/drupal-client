@@ -43,7 +43,7 @@ public class Export implements Callable<Integer> {
   public static final String API_DOCS_IMAGE_DIRECTORY = "images";
   public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
   public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
-  protected Path apiPageDirectory;
+
 
   @Mixin
   private GlobalOptions globalOptions;
@@ -79,7 +79,7 @@ public class Export implements Callable<Integer> {
 
     for (var i = 0; i < getTranslations.size(); i++) {
       var langCode = getTranslations.get(i).getLangcode();
-      apiPageDirectory = apiPageBaseDirectory.resolve(langCode);
+      Path apiPageDirectory = apiPageBaseDirectory.resolve(langCode);
       nodeModel = nodeClient.getTranslatedNode(nodeID, langCode);
       System.out.println("Creating directories for language " + langCode);
 
@@ -105,7 +105,7 @@ public class Export implements Callable<Integer> {
         Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
         System.out.println("Downloading images...");
-        downloadImages(imageClient, doc);
+        downloadImages(imageClient, doc, apiPageDirectory);
 
         List<String> markdown = new ArrayList<>();
         markdown.add("---");
@@ -136,7 +136,7 @@ public class Export implements Callable<Integer> {
         Document doc = Jsoup.parse(formattedTextModel.getProcessed());
 
         System.out.println("Downloading images...");
-        downloadImages(imageClient, doc);
+        downloadImages(imageClient, doc, apiPageDirectory);
 
         List<String> markdown = new ArrayList<>();
         markdown.add("---");
@@ -265,7 +265,7 @@ public class Export implements Callable<Integer> {
     return 0;
   }
 
-  private void downloadImages(ImageClient imageClient, Document doc) throws IOException, URISyntaxException {
+  private void downloadImages(ImageClient imageClient, Document doc, Path apiPageDirectory) throws IOException, URISyntaxException {
     Elements images = doc.select("img");
     for (Element image : images) {
       String srcAttribute = image.attr("src");
@@ -278,15 +278,9 @@ public class Export implements Callable<Integer> {
       byte[] imageByte = imageClient.download(srcAttribute);
       String md5Hash = imageClient.generateMd5Hash(imageByte);
       imageName = StringUtils.removeStart(imageName, md5Hash);
-      try {
-        Files.write(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
-        // change source attribute
-        image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
-      }
-      catch (IOException e) {
-        throw new IOException("Api directory is incorrect");
-      }
-      
+      Files.write(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
+      // change source attribute
+      image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
     }
   }
 
