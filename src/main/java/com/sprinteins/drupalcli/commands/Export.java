@@ -278,9 +278,15 @@ public class Export implements Callable<Integer> {
       byte[] imageByte = imageClient.download(srcAttribute);
       String md5Hash = imageClient.generateMd5Hash(imageByte);
       imageName = StringUtils.removeStart(imageName, md5Hash);
-      Files.write(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
-      // change source attribute
-      image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
+      try {
+        Files.write(apiPageDirectory.resolve(API_DOCS_IMAGE_DIRECTORY).resolve(imageName), imageByte);
+        // change source attribute
+        image.attr("src", Paths.get(API_DOCS_IMAGE_DIRECTORY).resolve(imageName).toString());
+      }
+      catch (IOException e) {
+        throw new IOException("Api directory is incorrect");
+      }
+      
     }
   }
 
