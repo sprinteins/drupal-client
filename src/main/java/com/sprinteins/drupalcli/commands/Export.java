@@ -43,7 +43,7 @@ public class Export implements Callable<Integer> {
   public static final String API_DOCS_IMAGE_DIRECTORY = "images";
   public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
   public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
-  public static Path apiPageDirectory;
+  protected Path apiPageDirectory;
 
   @Mixin
   private GlobalOptions globalOptions;
