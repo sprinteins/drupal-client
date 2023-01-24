@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,8 +37,9 @@ public class TranslationClient {
       HttpResponse<String> httpResponse = httpClient
               .send(request, HttpResponse.BodyHandlers.ofString());
 
-      HttpResponseStatusHandler.checkStatusCode(httpResponse);    
-      return objectMapper.readValue(httpResponse.body(), new TypeReference<List<TranslationModel>>(){});
+      HttpResponseStatusHandler.checkStatusCode(httpResponse);  
+      return Arrays.asList(objectMapper.readValue(httpResponse.body(), TranslationModel[].class));
+      
     } catch (IOException | InterruptedException e) {
       throw new IllegalStateException("Get translations failed", e);
     }
