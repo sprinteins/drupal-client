@@ -81,8 +81,6 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Install native-image module
       run: gu install native-image
-    - name: Install upx
-      run: brew install upx
     - name: Build with Maven
       run: |
         set -o xtrace
@@ -93,8 +91,6 @@ jobs:
           verify
     - name: Test and compress executable
       run: |
-        "./target/${{ env.ARTIFACT }}-macos-${REVISION}"
-        upx "target/${{ env.ARTIFACT }}-macos-${REVISION}"
         "./target/${{ env.ARTIFACT }}-macos-${REVISION}"
     - name: Move artifacts
       run: |
@@ -128,10 +124,6 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Install native-image module
       run: gu install native-image
-    - name: Install upx
-      run: |
-        wget -q https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
-        tar xf upx-3.96-amd64_linux.tar.xz
     - name: Build with Maven
       run: |
         set -o xtrace
@@ -142,8 +134,6 @@ jobs:
           verify
     - name: Test and compress executable
       run: |
-        "./target/${{ env.ARTIFACT }}-linux-${REVISION}"
-        ./upx-3.96-amd64_linux/upx "target/${{ env.ARTIFACT }}-linux-${REVISION}"
         "./target/${{ env.ARTIFACT }}-linux-${REVISION}"
     - name: Move artifacts
       run: |
@@ -171,8 +161,6 @@ jobs:
         java: 'java11'
     - name: Install native-image module
       run: '& "$env:JAVA_HOME\bin\gu" install native-image'
-    - name: Install upx
-      run: choco install upx --version=3.96 --no-progress
     - name: Set up Visual Studio shell
       uses: egor-tensin/vs-shell@v2
     - name: Cache Maven packages
@@ -188,16 +176,9 @@ jobs:
       run: |
         $expectedOutput = "You are missing some arguments!`r`nType in --help or -h for help.`r`n"
         $firstOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
-        upx "target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe"
-        $secondOutput = & "./target/${{ env.ARTIFACT }}-windows-$env:REVISION.exe" | Out-String
         if ($firstOutput -ne $expectedOutput) {
           echo "The first output is wrong:"
           echo $firstOutput
-          exit 1
-        }
-        if ($secondOutput -ne $expectedOutput) {
-          echo "The second output is wrong:"
-          echo $secondOutput
           exit 1
         }
     - name: Move artifacts
