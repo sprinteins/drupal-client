@@ -10,7 +10,7 @@ env:
 
 jobs:
   debug:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Dump GitHub context
       env:
@@ -37,7 +37,7 @@ jobs:
         MATRIX_CONTEXT: ${{ toJSON(matrix) }}
       run: echo "$MATRIX_CONTEXT"
   version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       new_version: ${{ steps.output.outputs.new_version }}
     steps:
@@ -101,7 +101,7 @@ jobs:
         name: ${{ env.ARTIFACT }}-${{ github.job }}-${{ needs.version.outputs.new_version }}
         path: target/artifacts
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: version
     env:
       REVISION: ${{ needs.version.outputs.new_version }}
@@ -191,7 +191,7 @@ jobs:
         path: target/artifacts
   release:
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [version, macos, linux, windows]
     steps:
     - uses: actions/checkout@v3
@@ -277,7 +277,7 @@ jobs:
   deploy:
     needs: [version, macos, linux, windows]
     if: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/dependabot/') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-java@v3
