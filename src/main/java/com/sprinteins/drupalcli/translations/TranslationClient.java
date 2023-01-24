@@ -5,7 +5,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -23,10 +25,10 @@ public class TranslationClient {
         this.httpClient = httpClient;
     }
 
-  public TranslationModel getTranslations(long nid) {
+  public List<TranslationModel> getTranslations(long nid) {
     try {
       HttpRequest request = HttpRequestBuilderFactory
-              .create(URI.create(baseUri + "/get-translations/" + nid + "?_format=json"), apiKey)
+              .create(URI.create(baseUri + "/api-reference/" + nid + "/available-translations" + "?_format=json"), apiKey)
               .GET()
               .header("Content-Type", "application/json")
               .build();
@@ -34,30 +36,11 @@ public class TranslationClient {
       HttpResponse<String> httpResponse = httpClient
               .send(request, HttpResponse.BodyHandlers.ofString());
 
-      HttpResponseStatusHandler.checkStatusCode(httpResponse);
-
-      return objectMapper.readValue(httpResponse.body(), TranslationModel.class);
+      HttpResponseStatusHandler.checkStatusCode(httpResponse);    
+      return objectMapper.readValue(httpResponse.body(), new TypeReference<List<TranslationModel>>(){});
     } catch (IOException | InterruptedException e) {
       throw new IllegalStateException("Get translations failed", e);
     }
   }
 
-  public TranslationModel getTranslatedNode(long nid, String langcode) {
-    try {
-      HttpRequest request = HttpRequestBuilderFactory
-              .create(URI.create(baseUri + nid + "?_format=json" + "&lang=" + langcode), apiKey)
-              .GET()
-              .header("Content-Type", "application/json")
-              .build();
-
-      HttpResponse<String> httpResponse = httpClient
-              .send(request, HttpResponse.BodyHandlers.ofString());
-
-      HttpResponseStatusHandler.checkStatusCode(httpResponse);
-
-      return objectMapper.readValue(httpResponse.body(), TranslationModel.class);
-    } catch (IOException | InterruptedException e) {
-      throw new IllegalStateException("Get translated node failed", e);
-    }
-  }
 }
