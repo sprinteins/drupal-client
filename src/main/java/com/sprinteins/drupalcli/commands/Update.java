@@ -70,11 +70,32 @@ public class Update implements Callable<Integer> {
             description = "Use JSON file to update api page"
     )
     boolean useJson;
+
+    @Option(
+      names = {"--lang"},
+      description = "Language code for updating translated api page"
+    )
+    String langcode = "";
+
+    public Path resolveLangcode (Path workingBaseDir, String langcode) {
+      if(!langcode.isEmpty()) {
+        return workingBaseDir.resolve(langcode);
+         
+      }
+      else {
+        return workingBaseDir.resolve("en");
+      }
+    }
+
+
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
-        Path workingDir = globalOptions.apiPageDirectory;
+        Path workingBaseDir = globalOptions.apiPageDirectory;
+
+
+        Path workingDir= resolveLangcode(workingBaseDir, langcode);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
         
