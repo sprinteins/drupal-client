@@ -19,6 +19,8 @@ import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
+import com.sprinteins.drupalcli.translations.TranslationClient;
+
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -133,6 +135,7 @@ public class Update implements Callable<Integer> {
 
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
+        TranslationClient translationClient = applicationContext.translationClient();
 
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
@@ -149,6 +152,9 @@ public class Update implements Callable<Integer> {
         Validator validator = factory.getValidator();
         NodeModel nodeModel = nodeClient.getByUri(link);
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
+        var getTranslations = translationClient.getTranslations(nodeId);
+        var langCode = getTranslations.get(0).getLangcode();
+        nodeModel = nodeClient.getTranslatedNode(nodeId, langCode);
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
 
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
