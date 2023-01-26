@@ -79,10 +79,18 @@ public class Update implements Callable<Integer> {
     )
     String langcode = "";
 
-    public Path resolveLangcode (Path workingBaseDir, String langcode) {
+    public Path resolveLangcode(Path workingBaseDir, String langcode) throws Exception{
       if(!langcode.isEmpty()) {
-        return workingBaseDir.resolve(langcode);
-         
+        File directory = new File(workingBaseDir.toFile().getName());
+        File[] fList = directory.listFiles();
+        for( File file: fList) {
+          var path = file.getPath();
+          if(path.endsWith(langcode)) {
+            return workingBaseDir.resolve(langcode);
+          }
+        }       
+        throw new Exception ("The entered langcode does not match the langcode of the folder you are trying to update");       
+    
       }
       else {
         return workingBaseDir.resolve("en");
