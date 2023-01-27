@@ -20,6 +20,7 @@ import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
 import com.sprinteins.drupalcli.translations.TranslationClient;
+import com.sprinteins.drupalcli.translations.TranslationModel;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -35,7 +36,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -77,35 +77,39 @@ public class Update implements Callable<Integer> {
       names = {"--lang"},
       description = "Language code for updating translated api page"
     )
-    String langcode = "";
+    String langcodeInput = "en";
 
-    public Path resolveLangcode(Path workingBaseDir, String langcode) throws Exception{
-      if(!langcode.isEmpty()) {
-        File directory = new File(workingBaseDir.toFile().getName());
-        File[] fList = directory.listFiles();
-        for( File file: fList) {
-          var path = file.getPath();
-          if(path.endsWith(langcode)) {
-            return workingBaseDir.resolve(langcode);
+    public boolean validateLangCode(String langcodeInput, List<TranslationModel> langCodeList){
+        boolean isValid = false;
+        for (var langcode : langCodeList) {
+          if (langcode.getLangcode().equals(langcodeInput)) {
+            isValid = true;
+              break;
           }
-        }       
-        throw new Exception ("The entered langcode does not match the langcode of the folder you are trying to update");       
-    
-      }
-      else {
-        return workingBaseDir.resolve("en");
-      }
-    }
-
+        } 
+        return isValid;
+    } 
 
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
-        Path workingBaseDir = globalOptions.apiPageDirectory;
+        Path workingBaseDir = globalOptions.apiPageDirectory; 
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
+        NodeClient nodeClient = applicationContext.nodeClient();
+        TranslationClient translationClient = applicationContext.translationClient();
+        NodeModel nodeModel = nodeClient.getByUri(link);
+        Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
+        var getTranslations = translationClient.getTranslations(nodeId);
+
+        if(!validateLangCode(langcodeInput, getTranslations)){
+          throw new Exception ("The entered langcode does not exist for this api page."); 
+        };
+
+        nodeModel = nodeClient.getTranslatedNode(nodeId, langcodeInput);
 
 
-        Path workingDir= resolveLangcode(workingBaseDir, langcode);
+        Path workingDir= workingBaseDir.resolve(langcodeInput);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
         
@@ -134,16 +138,11 @@ public class Update implements Callable<Integer> {
 
         Path docPath = workingDir.resolve("downloads.markdown");
         checkIfFileExists(docPath);
-        String downloadsSection = Files.readString(docPath);
-            
+        String downloadsSection = Files.readString(docPath);            
         Map<String, List<String>> frontmatterDownloads = new FrontMatterReader().readFromString(downloadsSection);
-
         
 
-
-        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
-        NodeClient nodeClient = applicationContext.nodeClient();
-        TranslationClient translationClient = applicationContext.translationClient();
+        
 
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
@@ -152,17 +151,16 @@ public class Update implements Callable<Integer> {
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
         var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
 
+        
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
         DownloadFileClient downloadFileClient = applicationContext.downloadFileClient();
         Converter converter = applicationContext.converter();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        NodeModel nodeModel = nodeClient.getByUri(link);
-        Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
-        var getTranslations = translationClient.getTranslations(nodeId);
-        var langCode = getTranslations.get(0).getLangcode();
-        nodeModel = nodeClient.getTranslatedNode(nodeId, langCode);
+
+
+
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
 
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
