@@ -8,6 +8,10 @@ public class TranslationModel {
 
   public TranslationModel() {}
 
+  public TranslationModel(String lang) {
+    this.langcode = lang;
+  }
+
   @JsonProperty("langcode")
   public String getLangcode() {
     return langcode;
