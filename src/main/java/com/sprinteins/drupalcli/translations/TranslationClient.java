@@ -29,7 +29,7 @@ public class TranslationClient {
   public List<TranslationModel> getTranslations(long nid) {
     try {
       HttpRequest request = HttpRequestBuilderFactory
-              .create(URI.create(baseUri + "/api-reference/" + nid + "/available-translations" + "?_format=json"), apiKey)
+              .create(URI.create(baseUri + "/node/" + nid + "/translation" + "?_format=json"), apiKey)
               .GET()
               .header("Content-Type", "application/json")
               .build();
