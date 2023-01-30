@@ -75,7 +75,7 @@ public class Update implements Callable<Integer> {
 
     @Option(
       names = {"--lang"},
-      description = "Language code for updating translated api page"
+      description = "Enter langcode to update api page for a specific translation"
     )
     String langcodeInput = "en";
 
