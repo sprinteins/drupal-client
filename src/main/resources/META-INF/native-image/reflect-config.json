@@ -260,6 +260,12 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.translations.AvailableTranslationsModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.translations.TranslationModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,

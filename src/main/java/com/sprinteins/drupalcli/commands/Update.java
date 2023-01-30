@@ -19,8 +19,8 @@ import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
+import com.sprinteins.drupalcli.translations.AvailableTranslationsModel;
 import com.sprinteins.drupalcli.translations.TranslationClient;
-import com.sprinteins.drupalcli.translations.TranslationModel;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -79,16 +79,6 @@ public class Update implements Callable<Integer> {
     )
     String langcodeInput = "en";
 
-    public boolean validateLangCode(String langcodeInput, List<TranslationModel> langCodeList){
-      boolean isValid = false;
-      for (var langcode : langCodeList) {
-        if (langcode.getLangcode().equals(langcodeInput)) {
-          isValid = true;
-            break;
-        }
-      } 
-      return isValid;
-  } 
 
     @Override
     public Integer call() throws Exception {
@@ -100,18 +90,15 @@ public class Update implements Callable<Integer> {
         TranslationClient translationClient = applicationContext.translationClient();
         NodeModel nodeModel = nodeClient.getByUri(link);
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
+
         var getTranslations = translationClient.getTranslations(nodeId);
+        var translationsListModel = new AvailableTranslationsModel(getTranslations);
 
-        if(!validateLangCode(langcodeInput, getTranslations)){
-          StringBuilder availableTranslations = new StringBuilder();
-          for(TranslationModel translation: getTranslations){
-            availableTranslations.append("- ").append(translation.getLangcode()).append("\n");
-        }
-          throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ availableTranslations); 
-        };
-
+        if(!translationsListModel.validate(langcodeInput)){
+            throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ translationsListModel.printValues());
+        }; 
+        
         nodeModel = nodeClient.getTranslatedNode(nodeId, langcodeInput);
-
 
         Path workingDir= workingBaseDir.resolve(langcodeInput);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
