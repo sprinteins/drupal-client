@@ -79,6 +79,17 @@ public class Update implements Callable<Integer> {
     )
     String langcodeInput = "en";
 
+    public boolean validateLangCode(String langcodeInput, List<TranslationModel> langCodeList){
+      boolean isValid = false;
+      for (var langcode : langCodeList) {
+        if (langcode.getLangcode().equals(langcodeInput)) {
+          isValid = true;
+            break;
+        }
+      } 
+      return isValid;
+  } 
+
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
@@ -91,12 +102,12 @@ public class Update implements Callable<Integer> {
         Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
         var getTranslations = translationClient.getTranslations(nodeId);
 
-        if(!getTranslations.contains(new TranslationModel(langcodeInput))){
+        if(!validateLangCode(langcodeInput, getTranslations)){
           StringBuilder availableTranslations = new StringBuilder();
           for(TranslationModel translation: getTranslations){
-              availableTranslations.append("- ").append(translation.getLangcode()).append("\n");
-          }
-          throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ availableTranslations);
+            availableTranslations.append("- ").append(translation.getLangcode()).append("\n");
+        }
+          throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ availableTranslations); 
         };
 
         nodeModel = nodeClient.getTranslatedNode(nodeId, langcodeInput);
