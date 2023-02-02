@@ -21,6 +21,7 @@ import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
 import com.sprinteins.drupalcli.translations.AvailableTranslationsModel;
 import com.sprinteins.drupalcli.translations.TranslationClient;
+import com.sprinteins.drupalcli.translations.TranslationModel;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -36,6 +37,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -74,17 +77,23 @@ public class Update implements Callable<Integer> {
     boolean useJson;
 
     @Option(
-      names = {"--lang"},
-      description = "Enter langcode to update api page for a specific translation"
+            names = {"--lang"},
+            description = "Enter langcode to update api page for a specific translation"
     )
     String langcodeInput = "en";
+
+    @Option(
+            names = {"--all-lang"},
+            description = "Update all translations that exist for an api page"
+    )
+    boolean updateAllLanguages = false;
 
 
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
-        Path workingBaseDir = globalOptions.apiPageDirectory; 
+        Path workingBaseDir = globalOptions.apiPageDirectory;
         ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
         NodeClient nodeClient = applicationContext.nodeClient();
         TranslationClient translationClient = applicationContext.translationClient();
@@ -96,149 +105,161 @@ public class Update implements Callable<Integer> {
 
         if(!translationsListModel.validate(langcodeInput)){
             throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ translationsListModel.printValues());
-        }; 
-        
-        nodeModel = nodeClient.getTranslatedNode(nodeId, langcodeInput);
+        };
 
-        Path workingDir= workingBaseDir.resolve(langcodeInput);
-        Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
-        Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
-        
-        if (!Files.exists(mainFilePath)) {
-            throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
-        }
-        checkIfFileExists(releaseNoteFilePath);
-
-        Path swaggerPath;
-        if(useJson){
-            swaggerPath = FileFinder.findJsonFile(workingDir);
-        }else {
-            swaggerPath = FileFinder.findYamlFile(workingDir);
+        ArrayList<String> translationsSet = new ArrayList<>();
+        if (updateAllLanguages) {
+            boolean localTranslationsMatched = false;
+            translationsSet = compareLanguagesData(getTranslations, workingBaseDir);
+        } else {
+            translationsSet.add(langcodeInput);
         }
 
-        if(!validate(String.valueOf(swaggerPath))) {
-            throw new Exception("Swagger " + swaggerPath + " is invalid");
-        }
+        for (String langCode:translationsSet) {
 
-        String mainFileContent = readFile(mainFilePath);
-        Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
-        String title = frontmatter.get("title").get(0);
-        List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
-        List<String> additionalInformationMenuItems = frontmatter.get("additional-information-menu");
-        List<String> faqSectionItems = frontmatter.get("faqs");
+            nodeModel = nodeClient.getTranslatedNode(nodeId, langCode);
 
-        Path docPath = workingDir.resolve("downloads.markdown");
-        checkIfFileExists(docPath);
-        String downloadsSection = Files.readString(docPath);            
-        Map<String, List<String>> frontmatterDownloads = new FrontMatterReader().readFromString(downloadsSection);
-        
+            Path workingDir= workingBaseDir.resolve(langCode);
+            Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
+            Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
 
-        
-
-        var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
-        var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
-        var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
-        var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
-        var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
-        var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
-
-        
-        ImageClient imageClient = applicationContext.imageClient();
-        ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
-        DownloadFileClient downloadFileClient = applicationContext.downloadFileClient();
-        Converter converter = applicationContext.converter();
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-
-
-
-        System.out.println("Updating node: " + title + " - " + nodeId + " ...");
-
-        if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
-            throw new Exception(
-                    "The page titles do not match. Are you updating the wrong API page?\n" + " Supplied title: " + title
-                            + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
-        }
-
-        NodeModel patchNodeModel = new NodeModel();
-
-        updateGetStartedSection(workingDir, getStartedMenuItems, getStartedParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
-
-        updateAdditionalInfoSection(workingDir, additionalInformationMenuItems, additionalInformationParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
-
-        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
-
-        updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, converter, nodeModel, patchNodeModel);
-
-        Document newReleaseNoteDocument = Jsoup
-                .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
-        Element releaseNoteBody = newReleaseNoteDocument.body();
-
-        updateReleaseNoteSection(title, releaseNoteParagraphClient, validator, nodeModel, patchNodeModel, releaseNoteBody);
-
-
-        while (releaseNoteBody.childNodeSize() > 0) {
-            System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
-            var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
-            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
-            for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
-                newReleaseNoteElementList.add(releaseNoteElementModel);
+            if (!Files.exists(mainFilePath)) {
+                throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
             }
-            Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
-            ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
-            StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
-            DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
-            releaseNoteTitle.setValue(releaseNote.select("h3").html());
-            dateValueModel.setValue(releaseNote.select("h4").html());
-            releaseNote.select("h3").remove();
-            releaseNote.select("h4").remove();
-            FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
-            fieldDescription.setFormat(TextFormat.BASIC_HTML);
-            fieldDescription.setValue(releaseNote.html());
-            ReleaseNoteParagraphModel newReleaseNoteParagraph = releaseNoteParagraphClient.post(releaseNoteParagraph);
-            ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
-            newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
-            newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
-            newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
-            newReleaseNoteElementList.add(newReleaseNoteElement);
-            patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
+            checkIfFileExists(releaseNoteFilePath);
+
+            Path swaggerPath;
+            if(useJson){
+                swaggerPath = FileFinder.findJsonFile(workingDir);
+            }else {
+                swaggerPath = FileFinder.findYamlFile(workingDir);
+            }
+
+            if(!validate(String.valueOf(swaggerPath))) {
+                throw new Exception("Swagger " + swaggerPath + " is invalid");
+            }
+
+            String mainFileContent = readFile(mainFilePath);
+            Map<String, List<String>> frontmatter = new FrontMatterReader().readFromString(mainFileContent);
+            String title = frontmatter.get("title").get(0);
+            List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
+            List<String> additionalInformationMenuItems = frontmatter.get("additional-information-menu");
+            List<String> faqSectionItems = frontmatter.get("faqs");
+
+            Path docPath = workingDir.resolve("downloads.markdown");
+            checkIfFileExists(docPath);
+            String downloadsSection = Files.readString(docPath);
+            Map<String, List<String>> frontmatterDownloads = new FrontMatterReader().readFromString(downloadsSection);
+
+
+
+
+            var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+            var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
+            var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
+            var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
+            var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+            var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
+
+
+            ImageClient imageClient = applicationContext.imageClient();
+            ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
+            DownloadFileClient downloadFileClient = applicationContext.downloadFileClient();
+            Converter converter = applicationContext.converter();
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Validator validator = factory.getValidator();
+
+
+
+            System.out.println("Updating node: " + title + " - " + nodeId + " ...");
+
+            if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
+                throw new Exception(
+                        "The page titles do not match. Are you updating the wrong API page?\n" + " Supplied title: " + title
+                                + "\n" + " Target title: " + nodeModel.getOrCreateFirstDisplayTitle().getValue());
+            }
+
+            NodeModel patchNodeModel = new NodeModel();
+
+            updateGetStartedSection(workingDir, getStartedMenuItems, getStartedParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
+
+            updateAdditionalInfoSection(workingDir, additionalInformationMenuItems, additionalInformationParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
+
+            updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
+
+            updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, converter, nodeModel, patchNodeModel);
+
+            Document newReleaseNoteDocument = Jsoup
+                    .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
+            Element releaseNoteBody = newReleaseNoteDocument.body();
+
+            updateReleaseNoteSection(title, releaseNoteParagraphClient, validator, nodeModel, patchNodeModel, releaseNoteBody);
+
+
+            while (releaseNoteBody.childNodeSize() > 0) {
+                System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
+                var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
+                List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
+                for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
+                    newReleaseNoteElementList.add(releaseNoteElementModel);
+                }
+                Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
+                ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
+                StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
+                DateValueModel dateValueModel = releaseNoteParagraph.getOrCreateFirstDate();
+                releaseNoteTitle.setValue(releaseNote.select("h3").html());
+                dateValueModel.setValue(releaseNote.select("h4").html());
+                releaseNote.select("h3").remove();
+                releaseNote.select("h4").remove();
+                FormattedTextModel fieldDescription = releaseNoteParagraph.getOrCreateFirstDescription();
+                fieldDescription.setFormat(TextFormat.BASIC_HTML);
+                fieldDescription.setValue(releaseNote.html());
+                ReleaseNoteParagraphModel newReleaseNoteParagraph = releaseNoteParagraphClient.post(releaseNoteParagraph);
+                ReleaseNoteElementModel newReleaseNoteElement = new ReleaseNoteElementModel();
+                newReleaseNoteElement.setTargetId(newReleaseNoteParagraph.getOrCreateFirstId().getValue());
+                newReleaseNoteElement.setTargetRevisionId(newReleaseNoteParagraph.getOrCreateFirstRevisionId().getValue());
+                newReleaseNoteElement.setTargetUuid(newReleaseNoteParagraph.getOrCreateFirstUuid().getValue());
+                newReleaseNoteElementList.add(newReleaseNoteElement);
+                patchNodeModel.setReleaseNotesElement(newReleaseNoteElementList);
+            }
+            String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
+            String newApiReference = Files.readString(swaggerPath);
+
+            if (!currentApiReference.equals(newApiReference)) {
+                FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
+                patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
+            }
+
+            ObjectMapper mapper;
+            if(this.useJson) {
+                mapper = new ObjectMapper(new JsonFactory());
+            } else{
+                mapper = new ObjectMapper(new YAMLFactory());
+            }
+            var mapperNode = mapper.readTree(getSwaggerString(String.valueOf(swaggerPath)));
+            try {
+                var versionNode = mapperNode.findValue("version").toString();
+                StringValueModel version = new StringValueModel();
+                version.setValue(versionNode.replace("\"", ""));
+                List<StringValueModel> versionList = new ArrayList<>();
+                versionList.add(version);
+                patchNodeModel.setVersion(versionList);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+
+            Document newMainDocument = Jsoup
+                    .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
+            patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
+            patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
+            nodeClient.patch(nodeId, patchNodeModel);
+
+            System.out.println("Finished processing node: " + nodeId);
         }
-        String currentApiReference = apiReferenceFileClient.download(nodeModel.getOrCreateFirstSourceFile().getUrl());
-        String newApiReference = Files.readString(swaggerPath);
-
-        if (!currentApiReference.equals(newApiReference)) {
-            FileUploadModel apiReferenceModel = apiReferenceFileClient.upload(swaggerPath);
-            patchNodeModel.getOrCreateFirstSourceFile().setTargetId(apiReferenceModel.getFid().get(0).getValue());
-        }
-
-        ObjectMapper mapper;
-        if(this.useJson) {
-            mapper = new ObjectMapper(new JsonFactory());
-        } else{
-            mapper = new ObjectMapper(new YAMLFactory());
-        }
-        var mapperNode = mapper.readTree(getSwaggerString(String.valueOf(swaggerPath)));
-        try {
-            var versionNode = mapperNode.findValue("version").toString();
-            StringValueModel version = new StringValueModel();
-            version.setValue(versionNode.replace("\"", ""));
-            List<StringValueModel> versionList = new ArrayList<>();
-            versionList.add(version);
-            patchNodeModel.setVersion(versionList);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
-        Document newMainDocument = Jsoup
-                .parse(converter.convertMarkdownToHtml(Files.readString(mainFilePath)));
-        patchNodeModel.getOrCreateFirstListDescription().setValue(newMainDocument.body().html());
-        patchNodeModel.getOrCreateFirstListDescription().setFormat(TextFormat.BASIC_HTML);
-        nodeClient.patch(nodeId, patchNodeModel);
-
-        System.out.println("Finished processing node: " + nodeId);
 
         return 0;
+
     }
 
     private void updateReleaseNoteSection(String title, ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient, Validator validator, NodeModel nodeModel, NodeModel patchNodeModel, Element releaseNoteBody) throws Exception {
@@ -381,10 +402,10 @@ public class Update implements Callable<Integer> {
                 String md5 = imageClient.generateMd5Hash(imagePath);
                 Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                  image.attr("src", currentImage.attr("src"));
-                  image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
-                  image.attr("width", currentImage.attr("width"));
-                  image.attr("height", currentImage.attr("height"));
+                    image.attr("src", currentImage.attr("src"));
+                    image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("width", currentImage.attr("width"));
+                    image.attr("height", currentImage.attr("height"));
                 } else {
                     FileUploadModel imageModel = imageClient.upload(imagePath);
                     image.attr("src", imageModel.getOrCreateFirstUri().getUrl());
@@ -429,7 +450,7 @@ public class Update implements Callable<Integer> {
                     + ".markdown");
             checkIfFileExists(docPath);
             String faqSectionContent = Files.readString(docPath);
-            
+
             Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
 
             var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
@@ -438,7 +459,7 @@ public class Update implements Callable<Integer> {
             for (int j = 0; j < iterations; j++) {
                 FaqItemParagraphModel faqItemParagraphModel;
 
-                 if (j > faqItems.size() - 1) {
+                if (j > faqItems.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
                     var answerString = frontmatterFaq.get("answer-"+j);
                     faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(0));
@@ -495,48 +516,48 @@ public class Update implements Callable<Integer> {
 
 
     private void updateDownloadsSection (Path workingDir, Map<String, List<String>> frontmatterDownloads, ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient, DownloadFileClient downloadFileClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
-      var downloadElements = new ArrayList<>(nodeModel.getDownloadElements());
-      var keys = frontmatterDownloads.keySet();
-      var values = frontmatterDownloads.values().iterator();
-      String downloadsDirPath = workingDir.resolve(API_DOCS_DOWNLOADS_DIRECTORY).toString(); // api-docs/downloads
-      var keySetArray = keys.toArray();
+        var downloadElements = new ArrayList<>(nodeModel.getDownloadElements());
+        var keys = frontmatterDownloads.keySet();
+        var values = frontmatterDownloads.values().iterator();
+        String downloadsDirPath = workingDir.resolve(API_DOCS_DOWNLOADS_DIRECTORY).toString(); // api-docs/downloads
+        var keySetArray = keys.toArray();
 
 
-      for (var i = 0; i < keys.size(); i++) {
-        var downloadItemFile = keySetArray[i];
-        var downloadItemDescription = values.next().get(0);
-                
-        System.out.println("Updating paragraph: " + downloadItemDescription + " ...");
-        DownloadsElementParagraphModel downloadsParagraph;
+        for (var i = 0; i < keys.size(); i++) {
+            var downloadItemFile = keySetArray[i];
+            var downloadItemDescription = values.next().get(0);
 
-        Path downloadFilesPath = Paths.get(downloadsDirPath +"/" + downloadItemFile); //api-docs/downloads/example.json
-        FileUploadModel downloadModel = downloadFileClient.upload(downloadFilesPath); 
+            System.out.println("Updating paragraph: " + downloadItemDescription + " ...");
+            DownloadsElementParagraphModel downloadsParagraph;
 
-        
-         if (i > downloadElements.size() - 1) {
-          downloadsParagraph = DownloadsElementParagraphModel.create(downloadModel);
-          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
-          downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
-          downloadsParagraph = downloadsElementParagraphClient.post(downloadsParagraph);
-          downloadElements.add(new DownloadsModel(downloadsParagraph));             
-        } else {
-          downloadsParagraph = downloadsElementParagraphClient
-                  .get(downloadElements.get(i).getTargetId());
-          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
-          downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
-          downloadsParagraph.getOrCreateFirstDownloadFile().setTargetUuid(downloadModel.getUuid().get(0).getValue());
-          downloadsParagraph.getOrCreateFirstDownloadFile().setUrl(downloadModel.getUri().get(0).getValue());
-          downloadsElementParagraphClient.patch(downloadsParagraph);
-        }  
-        System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
-        System.out.println("Finished processing paragraph: " + downloadsParagraph.id());
-      }   
-      if(keys.size() < downloadElements.size()){
-        for(var d = downloadElements.size(); d > keys.size(); d--){
-          downloadElements.remove(d - 1);
+            Path downloadFilesPath = Paths.get(downloadsDirPath +"/" + downloadItemFile); //api-docs/downloads/example.json
+            FileUploadModel downloadModel = downloadFileClient.upload(downloadFilesPath);
+
+
+            if (i > downloadElements.size() - 1) {
+                downloadsParagraph = DownloadsElementParagraphModel.create(downloadModel);
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
+                downloadsParagraph = downloadsElementParagraphClient.post(downloadsParagraph);
+                downloadElements.add(new DownloadsModel(downloadsParagraph));
+            } else {
+                downloadsParagraph = downloadsElementParagraphClient
+                        .get(downloadElements.get(i).getTargetId());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetUuid(downloadModel.getUuid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setUrl(downloadModel.getUri().get(0).getValue());
+                downloadsElementParagraphClient.patch(downloadsParagraph);
+            }
+            System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
+            System.out.println("Finished processing paragraph: " + downloadsParagraph.id());
         }
-      }
-      patchNodeModel.setDownloadElements(downloadElements);   
+        if(keys.size() < downloadElements.size()){
+            for(var d = downloadElements.size(); d > keys.size(); d--){
+                downloadElements.remove(d - 1);
+            }
+        }
+        patchNodeModel.setDownloadElements(downloadElements);
     }
 
 
@@ -600,8 +621,63 @@ public class Update implements Callable<Integer> {
     }
 
     public static void checkIfFileExists(Path filePath) {
-      if (!Files.exists(filePath)) {
-        throw new IllegalStateException("File " + filePath + " not found");
-      } 
+        if (!Files.exists(filePath)) {
+            throw new IllegalStateException("File " + filePath + " not found");
+        }
+    }
+
+    public static ArrayList<String> compareLanguagesData(List<TranslationModel> translations, Path workingBaseDir) throws Exception {
+        List<TranslationModel> languagesList = translations;
+        ArrayList<String> pageLanguages = new ArrayList<>();
+        ArrayList<String> localLangFolders = getTranslationFolders(workingBaseDir);
+
+        for(TranslationModel translation: languagesList) {
+            pageLanguages.add(translation.getLangcode());
+        }
+
+        boolean languageSetMatched = true;
+        ArrayList<String> missingLanguages = new ArrayList<>();
+
+        for (String lang:pageLanguages) {
+            if(!localLangFolders.contains(lang)) {
+                languageSetMatched = false;
+                missingLanguages.add(lang);
+            }
+        }
+
+        if(!languageSetMatched) {
+            String missingLangsString = createMissingLanguagesString(missingLanguages);
+            throw new Exception ("The following translations are missing from the local working directory: " + missingLangsString);
+        }
+
+        return pageLanguages;
+    }
+
+    public static ArrayList<String> getTranslationFolders(Path workingBaseDir) {
+        ArrayList<String> subDirectories = new ArrayList<String>();
+
+        File file = new File(workingBaseDir.toString());
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        for (String dir: directories) {
+            subDirectories.add(dir);
+        }
+
+        return subDirectories;
+    }
+
+    public static String createMissingLanguagesString(ArrayList<String> languages) {
+        String missingLanguages = "";
+        for(String lang:languages) {
+            missingLanguages += lang + ", ";
+        }
+        missingLanguages = missingLanguages.substring(0, missingLanguages.length() - 1);
+        missingLanguages = missingLanguages.substring(0, missingLanguages.length() - 1);
+        return missingLanguages;
     }
 }
+
