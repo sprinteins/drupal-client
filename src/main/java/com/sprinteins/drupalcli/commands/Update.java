@@ -657,12 +657,10 @@ public class Update implements Callable<Integer> {
         ArrayList<String> subDirectories = new ArrayList<String>();
 
         File file = new File(workingBaseDir.toString());
-        String[] directories = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
+        if (file == null) {
+            throw new IllegalStateException("There aren't any directories by that path");
+        }
+        String[] directories = file.list((current, name) -> new File(current, name).isDirectory());
         for (String dir: directories) {
             subDirectories.add(dir);
         }
