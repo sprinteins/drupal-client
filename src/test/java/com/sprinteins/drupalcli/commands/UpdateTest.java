@@ -18,8 +18,6 @@ import java.util.Objects;
 
 import static com.sprinteins.drupalcli.commands.Update.*;
 import static com.sprinteins.drupalcli.commands.Update.compareLanguagesData;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-
 
 public class UpdateTest {
 
