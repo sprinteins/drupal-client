@@ -105,7 +105,7 @@ public class Update implements Callable<Integer> {
 
         if(!translationsListModel.validate(langcodeInput)){
             throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ translationsListModel.printValues());
-        };
+        }
 
         ArrayList<String> translationsSet = new ArrayList<>();
         if (updateAllLanguages) {
@@ -627,11 +627,10 @@ public class Update implements Callable<Integer> {
     }
 
     public static ArrayList<String> compareLanguagesData(List<TranslationModel> translations, Path workingBaseDir) throws Exception {
-        List<TranslationModel> languagesList = translations;
         ArrayList<String> pageLanguages = new ArrayList<>();
         ArrayList<String> localLangFolders = getTranslationFolders(workingBaseDir);
 
-        for(TranslationModel translation: languagesList) {
+        for(TranslationModel translation: translations) {
             pageLanguages.add(translation.getLangcode());
         }
 
@@ -661,6 +660,9 @@ public class Update implements Callable<Integer> {
             throw new IllegalStateException("There aren't any directories by that path");
         }
         String[] directories = file.list((current, name) -> new File(current, name).isDirectory());
+        if (directories == null) {
+            throw new IllegalStateException("There aren't any directories by that path");
+        }
         for (String dir: directories) {
             subDirectories.add(dir);
         }
@@ -669,13 +671,13 @@ public class Update implements Callable<Integer> {
     }
 
     public static String createMissingLanguagesString(ArrayList<String> languages) {
-        String missingLanguages = "";
+        StringBuilder missingLanguages = new StringBuilder();
         for(String lang:languages) {
-            missingLanguages += lang + ", ";
+            StringBuilder append = missingLanguages.append(lang).append(", ");
         }
-        missingLanguages = missingLanguages.substring(0, missingLanguages.length() - 1);
-        missingLanguages = missingLanguages.substring(0, missingLanguages.length() - 1);
-        return missingLanguages;
+        missingLanguages = new StringBuilder(missingLanguages.substring(0, missingLanguages.length() - 1));
+        missingLanguages = new StringBuilder(missingLanguages.substring(0, missingLanguages.length() - 1));
+        return missingLanguages.toString();
     }
 }
 

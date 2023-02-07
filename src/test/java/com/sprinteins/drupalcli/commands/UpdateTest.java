@@ -1,13 +1,24 @@
 package com.sprinteins.drupalcli.commands;
 
+import com.sprinteins.drupalcli.translations.TranslationModel;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+
+import static com.sprinteins.drupalcli.commands.Update.*;
+import static com.sprinteins.drupalcli.commands.Update.compareLanguagesData;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 
 public class UpdateTest {
@@ -92,5 +103,38 @@ public class UpdateTest {
 
         boolean valid = update.validate(test.toString());
         Assertions.assertFalse(valid);
+    }
+
+    @Test
+    void testGetTranslationFolders() {
+        Path pathToTestFolderDir = Paths.get("src/test/resources/testFolderTranslations");
+        ArrayList<String> expectedValue = new ArrayList<>(Arrays.asList("de", "en"));
+        var actualValue = getTranslationFolders(pathToTestFolderDir);
+        Assertions.assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    void testCreateMissingLanguagesString() {
+        ArrayList<String> testLanguages = new ArrayList<>(Arrays.asList("de", "it"));
+        String expectedValue = "de, it";
+        String actualValue = createMissingLanguagesString(testLanguages);
+        Assertions.assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    void testCompareLanguagesData() throws Exception {
+        TranslationModel model = new TranslationModel();
+        model.setLangcode("de");
+        TranslationModel model2 = new TranslationModel();
+        model2.setLangcode("en");
+        List<TranslationModel> translations = new ArrayList<>();
+        translations.add(model);
+        translations.add(model2);
+        Path testPathTranslation = Paths.get("src/test/resources/testFolderTranslations");
+
+        ArrayList<String> expectedValue = new ArrayList<>(Arrays.asList("de", "en"));
+        ArrayList<String> actualValue = compareLanguagesData(translations, testPathTranslation);
+
+        Assertions.assertEquals(expectedValue, actualValue);
     }
 }
