@@ -673,7 +673,7 @@ public class Update implements Callable<Integer> {
     public static String createMissingLanguagesString(ArrayList<String> languages) {
         StringBuilder missingLanguages = new StringBuilder();
         for(String lang:languages) {
-            StringBuilder append = missingLanguages.append(lang).append(", ");
+                missingLanguages.append(lang).append(", ");
         }
         missingLanguages = new StringBuilder(missingLanguages.substring(0, missingLanguages.length() - 1));
         missingLanguages = new StringBuilder(missingLanguages.substring(0, missingLanguages.length() - 1));
