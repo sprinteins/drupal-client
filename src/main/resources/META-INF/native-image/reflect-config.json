@@ -266,7 +266,7 @@
   "allDeclaredConstructors":true
 },
 {
-  "name":"com.sprinteins.drupalcli.translations.LanguageComparisonRecord",
+  "name":"com.sprinteins.drupalcli.translations.LanguageComparisonResult",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true
