@@ -15,12 +15,12 @@ public class LanguagesComparer {
         directory = directoryPath;
     }
 
-    public LanguageComparisonRecord compareLanguages() {
+    public LanguageComparisonResult compareLanguages() {
         boolean isLanguageSetsMatch = compareLanguageSets();
         if (!isLanguageSetsMatch){
-            return new LanguageComparisonRecord(false, getMissingLanguages());
+            return new LanguageComparisonResult(false, getMissingLanguages());
         }
-        return new LanguageComparisonRecord(true);
+        return new LanguageComparisonResult(true);
     }
     private ArrayList<String> getTranslationFolders() {
         ArrayList<String> localLangDirectories = new ArrayList<>();
