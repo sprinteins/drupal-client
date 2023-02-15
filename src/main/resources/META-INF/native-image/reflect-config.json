@@ -266,6 +266,18 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.translations.LanguageComparisonResult",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.LanguagesComparer",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.translations.TranslationModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
