@@ -1,6 +1,7 @@
 package com.sprinteins.drupalcli.paragraph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import com.sprinteins.drupalcli.fields.SourceFileModel;
 import com.sprinteins.drupalcli.fields.TypeModel;
 import com.sprinteins.drupalcli.fieldtypes.TargetId;
 import com.sprinteins.drupalcli.file.FileUploadModel;
+import org.yaml.snakeyaml.scanner.Constant;
 
 public class DownloadsElementParagraphModel extends ParagraphModel {
 
@@ -28,11 +30,10 @@ public class DownloadsElementParagraphModel extends ParagraphModel {
 
   @JsonIgnore
   public SourceFileModel getOrCreateFirstDownloadFile() {
-      if (downloadableFiles == null) {
-          downloadableFiles = new ArrayList<>();
-      }
-      if (downloadableFiles.isEmpty()) {
-          downloadableFiles.add(new SourceFileModel());
+      if (downloadableFiles == null || downloadableFiles.isEmpty()) {
+          downloadableFiles = new ArrayList<SourceFileModel>();
+          SourceFileModel sourceFileModel =  new SourceFileModel();
+          downloadableFiles.add(sourceFileModel);
       }
       return downloadableFiles.get(0);
   }
