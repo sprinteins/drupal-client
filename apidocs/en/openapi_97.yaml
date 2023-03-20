@@ -1,0 +1,2489 @@
+---
+openapi: 3.0.1
+info:
+  title: Print-Mailing Targeting API
+  description: The Target Group Selection API enables the user to make a selection
+    of delivery districts based on addresses and/or coordinates, and thus configure
+    the best suited delivery area for his advertising materials.
+  contact:
+    name: Technical Support
+    email: it-csp@deutschepost.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+  version: 20230317.825.25-440-ec34b32
+servers:
+- url: https://api-eu.dhl.com/post/advertising/print-mailing
+  description: Production environment
+- url: https://api-uat.dhl.com/post/advertising/print-mailing
+  description: Test environment
+tags:
+- name: authentication
+  description: Get access tokens for Print-Mailing Automation services
+- name: lookups
+  description: Lists static request oder response values of other API resources
+- name: Selection
+  description: This authenticated and customer specific selection endpoints can be
+    used to prepare a selection for further use (store, booking ...). All requests
+    need authentication via JWT.
+- name: Temporary selection
+  description: This temporary selection can be used to explore the data provided by
+    this API, but not to directly proceed to order a print mailing. For these requests,
+    it is necessary to preserve the set cookies between requests to ensure the correct
+    routing.
+paths:
+  "/user/v1/authentication/postshoplogin":
+    post:
+      tags:
+      - authentication
+      summary: Retrieve a dm access token for a registered user from the Post Shop.
+      operationId: loginPostShopUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreatePostShopLoginRep"
+        required: true
+      responses:
+        '200':
+          description: Successfully generated a new access token. Find it in the response
+            'jwtToken'.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenRep"
+        '403':
+          description: If a private user tries to login (DM_CUS_0001), or customerEkp
+            is different from the one already saved in customer data (DM_CUS_0003).
+  "/user/v1/authentication/partnersystem/tokenbased":
+    post:
+      tags:
+      - authentication
+      summary: Retrieve a dm access token for a registered user from a partner system
+        using token based authentication.
+      operationId: loginPartnerSystemTokenBased
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreatePartnerSystemLoginRep"
+        required: true
+      responses:
+        '200':
+          description: Successfully generated a new access token. Find it in the response
+            'jwtToken'.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenRep"
+        '404':
+          description: Resource not found. DM_GA_0008 if the partner system is unknown
+            / is not active.
+        '422':
+          description: Unprocessable entity. DM_GA_0009 if token has expired. DM_GA_0010
+            if token signature is invalid. DM_GA_0011 if token was issued in the future.
+            DM_CO_0006 if token cannot be decoded.
+  "/user/v1/authentication/partnersystem/credentialsbased":
+    post:
+      tags:
+      - authentication
+      summary: Retrieve a dm access token for a registered user from a partner system
+        using credential based authentication.
+      operationId: loginPartnerSystemCredentialBased
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreatePartnerSystemTokenRep"
+        required: true
+      responses:
+        '200':
+          description: Successfully generated a new access token. Find it in the response
+            'jwtToken'.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenRep"
+        '404':
+          description: If the partner system and customer combination is not foundor
+            the partner system is inactive or the partner system customer is inactive.
+            (DM_GA_0008)
+        '422':
+          description: If the authentication secret is wrong. (DM_CO_0011)
+  "/user/v1/authentication/businesslogin":
+    post:
+      tags:
+      - authentication
+      summary: Retrieve a jwt for a business login.
+      operationId: loginBusinessUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateBusinessLoginRep"
+        required: true
+      responses:
+        '200':
+          description: Successfully generated a new jwt. Find it in the response 'jwtToken'.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenRep"
+  "/user/v1/customererrorcodelookups":
+    get:
+      tags:
+      - lookups
+      summary: Retrieve all error code lookups for this service.
+      description: A lookup consists of an id and an internationalized label. It is
+        used to communicate possible values for specific objects to the api caller.
+      operationId: getAllCustomerErrorCodeLookups
+      responses:
+        '200':
+          description: All available error code lookup values per lookup.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/ValueLabelPairRep"
+  "/user/v1/authentication/reauth":
+    get:
+      tags:
+      - authentication
+      summary: Creates a new jwt with the maximum period of validity for the currently
+        logged in user. You must call this method with a valid token in the authentication
+        header
+      operationId: reauth
+      responses:
+        '200':
+          description: Successfully generated a new jwt. Find it in the response 'jwtToken'
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TokenRep"
+  "/targeting/v1/selections/{selectionId}/filters":
+    put:
+      tags:
+      - Temporary selection
+      summary: Update a selections filters.
+      operationId: changeFilters
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                "$ref": "#/components/schemas/PotentialFilter"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/zone/search":
+    post:
+      tags:
+      - Data
+      summary: Get a list of zone information by a zone search.
+      operationId: searchZone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegionZoneSearchBody"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/selections":
+    post:
+      tags:
+      - Temporary selection
+      summary: Creates a new selection inside the cache
+      description: Creates a new selection in cache and returns it
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SelectionRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/selections/{selectionId}/save":
+    post:
+      tags:
+      - Temporary selection
+      description: Saves a selection and returns an ID and date of removal.
+      operationId: saveSelection
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Permalink"
+  "/targeting/v1/selections/{selectionId}/areacodes/files":
+    post:
+      tags:
+      - Temporary selection
+      summary: Update a selection with a file upload.
+      description: Updates the selection via file upload. Only available for POSTAL_CODE
+        and DELIVERY_DISTRICT
+      operationId: uploadFiles
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: threshold
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/selections/load":
+    post:
+      tags:
+      - Temporary selection
+      description: Loads a selection for further editing, returns a new ID to the
+        selection and meta information.
+      operationId: loadSelection
+      parameters:
+      - name: permalinkid
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/region/search":
+    post:
+      tags:
+      - Data
+      description: Request a region shape based on the provided search body
+      operationId: searchRegion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegionZoneSearchBody"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/postal-code/search":
+    post:
+      tags:
+      - Data
+      description: Request postal-code shapes based on the provided search body.
+      operationId: searchPostalCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SearchBody"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/postal-code/files":
+    post:
+      tags:
+      - Data
+      summary: Get a list of shapes with a shape file in zip format or a kml file
+        upload.
+      operationId: uploadFiles_1
+      parameters:
+      - name: threshold
+        in: query
+        description: Defines the minimum size of the intersection between input feature
+          and database feature.
+        required: false
+        schema:
+          type: number
+          format: double
+          default: 50.0
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: Multipart form data with a shape zip or kml file in
+                    the 'file' field.
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FileFeatures"
+  "/targeting/v1/postal-code/costs":
+    post:
+      tags:
+      - Data
+      description: Retrieves the number of households based on the filters, product
+        and area codes given
+      operationId: costs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CostsRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CostsResponse"
+  "/targeting/v1/permalinks":
+    post:
+      tags:
+      - Permalink
+      summary: Saves a new selection as permalink in the database
+      description: Saves a new selection and returns the permalink id
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SelectionRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/Permalink"
+  "/targeting/v1/neighbourhood/search":
+    post:
+      tags:
+      - Data
+      description: Request a neighbourhood shape based on the provided search body.
+      operationId: searchNeighbourhood
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SearchBody"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/neighbourhood/search/{neighbourhood}":
+    post:
+      tags:
+      - Data
+      description: Get a list of neighbourhood ids by a neighbourhood prefix.
+      operationId: searchNeighbourhoodSuggestion
+      parameters:
+      - name: neighbourhood
+        in: path
+        required: true
+        schema:
+          pattern: "^[\\w%\\-\\(\\),&'.\\/]+$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/JsonNode"
+  "/targeting/v1/neighbourhood/costs":
+    post:
+      tags:
+      - Data
+      description: Retrieves the number of households based on the filters, product
+        and area codes given
+      operationId: costs_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CostsRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CostsResponse"
+  "/targeting/v1/delivery-district/search":
+    post:
+      tags:
+      - Data
+      description: Request a delivery-district shape based on the provided search
+        body.
+      operationId: searchDeliveryDistrict
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SearchBody"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/delivery-district/files":
+    post:
+      tags:
+      - Data
+      summary: Get a list of shapes with a shape file in zip format or a kml file
+        upload.
+      operationId: uploadFiles_2
+      parameters:
+      - name: threshold
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+          default: 50.0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: Multipart form data with a shape zip or kml file in
+                    the 'file' field.
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FileFeatures"
+  "/targeting/v1/delivery-district/costs":
+    post:
+      tags:
+      - Data
+      description: Retrieves the number of households based on the filters, product
+        and area codes given
+      operationId: costs_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CostsRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CostsResponse"
+  "/targeting/v1/customers/{customerId}/selections":
+    get:
+      tags:
+      - Selection
+      summary: List selection of a specific customer
+      description: List the stored selections for a customer. Can only be accessed
+        by valid token for that customerId.
+      operationId: list
+      parameters:
+      - name: customerId
+        in: path
+        description: The customer id to identify the requested selections.
+        required: true
+        schema:
+          type: string
+          description: The customer id to identify the requested selections.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserSelection"
+    post:
+      tags:
+      - Selection
+      summary: Create a new selection for a customer
+      description: Saves a new selection for the customer and returns the id. Can
+        only be accessed by valid token for that customerId.
+      operationId: create_2
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SelectionRequest"
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSelection"
+  "/targeting/v1/selections/{selectionId}/product":
+    patch:
+      tags:
+      - Temporary selection
+      summary: Update a selection detail level.
+      operationId: changeProduct
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              enum:
+              - POSTAKTUELL_DAILY_MAIL
+              - POSTAKTUELL_ALL
+              - POSTWURF_SPEZIAL
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/selections/{selectionId}/detaillevel":
+    patch:
+      tags:
+      - Temporary selection
+      summary: Update a selection detail level.
+      operationId: changeDetailLevel
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              enum:
+              - POSTAL_CODE
+              - DELIVERY_DISTRICT
+              - NEIGHBOURHOOD
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/selections/{selectionId}/areacodes":
+    patch:
+      tags:
+      - Temporary selection
+      summary: Update a selection.
+      description: Adds or removed given area-codes to the selection. Duplicates in
+        the provided list or IDs already part of the selection are ignored.
+      operationId: addOrRemoveCodes
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/PatchSelection"
+        required: true
+      responses:
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AddRemoveResult"
+  "/targeting/v1/customers/{customerId}/selections/{selectionId}":
+    get:
+      tags:
+      - Selection
+      summary: Get a stored selection by the id for a specific customer
+      description: Get a stored selection by id for a customer. Can only be accessed
+        by valid token for that customerId.
+      operationId: get_1
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: recalculate
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: No selection found.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+    delete:
+      tags:
+      - Selection
+      summary: Deletes a selection
+      description: Deletes a selection and returns HTTP 200. Can only be accessed
+        by valid token for that customerId.
+      operationId: delete_1
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json: {}
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+    patch:
+      tags:
+      - Selection
+      summary: Update a selection
+      description: Updates a selection and returns the id. Can only be accessed by
+        valid token for that customerId.
+      operationId: update
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SelectionRequest"
+        required: true
+      responses:
+        '404':
+          description: No selection found.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSelection"
+  "/targeting/v1/customers/{customerId}/selections/{selectionId}/name":
+    patch:
+      tags:
+      - Selection
+      summary: Updates the name of a selection
+      description: Updates the name of a selection and returns the id. Can only be
+        accessed by valid token for that customerId.
+      operationId: updateName
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"name","my selection"}'
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+  "/targeting/v1/pws-filter":
+    options:
+      tags:
+      - lookups
+      description: Returns all supported filters with their options including human
+        readable names
+      operationId: filters
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/SupportedFilter"
+  "/targeting/v1/zone":
+    get:
+      tags:
+      - Data
+      summary: Get geometric information for all zones.
+      operationId: getAllZones
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/JsonNode"
+  "/targeting/v1/zone/{zone}":
+    get:
+      tags:
+      - Data
+      description: Request all or a specific zone shape/s (10)
+      operationId: getByZone
+      parameters:
+      - name: zone
+        in: path
+        required: true
+        schema:
+          pattern: "^[0-9]$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/selections/{selectionId}":
+    get:
+      tags:
+      - Temporary selection
+      summary: Returns a selection by ID from cache
+      description: Returns information about the provided selection ID stored in cache
+      operationId: read
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: detailLevel
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD
+      - name: level
+        in: query
+        required: false
+        schema:
+          type: string
+          default: META
+          enum:
+          - DETAIL
+          - META
+      - name: itemWeightInGram
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SelectionSummary"
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+    delete:
+      tags:
+      - Temporary selection
+      summary: Removes a selection from cache
+      description: Removes the selection from cache
+      operationId: delete
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  "/targeting/v1/selections/{selectionId}/pam-export":
+    get:
+      tags:
+      - Temporary selection
+      description: Exports given selection to CSV which can be imported into PAM
+      operationId: exportSelectionToPamCsv
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            text/csv:
+              schema:
+                type: string
+              example: |-
+                postal code;delivery district;neighbourhood;tariff zone a;tariff zone b
+                84416;;OT Gruppe Taufkirchen (Vils) 84416 Taufkirchen;0;820
+                73453;;OT Gruppe Abtsgmünd 73453 Abtsgmünd;0;382
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+  "/targeting/v1/selections/{selectionId}/dispatch-information":
+    get:
+      tags:
+      - Temporary selection
+      description: Request information that can be used in conjunction with the Dispatch
+        Preparation API.
+      operationId: getDispatchInformation
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DisPaApiRep"
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+  "/targeting/v1/search":
+    get:
+      tags:
+      - Data
+      description: Searches for the given query and delivers a maximum of 10 results
+      operationId: search
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/SearchSummary"
+  "/targeting/v1/region/{region}":
+    get:
+      tags:
+      - Data
+      description: Request a region shape based on the provided id.
+      operationId: getByRegion
+      parameters:
+      - name: region
+        in: path
+        required: true
+        schema:
+          pattern: "^[0-9]{2}$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/postal-code/{postal-code}":
+    get:
+      tags:
+      - Data
+      description: Request a postal-code shape based on the provided id.
+      operationId: getPostalCode
+      parameters:
+      - name: postal-code
+        in: path
+        required: true
+        schema:
+          pattern: "^[0-9]{5}$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/permalinks/{permalinkId}":
+    get:
+      tags:
+      - Permalink
+      summary: Get the persistent selection of the permalink id
+      description: Get a selection from the permalink id
+      operationId: get
+      parameters:
+      - name: permalinkId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/MetaSelectionSummary"
+  "/targeting/v1/neighbourhood/{neighbourhood}":
+    get:
+      tags:
+      - Data
+      description: Request a neighbourhood shape based on the provided id.
+      operationId: getNeighbourhood
+      parameters:
+      - name: neighbourhood
+        in: path
+        required: true
+        schema:
+          pattern: "^[0-9]+$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/errorcode-lookups":
+    get:
+      tags:
+      - lookups
+      description: A lookup consists of an id and a label. It is used to communicate
+        possible error codes
+      operationId: getErrorMessages
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ErrorModel"
+  "/targeting/v1/delivery-district/{delivery-district}":
+    get:
+      tags:
+      - Data
+      description: Request a delivery-district shape based on the provided query parameter.
+      operationId: getDeliveryDistrict
+      parameters:
+      - name: delivery-district
+        in: path
+        required: true
+        schema:
+          pattern: "^[0-9]{5}-[0-9]{2}$"
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/delivery-district/search/{query}":
+    get:
+      tags:
+      - Data
+      description: Get a list of possible delivery districts based on the query given.
+      operationId: getSuggestionsByQuery
+      parameters:
+      - name: query
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Feature"
+  "/targeting/v1/customers/{customerId}/selections/{selectionId}/packaging":
+    get:
+      tags:
+      - Selection
+      summary: Get information's for packaging of the selection
+      description: Request all information for packaging the selection (only for product
+        POSTAKTUELL). Can only be accessed by valid token for that customerId.
+      operationId: getPackagingInformation
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: packaging
+        in: query
+        required: false
+        schema:
+          type: string
+          default: DELIVERY_BASE
+          enum:
+          - DELIVERY_DISTRICT
+          - DELIVERY_BASE
+      responses:
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/PackagingSelectionSummary"
+  "/targeting/v1/customers/{customerId}/selections/{selectionId}/dispatch-information":
+    get:
+      tags:
+      - Selection
+      summary: Request a summary about the information to dispatch the selection
+      description: Request all information for future dispatching the selection. Can
+        only be accessed by valid token for that customerId.
+      operationId: getDispatchInformation_1
+      parameters:
+      - name: selectionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DisPaApiRep"
+        '404':
+          description: No selection found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponseRep"
+              example:
+                timestamp: '2021-02-10T12:34:06.203Z'
+                status: 404
+                correlationId: a5fe243a-05bc-4a55-ae03-02bc34d43f9a
+                error: Not Found
+                errors:
+                - errorCode: DM_CO_0008
+                  errorMessage: 'Ein Datensatz konnte nicht gefunden werden: 41d709d6-3a6-41e2-89d6-da51a4a07f96.'
+                  arguments:
+                  - 41d709d6-3a6-41e2-89d6-da51a4a07f96
+                  fieldName: 
+components:
+  schemas:
+    CreatePostShopLoginRep:
+      required:
+      - jwtToken
+      type: object
+      properties:
+        jwtToken:
+          type: string
+          description: The json web token generated by the post shop as plain text.
+      description: The postshop login data.
+    TokenRep:
+      type: object
+      properties:
+        jwtToken:
+          type: string
+          description: The DM-Suite token.
+    CreatePartnerSystemLoginRep:
+      required:
+      - jwtToken
+      type: object
+      properties:
+        jwtToken:
+          type: string
+          description: The json web token generated by a partner system
+      description: The token based partner system login data.
+    CreatePartnerSystemTokenRep:
+      required:
+      - authenticationSecret
+      - locale
+      - partnerSystemCustomerIdExt
+      - partnerSystemIdExt
+      type: object
+      properties:
+        partnerSystemIdExt:
+          type: string
+          description: The external partner system ID.
+        partnerSystemCustomerIdExt:
+          maxLength: 60
+          minLength: 0
+          type: string
+          description: The external partner system customer ID.
+        authenticationSecret:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: The authentication secret.
+        locale:
+          type: string
+          description: The locale.
+      description: The partner system login data.
+    CreateBusinessLoginRep:
+      required:
+      - locale
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user to login.
+        password:
+          type: string
+          description: The password of the user to login.
+        locale:
+          type: string
+          description: The locale used for subsequent requests (e.g. 'de' or 'en').
+      description: The business login data.
+    ValueLabelPairRep:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+    ErrorRep:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+        arguments:
+          type: array
+          items:
+            type: object
+        fieldName:
+          type: string
+      xml:
+        name: error
+    ErrorResponseRep:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+          format: int32
+        correlationId:
+          type: string
+        error:
+          type: string
+        errors:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ErrorRep"
+      xml:
+        name: errorResponse
+    PotentialFilter:
+      type: object
+      properties:
+        id:
+          type: string
+          example: k_kaufkr_kombi
+        options:
+          type: array
+          example:
+          - '4'
+          items:
+            type: string
+            example: '["4"]'
+      description: Filter for PWS
+    AreaCodeInformation:
+      type: object
+      properties:
+        areaCode:
+          type: string
+        households:
+          type: integer
+          format: int32
+      example:
+      - areacode: '48231'
+        households: 47877
+    MetaSelectionSummary:
+      type: object
+      properties:
+        meta:
+          "$ref": "#/components/schemas/MetaSummary"
+        areaCodes:
+          uniqueItems: true
+          type: array
+          example:
+          - '48231'
+          - '47877'
+          items:
+            type: string
+            example: '["48231","47877"]'
+        areaCodeHouseholdDifferences:
+          uniqueItems: true
+          type: array
+          example:
+          - areacode: '48231'
+            households: 47877
+          items:
+            "$ref": "#/components/schemas/AreaCodeInformation"
+      description: Response describing a selection
+    MetaSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f36ac95d-d412-43ad-947b-29f2e3ddb249
+        customerId:
+          type: string
+          example: '1234'
+        name:
+          type: string
+          example: MySelection
+        type:
+          type: string
+          example: POSTAL_CODE
+          enum:
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD
+          - REGION
+          - ZONE
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD
+        productType:
+          type: string
+          example: POSTAKTUELL_DAILY_MAIL
+          enum:
+          - POSTAKTUELL_DAILY_MAIL
+          - POSTAKTUELL_ALL
+          - POSTWURF_SPEZIAL
+        numberOfAreas:
+          type: integer
+          format: int32
+          example: 2
+        netQuantity:
+          type: integer
+          format: int32
+          example: 1179
+        quantity:
+          type: integer
+          format: int32
+          example: 826
+        itemWeightInGram:
+          type: integer
+          format: int32
+          example: 20
+        itemsPerPackage:
+          type: integer
+          format: int32
+          example: 500
+        tolerance:
+          type: integer
+          format: int32
+          example: 0
+        roundOff:
+          type: integer
+          format: int32
+          example: 20
+        dataVersion:
+          type: string
+          example: '2021-08-18T09:01:24.665844'
+        filters:
+          type: array
+          items:
+            "$ref": "#/components/schemas/PotentialFilter"
+        filterCosts:
+          type: integer
+          format: int32
+      description: Meta information of a selection
+    Coordinate:
+      required:
+      - latitude
+      - longitude
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 50.6789
+        longitude:
+          type: number
+          format: double
+          example: 6.2345
+        distance:
+          type: integer
+          description: search radius in kilometres around the given coordinates
+          format: int32
+          example: 5
+    RegionZoneSearchBody:
+      type: object
+      properties:
+        regions:
+          type: array
+          items:
+            type: string
+        zones:
+          type: array
+          example:
+          - '6'
+          items:
+            type: string
+            example: '["6"]'
+        coordinates:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Coordinate"
+      description: Request with multiple options
+    Feature:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '45958'
+        type:
+          type: string
+          example: Feature
+        properties:
+          "$ref": "#/components/schemas/FeatureProperties"
+        geometry:
+          "$ref": "#/components/schemas/FeatureGeometry"
+    FeatureCentroid:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Point
+        coordinates:
+          maxLength: 2
+          minLength: 2
+          type: array
+          properties:
+            empty:
+              type: boolean
+          example:
+          - 7.083297877833819
+          - 50.71886197143952
+          items:
+            maxLength: 2
+            minLength: 2
+            type: number
+            format: double
+    FeatureCoordinate:
+      maxLength: 2
+      minLength: 2
+      type: array
+      properties:
+        empty:
+          type: boolean
+      description: Multipolygon shape
+      example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+      items:
+        maxLength: 2
+        minLength: 2
+        type: number
+        description: Multipolygon shape
+        format: double
+    FeatureGeometry:
+      type: object
+      properties:
+        type:
+          type: string
+          example: MultiPolygon
+        coordinates:
+          type: array
+          properties:
+            empty:
+              type: boolean
+          description: Multipolygon shape
+          example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+          items:
+            type: array
+            properties:
+              empty:
+                type: boolean
+            description: Multipolygon shape
+            example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+            items:
+              type: array
+              properties:
+                empty:
+                  type: boolean
+              description: Multipolygon shape
+              example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+              items:
+                maxLength: 2
+                minLength: 2
+                type: array
+                properties:
+                  empty:
+                    type: boolean
+                description: Multipolygon shape
+                example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+                items:
+                  maxLength: 2
+                  minLength: 2
+                  type: number
+                  description: Multipolygon shape
+                  format: double
+    FeatureLineString:
+      type: array
+      properties:
+        empty:
+          type: boolean
+      description: Multipolygon shape
+      example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+      items:
+        maxLength: 2
+        minLength: 2
+        type: array
+        properties:
+          empty:
+            type: boolean
+        description: Multipolygon shape
+        example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+        items:
+          maxLength: 2
+          minLength: 2
+          type: number
+          description: Multipolygon shape
+          format: double
+    FeatureMultiPolygon:
+      type: array
+      properties:
+        empty:
+          type: boolean
+      description: Multipolygon shape
+      example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+      items:
+        type: array
+        properties:
+          empty:
+            type: boolean
+        description: Multipolygon shape
+        example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+        items:
+          type: array
+          properties:
+            empty:
+              type: boolean
+          description: Multipolygon shape
+          example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+          items:
+            maxLength: 2
+            minLength: 2
+            type: array
+            properties:
+              empty:
+                type: boolean
+            description: Multipolygon shape
+            example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+            items:
+              maxLength: 2
+              minLength: 2
+              type: number
+              description: Multipolygon shape
+              format: double
+    FeaturePolygon:
+      type: array
+      properties:
+        empty:
+          type: boolean
+      description: Multipolygon shape
+      example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+      items:
+        type: array
+        properties:
+          empty:
+            type: boolean
+        description: Multipolygon shape
+        example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+        items:
+          maxLength: 2
+          minLength: 2
+          type: array
+          properties:
+            empty:
+              type: boolean
+          description: Multipolygon shape
+          example: "[[[7.097201732382503,50.71886197143952],[...],...]]"
+          items:
+            maxLength: 2
+            minLength: 2
+            type: number
+            description: Multipolygon shape
+            format: double
+    FeatureProperties:
+      type: object
+      properties:
+        id:
+          type: string
+          description: '45958'
+        centroid:
+          "$ref": "#/components/schemas/FeatureCentroid"
+        neighbourhood:
+          type: string
+          example: Poppelsdorf
+        city:
+          type: string
+          example: Bonn
+        region:
+          type: string
+          example: '53'
+        zone:
+          type: string
+          example: '5'
+        hh:
+          type: integer
+          description: number of households
+          format: int32
+          example: 122
+        postal_code:
+          type: string
+          example: '53115'
+        zbn:
+          type: string
+          description: Zustellbezirksnummer - Delivery District ID
+          example: 53115-01
+    SelectionRequest:
+      type: object
+      properties:
+        name:
+          maxLength: 50
+          pattern: "^.{0,50}$"
+          type: string
+          example: my selection
+        detailLevel:
+          type: string
+          example: POSTAL_CODE
+          enum:
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD
+          - REGION
+          - ZONE
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD
+        areaCodes:
+          uniqueItems: true
+          type: array
+          example:
+          - '48231'
+          items:
+            type: string
+            example: '["48231"]'
+        product:
+          type: string
+          example: POSTAKTUELL_DAILY_MAIL
+          enum:
+          - POSTAKTUELL_DAILY_MAIL
+          - POSTAKTUELL_ALL
+          - POSTWURF_SPEZIAL
+        filters:
+          type: array
+          items:
+            "$ref": "#/components/schemas/PotentialFilter"
+        itemWeightInGram:
+          type: integer
+          format: int32
+          example: 20
+      description: Request for a new Selection
+    Permalink:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the saved selection to request the saved content
+          example: aaaa11aa-aa11-aa11-aa11-aaaa11aaaa11
+        expiryDate:
+          type: string
+          description: The expireDate is used to automatically delete old permalinks.
+          format: date
+      description: Response when creating a saved temporary selection.
+    City:
+      type: object
+      properties:
+        city:
+          type: string
+          example: Hamburg
+        neighbourhood:
+          type: string
+          example: Altstadt
+        latitude:
+          type: number
+          format: double
+          example: 6.2345
+        longitude:
+          type: number
+          format: double
+          example: 50.6789
+      description: City and/or neighbourhood required.
+    SearchBody:
+      type: object
+      properties:
+        cities:
+          type: array
+          items:
+            "$ref": "#/components/schemas/City"
+        neighbourhoods:
+          type: array
+          example:
+          - '24459602'
+          items:
+            type: string
+            example: '["24459602"]'
+        districtCodes:
+          type: array
+          example:
+          - 52222-21
+          items:
+            type: string
+            example: '["52222-21"]'
+        postalCodes:
+          type: array
+          example:
+          - '48231'
+          items:
+            type: string
+            example: '["48231"]'
+        regions:
+          type: array
+          example:
+          - '64'
+          items:
+            type: string
+            example: '["64"]'
+        zones:
+          type: array
+          example:
+          - '6'
+          items:
+            type: string
+            example: '["6"]'
+        coordinates:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Coordinate"
+        ags:
+          type: array
+          description: Amtlicher Gemeindeschlüssel
+          example:
+          - '18807060'
+          items:
+            type: string
+            description: Amtlicher Gemeindeschlüssel
+            example: '["18807060"]'
+      description: Request with multiple options
+    FileFeatures:
+      type: object
+      properties:
+        fileFeatures:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/Feature"
+        selectedFeatures:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/Feature"
+    CostsRequest:
+      type: object
+      properties:
+        filters:
+          type: array
+          description: List of PWS filter.
+          items:
+            "$ref": "#/components/schemas/PotentialFilter"
+        areaCodes:
+          type: array
+          description: List of area codes.
+          example:
+          - '10969'
+          items:
+            type: string
+            description: List of area codes.
+            example: '["10969"]'
+        productType:
+          type: string
+          description: Product type
+          example: POSTWURF_SPEZIAL
+          enum:
+          - POSTAKTUELL_DAILY_MAIL
+          - POSTAKTUELL_ALL
+          - POSTWURF_SPEZIAL
+      description: Object to request a simple cost calculation
+    CostsResponse:
+      type: object
+      properties:
+        houseHoldCount:
+          type: integer
+          description: Number of house holds
+          format: int32
+          example: 1200
+        totalcost:
+          type: integer
+          description: Cost in cent
+          format: int32
+          example: 1200
+        deliveryDistrictFee:
+          type: integer
+          description: Fee for a delivery district selection in cent
+          format: int32
+          example: 1200
+        minimumOrderFee:
+          type: integer
+          description: Fee for a minimum order in cent
+          format: int32
+          example: 1200
+        filterFees:
+          type: integer
+          description: Fee for Postwurf Spezial filter in cent
+          format: int32
+          example: 1200
+        isPwsEasy:
+          type: boolean
+          description: Is this Postwurf Spezial easy
+          example: true
+        pwsPostageAdditions:
+          type: integer
+          description: Additional Postwurf Spezial postage costs in cent
+          format: int32
+          example: 1200
+      description: Cost calculation simple response
+    JsonNode:
+      type: object
+    UserSelection:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the Selection
+          example: aaaa11aa-aa11-aa11-aa11-aaaa11aaaa11
+        name:
+          type: string
+          description: Name of the Selection
+          example: My Selection 1
+      description: Selection of a user.
+    PatchSelection:
+      type: object
+      properties:
+        add:
+          "$ref": "#/components/schemas/SearchBody"
+        remove:
+          "$ref": "#/components/schemas/SearchBody"
+    AddRemoveResult:
+      type: object
+      properties:
+        added:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/Feature"
+        removed:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/Feature"
+    SupportedFilter:
+      type: object
+      properties:
+        topic:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        options:
+          type: object
+          additionalProperties:
+            type: string
+    SelectionSummary:
+      type: object
+      properties:
+        meta:
+          "$ref": "#/components/schemas/MetaSummary"
+    DisPaApiRep:
+      type: object
+      properties:
+        numberItemsTariffZoneA:
+          type: integer
+          format: int32
+          example: 123
+        numberItemsTariffZoneB:
+          type: integer
+          format: int32
+          example: 123
+        itemWeightInGram:
+          type: integer
+          format: int32
+          example: 20
+        productType:
+          type: string
+          example: POSTAKTUELL_DAILY_MAIL
+          enum:
+          - POSTAKTUELL_DAILY_MAIL
+          - POSTAKTUELL_ALL
+          - POSTWURF_SPEZIAL
+        deliveryDistrictSelection:
+          type: boolean
+          example: false
+        inductionDate:
+          type: string
+          example: '2021-07-01T07:43:56.001Z'
+      description: Response body of the dispatch-information
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '12128'
+        areaCode:
+          type: string
+          example: Eimsbüttel
+        type:
+          type: string
+          example: NEIGHBOURHOOD
+          enum:
+          - POSTAL_CODE
+          - DELIVERY_DISTRICT
+          - NEIGHBOURHOOD_ID
+          - AGS
+          - CITY
+          - NEIGHBOURHOOD
+      description: List of maximal 10 results for the search
+    SearchSummary:
+      type: object
+      properties:
+        results:
+          uniqueItems: true
+          type: array
+          description: List of maximal 10 results for the search
+          items:
+            "$ref": "#/components/schemas/SearchResult"
+        furtherResults:
+          type: integer
+          description: Number of further not returned results, to indicate the need
+            of a more specific query
+          format: int32
+    ErrorModel:
+      type: object
+      properties:
+        value:
+          type: string
+          example: DM_ZGS_00XX
+        label:
+          type: string
+          example: A descriptive error message.
+    DeliveryBasePackaging:
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/Packaging"
+      - type: object
+        properties:
+          fullDeliveryBase:
+            type: boolean
+    DeliveryDistrictPackaging:
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/Packaging"
+      - type: object
+        properties:
+          deliveryDistrictName:
+            type: string
+          fullDeliveryDistrict:
+            type: boolean
+    HHCount:
+      type: object
+      properties:
+        quantityTariffZoneA:
+          type: integer
+          description: Households in tariffzone A
+          format: int32
+          example: 178
+        quantityTariffZoneB:
+          type: integer
+          description: Households in tariffzone B
+          format: int32
+          example: 289
+        neighbourhood:
+          type: string
+          description: Name of the neighbourhood
+          example: Gronau
+        postalCode:
+          type: string
+          description: Zip of the neighbourhood
+          example: '53113'
+        city:
+          type: string
+          description: Name of the city
+          example: Bonn
+      description: List of neighbourhoods in the delivery base
+    Packaging:
+      type: object
+      properties:
+        deliveryBaseName:
+          type: string
+          description: Name of the delivery base
+          example: Bonn 102
+        deliveryBasePostalCode:
+          type: string
+          description: Zip of the delivery base
+          example: '53113'
+        quantityTariffZoneA:
+          type: integer
+          description: Households in tariffzone A of the delivery base
+          format: int32
+          example: 15000
+        quantityTariffZoneB:
+          type: integer
+          description: Households in tariffzone B of the delivery base
+          format: int32
+          example: 15000
+        roundedTotal:
+          type: integer
+          format: int32
+        packages:
+          type: integer
+          format: int32
+        lastPackageQuantity:
+          type: integer
+          format: int32
+        neighbourhoods:
+          type: array
+          description: List of neighbourhoods in the delivery base
+          items:
+            "$ref": "#/components/schemas/HHCount"
+      description: Packaging object
+      anyOf:
+      - "$ref": "#/components/schemas/DeliveryBasePackaging"
+      - "$ref": "#/components/schemas/DeliveryDistrictPackaging"
+    PackagingSelectionSummary:
+      type: object
+      properties:
+        meta:
+          "$ref": "#/components/schemas/MetaSummary"
+        packagings:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/Packaging"
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+        hreflang:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        deprecation:
+          type: string
+        profile:
+          type: string
+        name:
+          type: string
+        templated:
+          type: boolean
+    Links:
+      type: object
+      additionalProperties:
+        "$ref": "#/components/schemas/Link"
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T12:34:06.203Z",
+              "status": 400,
+              "correlationId": "a5fe243a-05bc-4a55-ae03-02bc34d43f9a",
+              "error": "Bad Request",
+              "errors": [
+                {
+                  "errorCode": "DM_CO_0029",
+                  "errorMessage": "Die HTTP-Methode wird nicht unterstützt.",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T13:21:02.412Z",
+              "status": 401,
+              "correlationId": "35aad039-420a-4628-aa69-6bd0beb149ce",
+              "error": "Unauthorized",
+              "errors": [
+                {
+                  "errorCode": "DM_ZGS_0017",
+                  "errorMessage": "The provided authentication was empty for this request!",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T13:18:17.751Z",
+              "status": 403,
+              "correlationId": "b005ffc8-8a52-4c94-a75b-c240be1701c1",
+              "error": "Forbidden",
+              "errors": [
+                {
+                  "errorCode": "DM_ZGS_0017",
+                  "errorMessage": "The provided authentication is not valid for this request!",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }
+    UnsupportedMediaType:
+      description: Unsupported Media Type
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T12:44:08.000Z",
+              "status": 415,
+              "correlationId": "83e024b7-a687-46e8-8473-1eb264069df0",
+              "error": "Unsupported Media Type",
+              "errors": [
+                {
+                  "errorCode": "DM_CO_0015",
+                  "errorMessage": "Der gesendete Datentyp wird nicht unterstützt. Korrigieren Sie ggf. den Header-Wert von 'Content-Type'.",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T12:32:39.731Z",
+              "status": 422,
+              "correlationId": "6ab5d7db-9811-4b01-8e14-1eada6c2e3e6",
+              "error": "Unprocessable Entity",
+              "errors": [
+                {
+                  "errorCode": "DM_CO_0003",
+                  "errorMessage": "muss auf Ausdruck \"^[\\w%\\-\\(\\),&'.\\/]+$\" passen",
+                  "arguments": [
+                    "Ra th"
+                  ],
+                  "fieldName": "neighbourhood"
+                }
+              ]
+            }
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T12:59:00.861Z",
+              "status": 500,
+              "correlationId": "274b8642-10c2-47af-a673-6263f369c632",
+              "error": "Internal Server Error",
+              "errors": [
+                {
+                  "errorCode": "DM_CO_0004",
+                  "errorMessage": "Interner Serverfehler.",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ErrorResponseRep"
+          example: |-
+            {
+              "timestamp": "2021-02-10T12:59:24.690Z",
+              "status": 503,
+              "correlationId": "e9278fb7-cabb-48ea-9566-03a95fd4abfa",
+              "error": "Service Unavailable",
+              "errors": [
+                {
+                  "errorCode": "DM_CO_0012",
+                  "errorMessage": "Die Funktionalität ist zum aktuellen Zeitpunkt nicht verfügbar. Bitte versuchen Sie es später noch einmal.",
+                  "arguments": [],
+                  "fieldName": null
+                }
+              ]
+            }

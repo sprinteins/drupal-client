@@ -4,7 +4,7 @@ public class SourceFileModel extends TargetModel {
 
     private Boolean display = Boolean.TRUE;
     private String description = "";
-    private String url = "";
+    private String url = "  ";
 
     public SourceFileModel() {
         super();

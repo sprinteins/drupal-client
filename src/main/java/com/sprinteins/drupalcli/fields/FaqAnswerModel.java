@@ -7,14 +7,7 @@ public class FaqAnswerModel {
     private String value;
     private TextFormat format;
     private String processed;
-    
-    public static FaqAnswerModel basicHtml(String html) {
-      FaqAnswerModel result = new FaqAnswerModel();
-        result.value = html;
-        result.format = TextFormat.BASIC_HTML;
-        return result;
-    }
-      
+
     public String getValue() {
         return value;
     }

@@ -13,6 +13,7 @@ import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
 import com.sprinteins.drupalcli.translations.TranslationClient;
 
+import com.sprinteins.drupalcli.translations.TranslationModel;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -41,7 +42,6 @@ import static java.util.function.Predicate.not;
 public class Export implements Callable<Integer> {
 
   public static final String API_DOCS_IMAGE_DIRECTORY = "images";
-  public static final String API_DOCS_RELEASE_NOTES_DIRECTORY = "release-notes";
   public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
 
 
@@ -59,12 +59,12 @@ public class Export implements Callable<Integer> {
 
     ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
     NodeClient nodeClient = applicationContext.nodeClient();
-    var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
-    var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
-    var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
-    var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
-    var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
-    var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
+    ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient = applicationContext.getStartedParagraphClient();
+    ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
+    ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
+    ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient = applicationContext.faqItemParagraphClient();
+    ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+    ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
     ImageClient imageClient = applicationContext.imageClient();
     ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
     Converter converter = applicationContext.converter();
@@ -77,8 +77,8 @@ public class Export implements Callable<Integer> {
     var nodeID = nodeModel.getNid().get(0).getValue();
     var getTranslations = translationClient.getTranslations(nodeID);
 
-    for (var i = 0; i < getTranslations.size(); i++) {
-      var langCode = getTranslations.get(i).getLangcode();
+    for (TranslationModel getTranslation : getTranslations) {
+      var langCode = getTranslation.getLangcode();
       Path apiPageDirectory = apiPageBaseDirectory.resolve(langCode);
       nodeModel = nodeClient.getTranslatedNode(nodeID, langCode);
       System.out.println("Creating directories for language " + langCode);
@@ -94,7 +94,7 @@ public class Export implements Callable<Integer> {
       mainMarkdown.add("get-started-menu:");
       for (GetStartedDocsElementModel getStartedDocsElement : nodeModel.getGetStartedDocsElements()) {
         GetStartedParagraphModel getStartedParagraph = getStartedParagraphClient
-            .get(getStartedDocsElement.getTargetId());
+                .get(getStartedDocsElement.getTargetId());
         FormattedTextModel formattedTextModel = getStartedParagraph.getOrCreateFirstDescription();
 
         String paragraphTitle = getStartedParagraph.title();
@@ -117,15 +117,15 @@ public class Export implements Callable<Integer> {
 
         System.out.println("Create markdown file...");
         Files.write(apiPageDirectory.resolve(paragraphTitle
-            .toLowerCase(Locale.ROOT)
-            .replace(" ", "-") + ".markdown"), markdown);
+                .toLowerCase(Locale.ROOT)
+                .replace(" ", "-") + ".markdown"), markdown);
 
       }
       mainMarkdown.add("additional-information-menu:");
       for (AdditionalInformationElementModel additionalInformationElement : nodeModel
-          .getAdditionalInformationElements()) {
+              .getAdditionalInformationElements()) {
         AdditionalInformationParagraphModel additionalInformationParagraph = additionalInformationParagraphClient
-            .get(additionalInformationElement.getTargetId());
+                .get(additionalInformationElement.getTargetId());
         FormattedTextModel formattedTextModel = additionalInformationParagraph.getOrCreateFirstDescription();
 
         String paragraphTitle = additionalInformationParagraph.title();
@@ -148,8 +148,8 @@ public class Export implements Callable<Integer> {
 
         System.out.println("Create markdown file...");
         Files.write(apiPageDirectory.resolve(paragraphTitle
-            .toLowerCase(Locale.ROOT)
-            .replace(" ", "-") + ".markdown"), markdown);
+                .toLowerCase(Locale.ROOT)
+                .replace(" ", "-") + ".markdown"), markdown);
 
       }
 
@@ -188,14 +188,14 @@ public class Export implements Callable<Integer> {
 
         System.out.println("Create markdown file...");
         Files.write(apiPageDirectory.resolve(paragraphTitle.toLowerCase(Locale.ROOT).replace(" ", "-") + ".markdown"),
-            markdown);
+                markdown);
       }
 
       System.out.println("Download release notes ...");
       StringBuilder stringBuilder = new StringBuilder();
       for (ReleaseNoteElementModel releaseNoteElementModel : nodeModel.getReleaseNotesElement()) {
         ReleaseNoteParagraphModel releaseNoteParagraphModel = releaseNoteParagraphClient
-            .get(releaseNoteElementModel.getTargetId());
+                .get(releaseNoteElementModel.getTargetId());
         FormattedTextModel formattedTextModel = releaseNoteParagraphModel.getOrCreateFirstDescription();
         StringValueModel releaseNoteTitle = releaseNoteParagraphModel.getOrCreateFirstTitle();
         DateValueModel dateValueModel = releaseNoteParagraphModel.getOrCreateFirstDate();
@@ -214,10 +214,10 @@ public class Export implements Callable<Integer> {
       System.out.println("Download OpenAPI spec file ...");
       String sourceFileLink = nodeModel.getOrCreateFirstSourceFile().getUrl();
       String fileName = Optional.of(sourceFileLink)
-          .map(URI::create)
-          .map(URI::getPath)
-          .map(FilenameUtils::getName)
-          .orElseThrow();
+              .map(URI::create)
+              .map(URI::getPath)
+              .map(FilenameUtils::getName)
+              .orElseThrow();
       String apiReference = apiReferenceFileClient.download(sourceFileLink);
       Files.writeString(apiPageDirectory.resolve(fileName), apiReference);
 
@@ -239,7 +239,7 @@ public class Export implements Callable<Integer> {
                 .map(URI::getPath)
                 .map(FilenameUtils::getName)
                 .orElseThrow();
-        if(downloadableFileName.equals("")) continue;
+        if (downloadableFileName.equals("")) continue;
         Files.writeString(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY).resolve(downloadableFileName),
                 downloadsElementParagraphClient.download(downloadFileURL));
 

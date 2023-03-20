@@ -20,23 +20,24 @@ import org.jsoup.safety.Safelist;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Converter {
 
-    private static final Pattern REMOVE_TRAILING_PATTERN = Pattern.compile("\\p{Blank}+$", Pattern.MULTILINE);
+    private static final Pattern REMOVE_TRAILING_PATTERN = Pattern.compile("''+$", Pattern.MULTILINE);
 
     private final boolean customHtml;
 
     public Converter() {
-        this(false);
+        this.customHtml = false;
     }
     public Converter(boolean customHtml) {
         this.customHtml = customHtml;
     }
 
     public String convertHtmlToMarkdown(String input, String link){
-        // microsoft word aka long dash is replaced with regular minus
+        // Microsoft Word aka long dash is replaced with regular minus
         input = input.replace("–","-");
         input = input.replace("&nbsp;", " ");
 
@@ -80,7 +81,7 @@ public class Converter {
         for (Element element : document.select("strong,em")) {
             // if the text inside the element ends with an empty space
             if (element.wholeText().endsWith(" ")) {
-                // add one after the element so it will be collapsed properly
+                // add one after the element , so it will be collapsed properly
                 element.after(" ");
             }
             // this prevents flexmark from adding unnecessary whitespace if a tag follows
@@ -146,7 +147,7 @@ public class Converter {
         
         for(Element element : document.select("pre")){
             if (element.select("code").isEmpty()) {
-                element.unwrap().wrap("<pre><code></code></pre>");
+                Objects.requireNonNull(element.unwrap()).wrap("<pre><code></code></pre>");
             }
         }
         
@@ -185,9 +186,8 @@ public class Converter {
         document.select("h1").tagName("h3");
 
         String body = document.body().html();
-        String bodyWithRemovedWhitespaces = REMOVE_TRAILING_PATTERN.matcher(body).replaceAll("");;
 
-        return bodyWithRemovedWhitespaces;
+        return REMOVE_TRAILING_PATTERN.matcher(body).replaceAll("");
     }
 
     private DataHolder generateConverterOptions() {
@@ -210,5 +210,5 @@ public class Converter {
                 .set(Parser.EXTENSIONS, Collections.singletonList(TablesExtension.create()))
                 .toImmutable();
         }
-    };
+    }
 }

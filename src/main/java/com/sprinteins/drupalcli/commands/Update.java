@@ -38,8 +38,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -55,7 +53,6 @@ import java.util.concurrent.Callable;
 public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
-    public static final String IMAGE_FOLDER_NAME = "images";
     public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
 
     @Mixin
@@ -66,11 +63,6 @@ public class Update implements Callable<Integer> {
             required = true
     )
     String link;
-    @Option(
-            names = {"--explicitly-disable-checks", "-e"},
-            description = "Explicitly disabled checks"
-    )
-    ArrayList<String> disabledChecks;
     @Option(
             names = {"--use-json"},
             description = "Use JSON file to update api page"
@@ -195,9 +187,9 @@ public class Update implements Callable<Integer> {
 
         updateAdditionalInfoSection(workingDir, additionalInformationMenuItems, additionalInformationParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
 
-        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
+        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, nodeModel, patchNodeModel);
 
-        updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, converter, nodeModel, patchNodeModel);
+        updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, nodeModel, patchNodeModel);
 
         Document newReleaseNoteDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
@@ -209,10 +201,7 @@ public class Update implements Callable<Integer> {
         while (releaseNoteBody.childNodeSize() > 0) {
             System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
             var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
-            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
-            for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
-                newReleaseNoteElementList.add(releaseNoteElementModel);
-            }
+            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>(currentReleaseNotesList);
             Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
             ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
             StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
@@ -298,7 +287,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
     }
 
-    private static void updateGetStartedSection(Path workingDir, List<String> getStartedMenuItems, ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+    private static void updateGetStartedSection(Path workingDir, List<String> getStartedMenuItems, ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
         var getStartedDocsElements = new ArrayList<>(nodeModel.getGetStartedDocsElements());
 
         for (int i = 0; i < getStartedMenuItems.size(); i++) {
@@ -366,7 +355,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
     }
 
-    private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+    private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
         var additionalInformationElements = new ArrayList<>(nodeModel.getAdditionalInformationElements());
 
         for (int i = 0; i < additionalInformationMenuItems.size(); i++) {
@@ -434,7 +423,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setAdditionalInformationElementsElements(additionalInformationElements);
     }
 
-    private void updateFaqSection(Path workingDir, List<String> faqSectionItems, ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient, ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws Exception {
+    private void updateFaqSection(Path workingDir, List<String> faqSectionItems, ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient, ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient, NodeModel nodeModel, NodeModel patchNodeModel) throws Exception {
         var faqSectionElements = new ArrayList<>(nodeModel.getFaqItems());
 
         for (int i = 0; i < faqSectionItems.size(); i++) {
@@ -521,7 +510,7 @@ public class Update implements Callable<Integer> {
     }
 
 
-    private void updateDownloadsSection (Path workingDir, Map<String, List<String>> frontmatterDownloads, ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient, DownloadFileClient downloadFileClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+    private void updateDownloadsSection (Path workingDir, Map<String, List<String>> frontmatterDownloads, ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient, DownloadFileClient downloadFileClient, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
         var downloadElements = new ArrayList<>(nodeModel.getDownloadElements());
         var keys = frontmatterDownloads.keySet();
         var values = frontmatterDownloads.values().iterator();
@@ -617,7 +606,7 @@ public class Update implements Callable<Integer> {
         return validationResult;
     }
     public String readFile(Path filePath) {
-        String result = "";
+        String result;
         try {
             result = Files.readString(filePath);
         } catch (IOException error) {
