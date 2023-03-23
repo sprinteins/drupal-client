@@ -12,12 +12,18 @@ import com.sprinteins.drupalcli.fieldtypes.FormattedTextModel;
 import com.sprinteins.drupalcli.fieldtypes.StringValueModel;
 import com.sprinteins.drupalcli.fieldtypes.TextFormat;
 import com.sprinteins.drupalcli.file.ApiReferenceFileClient;
+import com.sprinteins.drupalcli.file.DownloadFileClient;
 import com.sprinteins.drupalcli.file.FileFinder;
 import com.sprinteins.drupalcli.file.FileUploadModel;
 import com.sprinteins.drupalcli.file.ImageClient;
 import com.sprinteins.drupalcli.node.NodeClient;
 import com.sprinteins.drupalcli.node.NodeModel;
 import com.sprinteins.drupalcli.paragraph.*;
+import com.sprinteins.drupalcli.translations.AvailableTranslationsModel;
+import com.sprinteins.drupalcli.translations.LanguagesComparer;
+import com.sprinteins.drupalcli.translations.TranslationClient;
+import com.sprinteins.drupalcli.translations.TranslationModel;
+
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,6 +37,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -46,7 +53,8 @@ import java.util.concurrent.Callable;
 public class Update implements Callable<Integer> {
     public static final String MAIN_MARKDOWN_FILE_NAME = "main.markdown";
     public static final String RELEASE_NOTES_MARKDOWN_FILE_NAME = "release-notes.markdown";
-    public static final String IMAGE_FOLDER_NAME = "images";
+    public static final String API_DOCS_DOWNLOADS_DIRECTORY = "downloads";
+
     @Mixin
     private GlobalOptions globalOptions;
     @Option(
@@ -56,22 +64,70 @@ public class Update implements Callable<Integer> {
     )
     String link;
     @Option(
-            names = {"--explicitly-disable-checks", "-e"},
-            description = "Explicitly disabled checks"
-    )
-    ArrayList<String> disabledChecks;
-    @Option(
             names = {"--use-json"},
             description = "Use JSON file to update api page"
     )
     boolean useJson;
+
+    @Option(
+            names = {"--lang"},
+            description = "Enter langcode to update api page for a specific translation"
+    )
+    String langcodeInput = "en";
+
+    @Option(
+            names = {"--all-lang"},
+            description = "Update all translations that exist for an api page"
+    )
+    boolean updateAllLanguages;
+
+
     @Override
     public Integer call() throws Exception {
         URI uri = URI.create(link);
         String baseUri = uri.getScheme() + "://" + uri.getHost();
-        Path workingDir = globalOptions.apiPageDirectory;
+        Path workingBaseDir = globalOptions.apiPageDirectory;
+        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
+        NodeClient nodeClient = applicationContext.nodeClient();
+        TranslationClient translationClient = applicationContext.translationClient();
+        NodeModel nodeModel = nodeClient.getByUri(link);
+        Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
+
+        var availableNodeTranslations = translationClient.getTranslations(nodeId);
+        var translationsListModel = new AvailableTranslationsModel(availableNodeTranslations);
+
+        if(!translationsListModel.validate(langcodeInput)){
+            throw new Exception ("The entered language code does not exist for this api page. (\""+ langcodeInput + "\" entered)\nUse one of the following: \n"+ translationsListModel.printValues());
+        }
+
+        if (updateAllLanguages) {
+            var languageComparer = new LanguagesComparer(availableNodeTranslations, workingBaseDir);
+            var comparisonResult = languageComparer.compareLanguages();
+
+            if (!comparisonResult.result()){
+                throw new Exception("The following translations are missing from the local working directory: " + comparisonResult.missingTranslations());
+            }
+
+            for (TranslationModel translation:availableNodeTranslations) {
+
+                updateNodes(workingBaseDir, applicationContext, nodeClient, nodeId, translation.getLangcode());
+            }
+        } else {
+            updateNodes(workingBaseDir, applicationContext, nodeClient, nodeId, langcodeInput);
+        }
+
+        return 0;
+
+    }
+
+    private void updateNodes(Path workingBaseDir, ApplicationContext applicationContext, NodeClient nodeClient, Long nodeId, String langCode) throws Exception {
+        NodeModel nodeModel;
+        nodeModel = nodeClient.getTranslatedNode(nodeId, langCode);
+
+        Path workingDir= workingBaseDir.resolve(langCode);
         Path mainFilePath = workingDir.resolve(MAIN_MARKDOWN_FILE_NAME);
         Path releaseNoteFilePath = workingDir.resolve(RELEASE_NOTES_MARKDOWN_FILE_NAME);
+
         if (!Files.exists(mainFilePath)) {
             throw new Exception("No " + MAIN_MARKDOWN_FILE_NAME + " file in given directory (" + workingDir + ")");
         }
@@ -94,22 +150,29 @@ public class Update implements Callable<Integer> {
         List<String> getStartedMenuItems = frontmatter.get("get-started-menu");
         List<String> additionalInformationMenuItems = frontmatter.get("additional-information-menu");
         List<String> faqSectionItems = frontmatter.get("faqs");
-        ApplicationContext applicationContext = new ApplicationContext(baseUri, globalOptions);
-        NodeClient nodeClient = applicationContext.nodeClient();
+
+        Path docPath = workingDir.resolve("downloads.markdown");
+        checkIfFileExists(docPath);
+        String downloadsSection = Files.readString(docPath);
+        Map<String, List<String>> frontmatterDownloads = new FrontMatterReader().readFromString(downloadsSection);
+
 
         var getStartedParagraphClient = applicationContext.getStartedParagraphClient();
         var additionalInformationParagraphClient = applicationContext.additionalInformationParagraphClient();
         var faqItemsParagraphClient = applicationContext.faqItemsParagraphClient();
         var faqItemParagraphClient = applicationContext.faqItemParagraphClient();
         var releaseNoteParagraphClient = applicationContext.releaseNoteParagraphClient();
+        var downloadsElementParagraphClient = applicationContext.downloadsElementParagraphClient();
+
 
         ImageClient imageClient = applicationContext.imageClient();
         ApiReferenceFileClient apiReferenceFileClient = applicationContext.apiReferenceFileClient();
+        DownloadFileClient downloadFileClient = applicationContext.downloadFileClient();
         Converter converter = applicationContext.converter();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        NodeModel nodeModel = nodeClient.getByUri(link);
-        Long nodeId = nodeModel.getOrCreateFirstNid().getValue();
+
+
         System.out.println("Updating node: " + title + " - " + nodeId + " ...");
 
         if (!title.equals(nodeModel.getOrCreateFirstDisplayTitle().getValue())) {
@@ -124,8 +187,9 @@ public class Update implements Callable<Integer> {
 
         updateAdditionalInfoSection(workingDir, additionalInformationMenuItems, additionalInformationParagraphClient, imageClient, converter, nodeModel, patchNodeModel);
 
-        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, converter, nodeModel, patchNodeModel);
+        updateFaqSection(workingDir, faqSectionItems, faqItemsParagraphClient, faqItemParagraphClient, nodeModel, patchNodeModel);
 
+        updateDownloadsSection (workingDir, frontmatterDownloads, downloadsElementParagraphClient, downloadFileClient, nodeModel, patchNodeModel);
 
         Document newReleaseNoteDocument = Jsoup
                 .parse(converter.convertMarkdownToHtml(Files.readString(releaseNoteFilePath)));
@@ -137,10 +201,7 @@ public class Update implements Callable<Integer> {
         while (releaseNoteBody.childNodeSize() > 0) {
             System.out.println("There is a new entry to the release notes. Creating new paragraph... ");
             var currentReleaseNotesList = patchNodeModel.getReleaseNotesElement();
-            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>();
-            for (ReleaseNoteElementModel releaseNoteElementModel : currentReleaseNotesList) {
-                newReleaseNoteElementList.add(releaseNoteElementModel);
-            }
+            List<ReleaseNoteElementModel> newReleaseNoteElementList = new ArrayList<>(currentReleaseNotesList);
             Element releaseNote = extractFirstReleaseNote(releaseNoteBody);
             ReleaseNoteParagraphModel releaseNoteParagraph = new ReleaseNoteParagraphModel();
             StringValueModel releaseNoteTitle = releaseNoteParagraph.getOrCreateFirstTitle();
@@ -194,8 +255,6 @@ public class Update implements Callable<Integer> {
         nodeClient.patch(nodeId, patchNodeModel);
 
         System.out.println("Finished processing node: " + nodeId);
-
-        return 0;
     }
 
     private void updateReleaseNoteSection(String title, ParagraphClient<ReleaseNoteParagraphModel> releaseNoteParagraphClient, Validator validator, NodeModel nodeModel, NodeModel patchNodeModel, Element releaseNoteBody) throws Exception {
@@ -228,7 +287,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setReleaseNotesElement(nodeModel.getReleaseNotesElement());
     }
 
-    private static void updateGetStartedSection(Path workingDir, List<String> getStartedMenuItems, ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+    private static void updateGetStartedSection(Path workingDir, List<String> getStartedMenuItems, ParagraphClient<GetStartedParagraphModel> getStartedParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
         var getStartedDocsElements = new ArrayList<>(nodeModel.getGetStartedDocsElements());
 
         for (int i = 0; i < getStartedMenuItems.size(); i++) {
@@ -265,17 +324,19 @@ public class Update implements Callable<Integer> {
                         .map(Path::toString)
                         .orElseThrow();
                 System.out.println("Uploading " + filename + "...");
-                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
-                images.attr("data-entity-type", "file");
+                Elements image = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
+                image.attr("data-entity-type", "file");
                 String md5 = imageClient.generateMd5Hash(imagePath);
                 Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                    images.attr("src", currentImage.attr("src"));
-                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("src", currentImage.attr("src"));
+                    image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("width", currentImage.attr("width"));
+                    image.attr("height", currentImage.attr("height"));
                 } else {
-                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
-                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
-                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
+                    FileUploadModel imageModel = imageClient.upload(imagePath);
+                    image.attr("src", imageModel.getOrCreateFirstUri().getUrl());
+                    image.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
             }
             FormattedTextModel fieldDescription = getStartedParagraph.getOrCreateFirstDescription();
@@ -294,7 +355,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setGetStartedDocsElements(getStartedDocsElements);
     }
 
-    private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException, NoSuchAlgorithmException {
+    private static void updateAdditionalInfoSection(Path workingDir, List<String> additionalInformationMenuItems, ParagraphClient<AdditionalInformationParagraphModel> additionalInformationParagraphClient, ImageClient imageClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
         var additionalInformationElements = new ArrayList<>(nodeModel.getAdditionalInformationElements());
 
         for (int i = 0; i < additionalInformationMenuItems.size(); i++) {
@@ -331,17 +392,19 @@ public class Update implements Callable<Integer> {
                         .map(Path::toString)
                         .orElseThrow();
                 System.out.println("Uploading " + filename + "...");
-                Elements images = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
-                images.attr("data-entity-type", "file");
+                Elements image = newParagraphDocument.select("img[src=\"" + imageSrc + "\"]");
+                image.attr("data-entity-type", "file");
                 String md5 = imageClient.generateMd5Hash(imagePath);
                 Element currentImage = currentParagraphDocument.selectFirst("img[src^=\"/sites/default/files/api-docs/" + md5 + "\"]");
                 if (currentImage != null && currentImage.hasAttr("data-entity-uuid")) {
-                    images.attr("src", currentImage.attr("src"));
-                    images.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("src", currentImage.attr("src"));
+                    image.attr("data-entity-uuid", currentImage.attr("data-entity-uuid"));
+                    image.attr("width", currentImage.attr("width"));
+                    image.attr("height", currentImage.attr("height"));
                 } else {
-                    FileUploadModel imageModel = imageClient.upload(imagePath, md5 + imagePath.getFileName());
-                    images.attr("src", imageModel.getOrCreateFirstUri().getUrl());
-                    images.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
+                    FileUploadModel imageModel = imageClient.upload(imagePath);
+                    image.attr("src", imageModel.getOrCreateFirstUri().getUrl());
+                    image.attr("data-entity-uuid", imageModel.getOrCreateFirstUuid().getValue());
                 }
             }
             FormattedTextModel fieldDescription = additionalInformationParagraph.getOrCreateFirstDescription();
@@ -360,7 +423,7 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setAdditionalInformationElementsElements(additionalInformationElements);
     }
 
-    private void updateFaqSection(Path workingDir, List<String> faqSectionItems, ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient, ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient, Converter converter, NodeModel nodeModel, NodeModel patchNodeModel) throws Exception {
+    private void updateFaqSection(Path workingDir, List<String> faqSectionItems, ParagraphClient<FaqItemsParagraphModel> faqItemsParagraphClient, ParagraphClient<FaqItemParagraphModel> faqItemParagraphClient, NodeModel nodeModel, NodeModel patchNodeModel) throws Exception {
         var faqSectionElements = new ArrayList<>(nodeModel.getFaqItems());
 
         for (int i = 0; i < faqSectionItems.size(); i++) {
@@ -382,7 +445,7 @@ public class Update implements Callable<Integer> {
                     + ".markdown");
             checkIfFileExists(docPath);
             String faqSectionContent = Files.readString(docPath);
-            
+
             Map<String, List<String>> frontmatterFaq = new FrontMatterReader().readFromString(faqSectionContent);
 
             var faqItems = new ArrayList<>(faqItemsParagraph.getFaqItem());
@@ -391,7 +454,7 @@ public class Update implements Callable<Integer> {
             for (int j = 0; j < iterations; j++) {
                 FaqItemParagraphModel faqItemParagraphModel;
 
-                 if (j > faqItems.size() - 1) {
+                if (j > faqItems.size() - 1) {
                     var questionString = frontmatterFaq.get("question-"+j);
                     var answerString = frontmatterFaq.get("answer-"+j);
                     faqItemParagraphModel = FaqItemParagraphModel.question(questionString.get(0));
@@ -446,6 +509,53 @@ public class Update implements Callable<Integer> {
         patchNodeModel.setFaqItems(faqSectionElements);
     }
 
+
+    private void updateDownloadsSection (Path workingDir, Map<String, List<String>> frontmatterDownloads, ParagraphClient<DownloadsElementParagraphModel> downloadsElementParagraphClient, DownloadFileClient downloadFileClient, NodeModel nodeModel, NodeModel patchNodeModel) throws IOException {
+        var downloadElements = new ArrayList<>(nodeModel.getDownloadElements());
+        var keys = frontmatterDownloads.keySet();
+        var values = frontmatterDownloads.values().iterator();
+        String downloadsDirPath = workingDir.resolve(API_DOCS_DOWNLOADS_DIRECTORY).toString(); // api-docs/downloads
+        var keySetArray = keys.toArray();
+
+
+        for (var i = 0; i < keys.size(); i++) {
+            var downloadItemFile = keySetArray[i];
+            var downloadItemDescription = values.next().get(0);
+
+            System.out.println("Updating paragraph: " + downloadItemDescription + " ...");
+            DownloadsElementParagraphModel downloadsParagraph;
+
+            Path downloadFilesPath = Paths.get(downloadsDirPath +"/" + downloadItemFile); //api-docs/downloads/example.json
+            FileUploadModel downloadModel = downloadFileClient.upload(downloadFilesPath);
+
+
+            if (i > downloadElements.size() - 1) {
+                downloadsParagraph = DownloadsElementParagraphModel.create(downloadModel);
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
+                downloadsParagraph = downloadsElementParagraphClient.post(downloadsParagraph);
+                downloadElements.add(new DownloadsModel(downloadsParagraph));
+            } else {
+                downloadsParagraph = downloadsElementParagraphClient
+                        .get(downloadElements.get(i).getTargetId());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetId(downloadModel.getFid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setDescription(downloadItemDescription);
+                downloadsParagraph.getOrCreateFirstDownloadFile().setTargetUuid(downloadModel.getUuid().get(0).getValue());
+                downloadsParagraph.getOrCreateFirstDownloadFile().setUrl(downloadModel.getUri().get(0).getValue());
+                downloadsElementParagraphClient.patch(downloadsParagraph);
+            }
+            System.out.println("Updating paragraph: " + downloadsParagraph.id() + " ...");
+            System.out.println("Finished processing paragraph: " + downloadsParagraph.id());
+        }
+        if(keys.size() < downloadElements.size()){
+            for(var d = downloadElements.size(); d > keys.size(); d--){
+                downloadElements.remove(d - 1);
+            }
+        }
+        patchNodeModel.setDownloadElements(downloadElements);
+    }
+
+
     public Element extractFirstReleaseNote(Element releaseNoteBody) {
         Elements headlines = releaseNoteBody.select("h3");
         List<Integer> titleIds = new ArrayList<>();
@@ -496,7 +606,7 @@ public class Update implements Callable<Integer> {
         return validationResult;
     }
     public String readFile(Path filePath) {
-        String result = "";
+        String result;
         try {
             result = Files.readString(filePath);
         } catch (IOException error) {
@@ -506,8 +616,9 @@ public class Update implements Callable<Integer> {
     }
 
     public static void checkIfFileExists(Path filePath) {
-      if (!Files.exists(filePath)) {
-        throw new IllegalStateException("File " + filePath + " not found");
-      } 
+        if (!Files.exists(filePath)) {
+            throw new IllegalStateException("File " + filePath + " not found");
+        }
     }
 }
+

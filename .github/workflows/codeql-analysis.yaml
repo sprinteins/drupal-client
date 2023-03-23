@@ -10,7 +10,7 @@ on:
 
 jobs:
   debug:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Dump GitHub context
       env:
@@ -38,7 +38,7 @@ jobs:
       run: echo "$MATRIX_CONTEXT"
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3

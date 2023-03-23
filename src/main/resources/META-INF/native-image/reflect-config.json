@@ -50,6 +50,12 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.fields.DownloadsModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.fields.FaqAnswerModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
@@ -166,6 +172,18 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.file.DownloadFileClient",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.file.FileClient",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.file.FileFinder",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
@@ -202,6 +220,12 @@
   "allDeclaredConstructors":true
 },
 {
+  "name":"com.sprinteins.drupalcli.paragraph.DownloadsElementParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
   "name":"com.sprinteins.drupalcli.paragraph.FaqItemParagraphModel",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
@@ -231,6 +255,36 @@
 },
 {
   "name":"com.sprinteins.drupalcli.paragraph.ReleaseNoteParagraphModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.AvailableTranslationsModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.LanguageComparisonResult",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.LanguagesComparer",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.TranslationModel",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.sprinteins.drupalcli.translations.TranslationClient",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true

@@ -29,7 +29,7 @@ public class CustomFlexmarkExtension {
 
     static class CustomTagConverter implements HtmlNodeRenderer {
 
-        private Set<HtmlNodeRendererHandler<?>> defaultRenderers;
+        private final Set<HtmlNodeRendererHandler<?>> defaultRenderers;
 
         public CustomTagConverter(DataHolder options) {
             defaultRenderers = new HtmlConverterCoreNodeRenderer(options).getHtmlNodeRendererHandlers();

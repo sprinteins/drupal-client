@@ -1,5 +1,6 @@
 package com.sprinteins.drupalcli.file;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprinteins.drupalcli.HttpRequestBuilderFactory;
 import com.sprinteins.drupalcli.HttpResponseStatusHandler;
@@ -19,42 +20,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
-public class ImageClient {
+public class ImageClient extends FileClient{
 
-    private final ObjectMapper objectMapper;
     private final String uploadBaseUri;
-    private final String baseUri;
-    private final String apiKey;
     private final String apiDocsDirectory;
-    private final HttpClient httpClient;
+
 
     public ImageClient(ObjectMapper objectMapper, String baseUri, String apiKey, HttpClient httpClient) {
-        this.objectMapper = objectMapper;
+        super(objectMapper, baseUri, apiKey, httpClient);
         this.uploadBaseUri = baseUri + "/file/upload/media/file/field_media_file";
-        this.baseUri = baseUri;
-        this.apiKey = apiKey;
         this.apiDocsDirectory = baseUri + "/sites/default/files/api-docs/";
-        this.httpClient = httpClient;
     }
 
-    public FileUploadModel upload(Path path, String filename) throws NoSuchAlgorithmException {
-        try {
-            HttpRequest request = HttpRequestBuilderFactory
-                    .create(URI.create(uploadBaseUri + "?_format=json"), apiKey)
-                    .POST(HttpRequest.BodyPublishers.ofFile(path))
-                    .header("Content-Type", "application/octet-stream")
-                    .header("Content-Disposition", "file; filename=\"" + filename + "\"")
-                    .build();
-
-            HttpResponse<String> httpResponse = httpClient
-                    .send(request, HttpResponse.BodyHandlers.ofString());
-            
-            HttpResponseStatusHandler.checkStatusCode(httpResponse);
-
-            return objectMapper.readValue(httpResponse.body(), FileUploadModel.class);
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Upload failed", e);
-        }
+    public FileUploadModel upload(Path path) throws IOException {
+        String md5 = generateMd5Hash(path);
+        return super.upload(path, this.uploadBaseUri, md5 + path.getFileName());
     }
 
     public int head(Path path) throws NoSuchAlgorithmException {
