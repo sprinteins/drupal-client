@@ -233,12 +233,14 @@ public class Export implements Callable<Integer> {
 
         String downloadFileURL = downloadFile.getUrl();
         var downloadFileDescription = downloadFile.getDescription();
-
+        if(downloadFileURL == null) continue;
+        if (downloadFileURL.isBlank() || downloadFileURL.isEmpty()) continue;
         String downloadableFileName = Optional.of(downloadFileURL)
             .map(URI::create)
             .map(URI::getPath)
             .map(FilenameUtils::getName)
             .orElseThrow();
+        if (downloadableFileName.isBlank() || downloadableFileName.isEmpty()) continue;
         Files.writeString(apiPageDirectory.resolve(API_DOCS_DOWNLOADS_DIRECTORY).resolve(downloadableFileName),
             downloadsElementParagraphClient.download(downloadFileURL));
 
