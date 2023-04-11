@@ -28,10 +28,8 @@ public class DownloadsElementParagraphModel extends ParagraphModel {
 
   @JsonIgnore
   public SourceFileModel getOrCreateFirstDownloadFile() {
-      if (downloadableFiles == null) {
+      if (downloadableFiles == null || downloadableFiles.isEmpty()) {
           downloadableFiles = new ArrayList<>();
-      }
-      if (downloadableFiles.isEmpty()) {
           downloadableFiles.add(new SourceFileModel());
       }
       return downloadableFiles.get(0);
