@@ -2,6 +2,14 @@
 
 ## Installation guide
 
+### With Dockerfile
+
+1. Install Docker on your machine
+2. Build the project using 
+`docker build -t cli-tool:latest .`
+3. Run the project using 
+`docker run --rm cli-tool:latest`
+4. Bingo!
 ### Linux
 
 #### Using the client in automation environments like Jenkins
