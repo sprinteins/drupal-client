@@ -1,6 +1,6 @@
 # drupal-client
 
-## Getting started
+## Installation guide
 
 ### Linux
 
@@ -58,6 +58,41 @@ There is no support for multiple environments at the moment.
 7. Create a new file `token.txt` and paste the key into it
 8. Press `Win+R` and execute `rundll32 sysdm.cpl,EditEnvironmentVariables`
 9. Create the `DHL_API_DEVELOPER_PORTAL_TOKEN_FILE` variable and set it to `%USERPROFILE%\.config\drupal-client\token.txt`
+
+## User guide
+
+This user guide provides instructions on how to use the CLI tool for Drupal system of DHL API Developer Portal, which has two main commands: `update` and `export`. Both commands share a set of common flags, which are detailed below.
+
+### Commands
+
+1. `update`: This command is used for uploading existing documents to the Drupal system.
+2. `export`: This command is used to retrieve node's containment from the Drupal system.
+
+### Common Flags
+
+- `--debug`: Enable debug mode.
+- `--insecure` or `-k`: Allow insecure server connections when using SSL.
+- `--proxy` or `-x`: Use the specified proxy.
+- `--noproxy`: Provide a list of hosts which do not use a proxy.
+- `--api-page-directory`: Set the local path to the API page documentation (default: `api-docs`).
+- `--token-file`: Specify the path to the file containing the authentication token. Can also be set via the environment variable `DHL_API_DEVELOPER_PORTAL_TOKEN_FILE` *(required)*.
+- `--custom-html`: Keep custom HTML elements within the documentation.
+
+### Usage
+
+To use the CLI tool, you must specify the token file using the token argument.
+
+
+Here's an example of how you might use the `update` command with flags:
+
+```sh
+$ cli-tool update --debug --insecure --proxy http://proxy.example.com --noproxy example.com,example.org --api-page-directory my-api-docs --token-file /path/to/token-file.txt --custom-html
+```
+
+And here's an example of how to use the export command with flags:
+```shell
+$ cli-tool export --debug --insecure --proxy http://proxy.example.com --noproxy example.com,example.org --api-page-directory my-api-docs --token-file /path/to/token-file.txt --custom-html
+```
 
 ## Development
 
