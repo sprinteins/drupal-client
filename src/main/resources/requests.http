@@ -1,0 +1,15 @@
+// PLease note, that this particular file is not finished.
+// here is the list of the commands which was either erroneous or interesting for the case
+// however, please note that you have to use nodes which are accessible with your token
+update --debug --link=https://dhlapi-dev.metadeploy.com/node/255 --token-file=./secret
+
+export --debug --link=https://dhlapi-dev.metadeploy.com/api-reference/product-classification --token-file=./secret
+
+export --debug --link=https://dhlapi-dev.metadeploy.com/api-reference/print-mailing-dispatch-preparation-api -k --api-page -directory=./dispatchprep-apidocs --token-file=<(echo "token_value")
+
+update --debug --link=https://dhlapi-dev.metadeploy.com/api-reference/print-mailing-dispatch-preparation-api -k --api-page -directory=./dispatchprep-apidocs --token-file=<(echo "token_value")
+
+export --debug --link=https://dhlapi-dev.metadeploy.com/api-reference/clone-product-classification-tool-cli#downloads-section -k --api-page-directory=/product-classification-tool/pct/webapi/apidocs --token-file=./token_file
+
+update --debug --link=https://dhlapi-dev.metadeploy.com/api-reference/clone-product-classification-tool-cli#downloads-section -k --api-page-directory=/product-classification-tool/pct/webapi/apidocs --token-file=./token_file
+

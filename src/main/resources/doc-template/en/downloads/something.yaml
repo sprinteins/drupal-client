@@ -1,0 +1,828 @@
+swagger: '2.0'
+info:
+  description: >-
+    This API is designed to classify products based on their description and optionally on additional information into the categories of the Harmonized System (HS) of the World Customs Organization.
+    In addition to the 6 digit HS standard, additional standards may be supported. Which systems are supported by a running instance of this API can be queried
+    at the /classification-standards and /classifiers endpoints.
+
+  title: Product Classification Tool
+  version: "3.0.0"
+tags:
+  - name: API
+    description: >-
+      Publicly usable API of the product classification tool. These endpoints will be kept stable in newer API versions.
+  - name: APIv1
+    description: >-
+      Deprecated endpoints of the first API version.
+
+host: "api.dhl.com"
+basePath: "/product-classification/xbu"
+
+securityDefinitions:
+  OauthSecurity:
+    type: oauth2
+    description: OAuth2 secured area for tokens.
+    flow: application
+    tokenUrl: https://google.com
+    x-tokenName: id_token
+    x-tokenInfoFunc: pct.webapi.auth.get_token_info
+    scopes:
+      classification: Read access to the classification endpoints
+
+security:
+  - OauthSecurity:
+      - classification
+
+paths:
+  /classifiers:
+    get:
+      tags:
+        - API
+      operationId: something
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            maxItems: 100
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 30
+                  example: "XBU NMT D hs en"
+                  description: >-
+                    Name of the classifier as it also appears in the response of the /classification endpoint.
+                description:
+                  type: string
+                  maxLength: 100
+                  example: NMT model based on product description
+                  description: >-
+                    More detailed description of the classifier.
+                classificationStandard:
+                  type: string
+                  maxLength: 20
+                  example: hs
+                  description: Classification system used by this classifier.
+                inputLanguage:
+                  type: string
+                  minLength: 2
+                  maxLength: 2
+                  example: en
+                  description: Supported input language for classification.  2 letter language code as defined by ISO 639-1.
+      summary: >-
+        Returns the list of classifiers provided by this API instance.
+      description: >-
+        Every item in the list returned represents a classifier that has been loaded into the API at startup.
+
+definitions:
+  location:
+    properties:
+      postalCode:
+        type: string
+        minLength: 1
+        maxLength: 20
+        example: >-
+          85705
+      city:
+        type: string
+        example: Phoenix
+        minLength: 1
+        maxLength: 40
+      state:
+        type: string
+        minLength: 1
+        maxLength: 20
+        example: AZ
+        description: >-
+          Province or federal state within the country.
+      country:
+        type: string
+        example: US
+        minLength: 2
+        maxLength: 2
+        description: >-
+          "Expected format: Two letter ISO country code based on the
+          ISO 3166-1 alpha 2 standard."
+    type: object
+  monetaryValue:
+    required:
+      - value
+      - currency
+    properties:
+      value:
+        type: number
+        format: double
+        minimum: 0
+        example: 9.95
+      currency:
+        type: string
+        description: ISO 4217 3 character currency code. Only "USD" is supported at the moment!
+        example: USD
+        minLength: 3
+        maxLength: 3
+    type: object
+  classificationList:
+    type: object
+    required:
+      - items
+    properties:
+      language:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      classificationStandard:
+        type: string
+        maxLength: 20
+        example: hs
+        description: >-
+          Classification system to used. The values supported by the API can
+          be queried from the /classification-standards endpoint.
+          Example value: "hs"
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          $ref: '#/definitions/classification'
+
+  classificationList_v2:
+    type: object
+    required:
+      - items
+    properties:
+      inputLanguage:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      classificationStandard:
+        type: string
+        maxLength: 20
+        example: hs
+        description: >-
+          Classification system to used. The values supported by the API can
+          be queried from the /classification-standards endpoint.
+          Example value: "hs"
+      confidenceThreshold:
+        type: integer
+        minimum: 0
+        maximum: 100
+        default: 5
+        example: 5
+        description: >-
+          Confidence value threshold used in the query. This is a percentage.
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          $ref: '#/definitions/classification'
+
+  multiResultClassificationList:
+    required:
+      - items
+    properties:
+      language:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      classificationStandard:
+        type: string
+        maxLength: 20
+        example: hs
+        description: >-
+          Classification system to be used. The values supported by the API can
+          be queried from the /classification-standards endpoint.
+          Example value: "hs"
+      confidenceThreshold:
+        type: integer
+        minimum: 0
+        maximum: 100
+        default: 5
+        example: 5
+        description: >-
+          Confidence value threshold used in the query. This is a percentage.
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          type: object
+          required:
+            - itemDescription
+            - results
+          example:
+            {
+              "language": "en",
+              "classificationStandard": "hs",
+              "confidenceThreshold": 5,
+              "items": [
+                {
+                  "itemDescription": "Men's Stay Cool Slim Fit Oxford Shirt Broad Collar",
+                  "itemSellerAddress": {
+                    "postalCode": "85705",
+                    "city": "Phoenix",
+                    "state": "AZ",
+                    "country": "US"
+                  },
+                  "skuNumber": "X93749",
+                  "results": [
+                    {
+                      "code": "620520",
+                      "confidence": 100,
+                      "classifier": "ExactHashMatch",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription",
+                        "skuNumber"
+                      ]
+                    },
+                    {
+                      "code": "102030",
+                      "confidence": 65,
+                      "classifier": "LogRegression Desc+Address",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription"
+                      ]
+                    },
+                    {
+                      "code": "102010",
+                      "confidence": 20,
+                      "classifier": "LogRegression Desc+Address",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          properties:
+            itemDescription:
+              type: string
+              maxLength: 300
+              description: >-
+                Description of the product. The longer the description,
+                the better the chances are to get a correct classification.
+              example: >-
+                Men's Stay Cool Slim Fit Oxford Shirt Broad Collar
+            itemSellerAddress:
+              description: Adress of the item seller/merchant.
+              allOf:
+                - $ref: '#/definitions/location'
+            skuNumber:
+              type: string
+              maxLength: 50
+              description: Stock keeping unit number assigned to the product.
+              example: "X93749"
+            itemValue:
+              description: >-
+                The total net value of the item, excluding any taxes,
+                fees and dues. As currency only "USD" is supported at the moment!
+              allOf:
+                - $ref: '#/definitions/monetaryValue'
+            results:
+              type: array
+              maxItems: 100
+              items:
+                type: object
+                description: >-
+                  Actual result of the classification. This is a list of items with the
+                  same length and order as the input items. Every list item is an object
+                  containing the original query item and a list of results. These are
+                  the most likely customs categories for the item.
+                required:
+                  - code
+                  - confidence
+                  - classifier
+                  - fieldsUsed
+                properties:
+                  code:
+                    type: string
+                    minLength: 2
+                    maxLength: 15
+                    description: >-
+                      The code of the class the item has been classified into
+                      according to the classification system employed.
+                      A string of correct length but with only zeroes (e.g. '000000' for hs)
+                      is used to signal that no match was found.
+                    example: '102030'
+                  confidence:
+                    type: number
+                    format: int32
+                    minimum: 0
+                    maximum: 100
+                    description: >-
+                      Confidence of the classification, i.e. estimated probability for the
+                      classification to be correct. This is a percentage.
+                      Would be 0 in case of no match and 100 in case of an exact match.
+                    example: 65
+                  classifier:
+                    type: string
+                    maxLength: 30
+                    description: >-
+                      Name of the engine which created the classification. All possible values can be queried from the /classifiers endpoint.
+                    example: ExactMatch Connect
+                  fieldsUsed:
+                    type: array
+                    minItems: 0
+                    maxItems: 10
+                    description: >-
+                      List of fields actually used for the classification. These reflect the field names used in the query.
+                    example: ["itemSellerAddress", "itemDescription"]
+                    items:
+                      type: string
+
+  multiResultClassificationList_v2:
+    required:
+      - items
+    properties:
+      inputLanguage:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      classificationStandard:
+        type: string
+        maxLength: 20
+        example: hs
+        description: >-
+          Classification system to be used. The values supported by the API can
+          be queried from the /classification-standards endpoint.
+          Example value: "hs"
+      confidenceThreshold:
+        type: integer
+        minimum: 0
+        maximum: 100
+        default: 5
+        example: 5
+        description: >-
+          Confidence value threshold used in the query. This is a percentage.
+      allowedCodes:
+        type: array
+        maxItems: 1000
+        items:
+          type: string
+          minLength: 2
+          maxLength: 31
+        description: >-
+          Pre-specified codes to restrict the range of customs codes which
+          can be returned by the API. For example ["02"] would ensure that
+          the item can only be classified into HS Chapter 2. In this case
+          "020100" would be a possibly returned classification, but "010500"
+          would not be.
+          
+          It is possible to specify a list of possible codes with differing length and also ranges e.g. ["40", "4201", "6403-6406"].
+          
+          Note that the API understands the given codes from the perspective of
+          the target classification standard. So if the target standard is
+          for example "au-import" and the code "0101210021" is specified as
+          an allowed code, it is expected that this code also refers to the
+          Australian import standard and there is no translation being done.
+          If a code from a different standard is available it can however be
+          shortened to the common international level befor.
+        example: ["40", "42"]
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          type: object
+          required:
+            - itemDescription
+            - results
+          example:
+            {
+              "inputLanguage": "en",
+              "classificationStandard": "hs",
+              "confidenceThreshold": 5,
+              "items": [
+                {
+                  "itemDescription": "EYE PALETTE COSMETIC PRESSED POWDER",
+                  "itemSellerAddress": {
+                    "postalCode": "85705",
+                    "city": "Phoenix",
+                    "state": "AZ",
+                    "country": "US"
+                  },
+                  "skuNumber": "X93749",
+                  "results": [
+                    {
+                      "code": "330420",
+                      "confidence": 57,
+                      "classifier": "XBU NMT D hs en",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription",
+                        "skuNumber"
+                      ]
+                    },
+                    {
+                      "code": "330499",
+                      "confidence": 28,
+                      "classifier": "XBU NMT D hs en",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription"
+                      ]
+                    },
+                    {
+                      "code": "330491",
+                      "confidence": 9,
+                      "classifier": "XBU NMT D hs en",
+                      "fieldsUsed": [
+                        "itemSellerAddress",
+                        "itemDescription"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          properties:
+            itemDescription:
+              type: string
+              maxLength: 300
+              description: >-
+                Description of the product. The longer the description,
+                the better the chances are to get a correct classification.
+              example: >-
+                Men's Stay Cool Slim Fit Oxford Shirt Broad Collar
+            itemSellerAddress:
+              description: Adress of the item seller/merchant.
+              allOf:
+                - $ref: '#/definitions/location'
+            skuNumber:
+              type: string
+              maxLength: 50
+              description: Stock keeping unit number assigned to the product.
+              example: "X93749"
+            itemValue:
+              description: >-
+                The total net value of the item, excluding any taxes,
+                fees and dues. As currency only "USD" is supported at the moment!
+              allOf:
+                - $ref: '#/definitions/monetaryValue'
+            results:
+              type: array
+              maxItems: 100
+              items:
+                type: object
+                description: >-
+                  Actual result of the classification. This is a list of items with the
+                  same length and order as the input items. Every list item is an object
+                  containing the original query item and a list of results. These are
+                  the most likely customs categories for the item.
+                required:
+                  - code
+                  - confidence
+                  - classifier
+                  - fieldsUsed
+                properties:
+                  code:
+                    type: string
+                    minLength: 2
+                    maxLength: 15
+                    description: >-
+                      The code of the class the item has been classified into
+                      according to the classification system employed.
+                      A string of correct length but with only zeroes (e.g. '000000' for hs)
+                      is used to signal that no match was found.
+                    example: '102030'
+                  confidence:
+                    type: number
+                    format: int32
+                    minimum: 0
+                    maximum: 100
+                    description: >-
+                      Confidence of the classification, i.e. estimated probability for the
+                      classification to be correct. This is a percentage.
+                      Would be 0 in case of no match and 100 in case of an exact match.
+                    example: 65
+                  classifier:
+                    type: string
+                    maxLength: 30
+                    description: >-
+                      Name of the engine which created the classification. All possible values can be queried from the /classifiers endpoint.
+                    example: ExactMatch Connect
+                  fieldsUsed:
+                    type: array
+                    minItems: 0
+                    maxItems: 10
+                    description: >-
+                      List of fields actually used for the classification. These reflect the field names used in the query.
+                    example: ["itemSellerAddress", "itemDescription"]
+                    items:
+                      type: string
+
+  classificationQueryList:
+    type: object
+    required:
+      - items
+    properties:
+      language:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          $ref: '#/definitions/classificationQuery'
+    example:
+      {"items": [{"itemDescription": "T-Shirt Blue XL Cotton"}]}
+
+  classificationQueryList_v2:
+    type: object
+    required:
+      - items
+    properties:
+      inputLanguage:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          $ref: '#/definitions/classificationQuery'
+    example:
+      {"items": [{"itemDescription": "EYE PALETTE COSMETIC PRESSED POWDER"}]}
+  classificationQueryList_multi_v2:
+    type: object
+    required:
+      - items
+    properties:
+      inputLanguage:
+        type: string
+        minLength: 2
+        maxLength: 2
+        default: en
+        description: >-
+          Language of the input text. 2 letter language codes as defined by ISO 639-1.
+          Currently only \"en\" is supported.
+      items:
+        type: array
+        maxItems: 2000
+        items:
+          $ref: '#/definitions/classificationQuery_multi'
+    example:
+      {"items": [{"itemDescription": "EYE PALETTE COSMETIC PRESSED POWDER"}]}
+
+  classification:
+    type: object
+    required:
+      - itemDescription
+      - code
+      - confidence
+      - classifier
+      - fieldsUsed
+    properties:
+      code:
+        type: string
+        minLength: 2
+        maxLength: 15
+        description: >-
+          The code of the class the item has been classified into
+          according to the classification system employed.
+          A string of correct length but with only zeroes (e.g. '000000' for hs)
+          is used to signal that no match was found.
+        example: '330420'
+      confidence:
+        type: number
+        format: int32
+        minimum: 0
+        maximum: 100
+        description: >-
+          Confidence of the classification, i.e. estimated probability for the
+          classification to be correct. This is a percentage.
+          Would be 0 in case of no match and 100 in case of an exact match.
+        example: 57
+      classifier:
+        type: string
+        maxLength: 30
+        description: >-
+          Name of the engine which created the classification. All possible values can be queried from the /classifiers endpoint.
+        example: XBU NMT D hs en
+      fieldsUsed:
+        type: array
+        minItems: 0
+        maxItems: 10
+        description: >-
+          List of fields actually used for the classification. These reflect the field names used in the query.
+        example: ["itemSellerAddress", "itemDescription"]
+        items:
+          type: string
+      itemDescription:
+        type: string
+        maxLength: 300
+        description: >-
+          Description of the product. The longer the description,
+          the better the chances are to get a correct classification.
+        example: >-
+          EYE PALETTE COSMETIC PRESSED POWDER
+      itemSellerAddress:
+        description: Adress of the item seller/merchant.
+        allOf:
+          - $ref: '#/definitions/location'
+      skuNumber:
+        type: string
+        maxLength: 50
+        description: Stock keeping unit number assigned to the product.
+        example: "X93749"
+      itemValue:
+        description: >-
+          The total net value of the item, excluding any taxes,
+          fees and dues. As currency only "USD" is supported at the moment!
+        allOf:
+          - $ref: '#/definitions/monetaryValue'
+      shipmentInfo:
+        description: Information about a shipment containing the product to classify.
+        allOf:
+          - $ref: '#/definitions/shipmentInfo'
+
+  classificationQuery:
+    type: object
+    required:
+      - itemDescription
+    example:
+      {
+        "itemDescription": "EYE PALETTE COSMETIC PRESSED POWDER",
+        "itemSellerAddress": {
+          "postalCode": "85705",
+          "city": "Phoenix",
+          "state": "AZ",
+          "country": "US"
+        },
+        "skuNumber": "X93749"
+      }
+    properties:
+      itemDescription:
+        type: string
+        maxLength: 300
+        description: >-
+          Description of the product. The longer the description,
+          the better the chances are to get a correct classification.
+        example: >-
+          Men's Stay Cool Slim Fit Oxford Shirt Broad Collar
+      itemSellerAddress:
+        description: Adress of the item seller/merchant.
+        allOf:
+          - $ref: '#/definitions/location'
+      skuNumber:
+        type: string
+        maxLength: 50
+        description: Stock keeping unit number assigned to the product.
+        example: "X93749"
+      itemValue:
+        description: >-
+          The total net value of the item, excluding any taxes,
+          fees and dues. As currency only "USD" is supported at the moment!
+        allOf:
+          - $ref: '#/definitions/monetaryValue'
+      shipmentInfo:
+        description: Information about a shipment containing the product to classify.
+        allOf:
+          - $ref: '#/definitions/shipmentInfo'
+  classificationQuery_multi:
+    type: object
+    required:
+      - itemDescription
+    example:
+      {
+        "itemDescription": "Men's Stay Cool Slim Fit Oxford Shirt Broad Collar",
+        "itemSellerAddress": {
+          "postalCode": "85705",
+          "city": "Phoenix",
+          "state": "AZ",
+          "country": "US"
+        },
+        "skuNumber": "X93749"
+      }
+    properties:
+      itemDescription:
+        type: string
+        maxLength: 300
+        description: >-
+          Description of the product. The longer the description,
+          the better the chances are to get a correct classification.
+        example: >-
+          Men's Stay Cool Slim Fit Oxford Shirt Broad Collar
+      itemSellerAddress:
+        description: Adress of the item seller/merchant.
+        allOf:
+          - $ref: '#/definitions/location'
+      skuNumber:
+        type: string
+        maxLength: 50
+        description: Stock keeping unit number assigned to the product.
+        example: "X93749"
+      itemValue:
+        description: >-
+          The total net value of the item, excluding any taxes,
+          fees and dues. As currency only "USD" is supported at the moment!
+        allOf:
+          - $ref: '#/definitions/monetaryValue'
+      shipmentInfo:
+        description: Information about a shipment containing the product to classify.
+        allOf:
+          - $ref: '#/definitions/shipmentInfo'
+      allowedCodes:
+        type: array
+        maxItems: 1000
+        items:
+          type: string
+          minLength: 2
+          maxLength: 31
+        description: >-
+          Pre-specified codes to restrict the range of customs codes which
+          can be returned by the API. For example ["02"] would ensure that
+          the item can only be classified into HS Chapter 2. In this case
+          "020100" would be a possibly returned classification, but "010500"
+          would not be.
+
+          It is possible to specify a list of possible codes with differing length and also ranges e.g. ["40", "4201", "6403-6406"].
+
+          Note that the API understands the given codes from the perspective of
+          the target classification standard. So if the target standard is
+          for example "au-import" and the code "0101210021" is specified as
+          an allowed code, it is expected that this code also refers to the
+          Australian import standard and there is no translation being done.
+          If a code from a different standard is available it can however be
+          shortened to the common international level before.
+        example: ["40", "42"]
+  shipmentInfo:
+    type: object
+    description: Information about a shipment
+    properties:
+      originAirport:
+        description: >-
+          Origin airport code.
+        type: string
+        maxLength: 3
+        example: ORD
+      destinationAirport:
+        description: >-
+          Destination airport code.
+        type: string
+        maxLength: 3
+        example: CGN
+  error:
+    type: object
+    description: Problem details object as described in <https://tools.ietf.org/html/rfc7807>
+    required:
+      - type
+      - status
+      - title
+    properties:
+      detail:
+        type: string
+        example: "'itemDescription' is a required property"
+        description: >-
+          A human readable explanation specific to this occurrence of the problem.
+      status:
+        type: number
+        format: int32
+        example: 400
+        description: >-
+          The HTTP status code ([RFC7231], Section 6)
+          generated by the origin server for this occurrence of the problem.
+      title:
+        type: string
+        example: Bad Request
+        description: >-
+          A short, human-readable summary of the problem
+          type.
+          It is essentially just the description belonging to the HTTP status code.
+      type:
+        type: string
+        description: >-
+          An absolute URI [RFC3986] that identifies the
+          problem type.  When dereferenced, it SHOULD provide human-readable
+          documentation for the problem type (e.g., using HTML
+          [W3C.REC-html401-19991224]).  When this member is not present, its
+          value is assumed to be "about:blank".
