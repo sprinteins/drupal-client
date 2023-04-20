@@ -3,7 +3,12 @@
 ## Installation guide
 
 ### With Dockerfile
+#### Preconditions:
+**For Windows:** You have to have Docker approved in GSN and installed on your laptop;
 
+**For Unix:** You have to have Docker installed on your laptop;
+
+#### Steps:
 1. Install Docker on your machine
 2. Build the project using 
 `docker build -t cli-tool:latest .`
